@@ -1,19 +1,29 @@
-# SatKit
+# SatelliteKit
 ___Satellite Prediction Library___
 
-`SatKit` is a library, written in Swift, implementing the SGP4/SDP4 earth-orbiting satellite
+`SatelliteKit` is a library, written in Swift, implementing the SGP4/SDP4 earth-orbiting satellite
 propagation algorithms first published in the
 [SpaceTrack Report #3](https://celestrak.com/NORAD/documentation/)
 and later refined by Vallado et al in
 [Revisiting Spacetrack Report #3](https://celestrak.com/publications/AIAA/2006-6753/).
 
 The code of this library is derived from [Orekit](https://www.orekit.org) which, in part,
-implements the above published algorithms.  Test output from SatKit agrees,
+implements the above published algorithms.  Test output from `SatelliteKit` agrees,
 to meaninglessly high precision, with Orekit test output and the test output in
 the above published paper [1].
 
 [1] "Vallado, David A.; Paul Crawford; Richard Hujsak; T. S. Kelso,
 (August 2006), Revisiting Spacetrack Report #3".
+
+
+  _Some people will be surprised by some of my source code comment format; it is a style
+  I inherited from a systems programming language I used long ago and it is really not
+  appropriate for publicly released code in the modern age (especially since Swift has
+  markup built in).  I also note that there is extensive use
+  of Unicode characters in property names and other places.  This attempts to match, as
+  much as is reasonable, the mathematical notation and Greek characters usage in the
+  original 1980 Spacetrack Report._
+
 
 ### Change Notes
 
@@ -130,7 +140,7 @@ The `debugDescription` of the state vectors in `pv1` is (position in meters, vel
 
 ### Platforms
 
-SatKit has been used for applications on iOS devices (iPhone, iPad and TV),
+`SatelliteKit` has been used for applications on iOS devices (iPhone, iPad and TV),
 and Macintosh computers (GUI and command line).  It has not yet been
 exposed to the Unix Swift enviroment.
 
@@ -139,23 +149,9 @@ exposed to the Unix Swift enviroment.
 Translation from C++ and Java, testing and distribution by [Gavin Eadie](mailto:gavineadie.dev@icloud.com)
 
 ---
-- `2018 May 04 .. First documentation release`
+- `2019 Jun 14 .. version 1.0.0)`
 
-- `2018 Oct 18 .. Private repository (version #113)`
-
-  Some people will be surprised by some of my source code comment format; it is a style
-  I inherited from a systems programming language I used long ago and it is really not
-  appropriate for publicly released code in the modern age (especially since Swift has
-  markup built in).
-
-  I also note, as this code moves from personal to public, that there is extensive use
-  of Unicode characters in property names and other places.  This attempts to match, as
-  much as is reasonable, the mathematical notation and Greek characters usage in the
-  original 1980 Spacetrack Report.
-
-- `2019 Jun 14 .. Private repository made public (version 1.1.5)`
-
-  Start using Swift Package Manager (SPM).
+  First Swift Package Manager (SwiftPM) version.
 
 ---
 
