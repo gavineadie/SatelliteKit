@@ -8,8 +8,10 @@ import Foundation
 public struct SatelliteKit {
 
     public static var version: String {
-        guard let satkitBundle = Bundle(identifier: "com.ramsaycons.SatKit"),
-              let plistDictionary = satkitBundle.infoDictionary else { return "" }
+        guard let satelliteKitBundle = Bundle(identifier: "com.ramsaycons.SatelliteKit"),
+              let plistDictionary = satelliteKitBundle.infoDictionary else {
+                return "No 'SatelliteKit' Info.plist"
+        }
 
         return String(format: "%@ v%@ (#%@) [%@ @ %@]",
                       plistDictionary["CFBundleName"] as? String ?? "Library",
