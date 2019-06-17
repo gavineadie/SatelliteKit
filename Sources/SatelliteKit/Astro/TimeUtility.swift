@@ -26,7 +26,7 @@ public struct JD {
            static let epoch1900 = 2415020.0             // 1900 Jan 0.5
     public static let epoch1950 = 2433281.5             // 1949-Dec-31 00h00m00.0s
            static let epochUnix = 2440587.5             // 1970-Jan-01 00h00m00.0s
-           static let epoch2000 = 2451545.0             // 2000 Jan 1.5
+    public static let epoch2000 = 2451545.0             // 2000 Jan 1.5
     public static let appleZero = 2451910.5             // 2001-Jan-01 00h00m00.0s (CFAbsoluteTime zero)
 
 }
