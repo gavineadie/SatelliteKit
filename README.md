@@ -19,7 +19,9 @@ the above published paper [1].
   _Some people will be surprised by some of my source code comment format; it is a style
   I inherited from a systems programming language I used long ago and it is really not
   appropriate for publicly released code in the modern age (especially since Swift has
-  markup built in).  I also note that there is extensive use
+  markup built in)._
+
+  _Also note that there is extensive use
   of Unicode characters in property names and other places.  This attempts to match, as
   much as is reasonable, the mathematical notation and Greek characters usage in the
   original 1980 Spacetrack Report._
@@ -85,7 +87,7 @@ determined within the `TLEPropagator` initialization.
 
 The initializer is called internally by the static function:
 
-    public func selectPropagator(tle: TLE) -> TLEPropagator {
+    public func selectPropagator(tle: TLE) -> TLEPropagator
 
 The `TLEPropagator` class offers no public properties and two public functions.  Both functions
 accept a time argument and provide postion and velocity state vectors as output.
@@ -100,15 +102,15 @@ suggests various problems in the modeled physical world (perigee below the groun
 
 The `PVCoordinates` structure returned by the propagator encapsulates position and velocity vectors:
 
-    public struct PVCoordinates {
-        public var position: Vector                 // position in meters
-        public var velocity: Vector                 // velocity in m/sec
-    }
-
     public struct Vector {
         public var x: Double
         public var y: Double
         public var z: Double
+    }
+
+    public struct PVCoordinates {
+        public var position: Vector                 // position in meters
+        public var velocity: Vector                 // velocity in m/sec
     }
 
 ### Sample Usage
@@ -149,7 +151,7 @@ exposed to the Unix Swift enviroment.
 Translation from C++ and Java, testing and distribution by [Gavin Eadie](mailto:gavineadie.dev@icloud.com)
 
 ---
-- `2019 Jun 14 .. version 1.0.0)`
+- `version/tag 1.0.0 .. (2019 Jun 14)`
 
   First Swift Package Manager (SwiftPM) version.
 

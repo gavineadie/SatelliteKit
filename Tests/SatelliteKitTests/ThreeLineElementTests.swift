@@ -190,12 +190,12 @@ class ThreeLineElementTests: XCTestCase {
         XCTAssert(base10ID("99999") == 99999, "got \(base10ID("99999"))")
     }
 
-    func testPerformanceExample() {         // May06/19 = iOS sim average: 2.267
-
-        self.measure {
-            testLongFile()
-        }
-    }
+//    func testPerformanceExample() {         // May06/19 = iOS sim average: 2.267
+//
+//        self.measure {
+//            testLongFile()
+//        }
+//    }
 
 }
 

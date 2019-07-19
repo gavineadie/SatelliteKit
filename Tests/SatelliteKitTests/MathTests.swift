@@ -51,6 +51,35 @@ class MathTests: XCTestCase {
 
         }
 
+        func testLimits() {
+            XCTAssertEqual(limit180(180.0), 180.0)
+            XCTAssertEqual(limit180(120.0), 120.0)
+            XCTAssertEqual(limit180(60.0), 60.0)
+            XCTAssertEqual(limit180(0.0), 0.0)
+            XCTAssertEqual(limit180(-60.0), -60.0)
+            XCTAssertEqual(limit180(-120.0), -120.0)
+            XCTAssertEqual(limit180(-180.0), -180.0)
+            XCTAssertEqual(limit180(-240.0), 120.0)
+
+            XCTAssertEqual(limit360(420.0), 60.0)
+            XCTAssertEqual(limit360(360.0), 360.0)
+            XCTAssertEqual(limit360(300.0), 300.0)
+            XCTAssertEqual(limit360(240.0), 240.0)
+            XCTAssertEqual(limit360(180.0), 180.0)
+            XCTAssertEqual(limit360(120.0), 120.0)
+            XCTAssertEqual(limit360(60.0), 60.0)
+            XCTAssertEqual(limit360(0.0), 0.0)
+            XCTAssertEqual(limit360(-60.0), 300.0)
+            XCTAssertEqual(limit360(-120.0), 240.0)
+            XCTAssertEqual(limit360(-180.0), 180.0)
+            XCTAssertEqual(limit360(-240.0), 120.0)
+
+            XCTAssertEqual(limit360(360.00001),   0.00001, accuracy: 0.0000000001)
+            XCTAssertEqual(limit360(360.00000), 360.0)
+            XCTAssertEqual(limit360(359.99999), 359.99999, accuracy: 0.0000000001)
+
+        }
+
         func testnormalizeAngle() {
 
             for angle in stride(from: -400.0, to: +400.0, by: 20.0) {
@@ -59,13 +88,35 @@ class MathTests: XCTestCase {
 
         }
 
-    }
-
-//    func testPerformanceExample() {
+//        @available(OSX 10.12, *)
+//        func testUnits() {
+//            let degrees = Measurement<UnitAngle>(value: 1.0, unit: .degrees)
+//            print(degrees.description)
 //
-//        self.measure {
-//            // Put the code you want to measure the time of here.
+//            let radians = Measurement<UnitAngle>(value: 1.0, unit: .radians)
+//            print(radians.description)
 //        }
-//    }
+
+        func testPerformanceLimit180() {
+
+            self.measure {
+                for angle in stride(from: -400.0, to: +400.0, by: 20.0) {
+                    _ = limit180(angle)
+                }
+            }
+
+        }
+
+        func testPerformanceLimit360() {
+
+            self.measure {
+                for angle in stride(from: -220.0, to: +580.0, by: 20.0) {
+                    _ = limit360(angle)
+                }
+            }
+
+        }
+
+    }
 
 }

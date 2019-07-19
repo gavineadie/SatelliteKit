@@ -42,9 +42,9 @@ prefix func √ <T: FloatingPoint>(float: T) -> T {
   ┃                      unit of least precision (ULP) is the spacing between floating-point numbers ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 public func almostEqual(_ a: Double, _ b: Double) -> Bool {
-    return a == b ||
-           a == nextafter(b, +.greatestFiniteMagnitude) ||
-           a == nextafter(b, -.greatestFiniteMagnitude)
+    return a == b || a == b.nextUp || a == b.nextDown
+//           a == nextafter(b, +.greatestFiniteMagnitude) ||
+//           a == nextafter(b, -.greatestFiniteMagnitude)
 }
 
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -140,19 +140,6 @@ func ⨯ (_ vector1: Vector, _ vector2: Vector) -> Vector {
 }
 
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
-  ║                                                                         M E A S U R E M E N T S  ║
-  ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
-
-@available(iOS 10.0, tvOS 10.0, OSX 10.12, *)
-extension Measurement {
-    typealias Angle = Measurement<UnitAngle>
-
-    public init(_ value: Double, _ unit: UnitType) {
-        self.init(value: value, unit: unit)
-    }
-}
-
-/*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║                                                                         T R I G O N O M E T R Y  ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
@@ -205,5 +192,15 @@ public func limit180 (_ value: Double) -> Double {
     var value = value
     while value > +180.0 { value -= 360.0 }
     while value < -180.0 { value += 360.0 }
+    return value
+}
+
+/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃ limit360(degrees) -- limits 'degrees' to 0°..+360°                                               ┃
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+public func limit360 (_ value: Double) -> Double {
+    var value = value
+    while value > +360.0 { value -= 360.0 }
+    while value <    0.0 { value += 360.0 }
     return value
 }

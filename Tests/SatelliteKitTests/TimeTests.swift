@@ -60,6 +60,7 @@ class TimeTests: XCTestCase {
 
     func testDeg2hms() {
 
+        print(stringHMS(hms: deg2hms(decimalDegrees: 179.5)))
         print(stringHMS(hms: deg2hms(decimalDegrees: 180.0)))
         print(stringHMS(hms: deg2hms(decimalDegrees: 180.1)))
         print(stringHMS(hms: deg2hms(decimalDegrees: 180.5)))

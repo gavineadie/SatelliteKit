@@ -7,6 +7,8 @@ import Foundation
 
 public struct SatelliteKit {
 
+    var staticVersion = "~~AppBuildDate~~ ~~AppBuildTime~~"
+
     public static var version: String {
         guard let satelliteKitBundle = Bundle(identifier: "com.ramsaycons.SatelliteKit"),
               let plistDictionary = satelliteKitBundle.infoDictionary else {
