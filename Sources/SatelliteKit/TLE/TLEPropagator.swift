@@ -59,8 +59,6 @@ public class TLEPropagator {
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     let tle: TLE
 
-    let perigee: Double                     // perigee altitude, expressed in Kms.
-
     let θ²: Double                          //
 
     let M_dot: Double                       // common parameter for mean anomaly (M) computation.
@@ -68,14 +66,14 @@ public class TLEPropagator {
     let Ω_dot: Double                       // common parameter for raan (Ω) computation.
     let xnodcf: Double                      // common parameter for raan ( ) computation.
 
-    let e₀²: Double                         // original eccentricity squared .. e²
-    let β₀²: Double                         //                                1-e²
-    let β₀: Double                          //                              √(1-e²)
+    let e₀²: Double                         // original eccentricity squared .. e₀²
+    let β₀²: Double                         //                                1-e₀²
+    let β₀: Double                          //                              √(1-e₀²)
 
     let ξ: Double                           // tsi from SPTRCK #3.
     let η: Double                           // eta from SPTRCK #3.
     let η²: Double                          // eta squared.
-    let eeta: Double                        // original eccentricity * eta.
+    let eeta: Double                        // original e₀ * eta.
 
     let coef: Double                        // coef for SGP C3 computation.
     let coef1: Double                       // coef for SGP C5 computation.
@@ -114,10 +112,9 @@ public class TLEPropagator {
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆ For perigee below 156Km, the values of s and (q₀-s)⁴ are changed                                 ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
-        self.perigee = (self.tle.a₀ * (1.0 - self.tle.e₀) - 1.0) * TLEConstants.Rₑ
-        switch self.perigee {
-        case ...98.0:       self.s = 20.0
-        case 98.0...156.0:  self.s = self.perigee - 78.0
+        switch self.tle.perigee {
+        case ..<98.0:       self.s = 20.0
+        case 98.0...156.0:  self.s = self.tle.perigee - 78.0
         default:            self.s = 78.0
         }
         let q₀_s = (120.0 - self.s) / TLEConstants.Rₑ

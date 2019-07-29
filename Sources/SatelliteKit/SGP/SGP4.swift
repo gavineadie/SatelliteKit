@@ -33,7 +33,7 @@ class SGP4: TLEPropagator {
   ┆ and quadratic variation in mean anomaly. Also, the c₃ term, the delta omega term, and the delta  ┆
   ┆ m term are dropped.                                                                              ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
-        if super.perigee > 220 {
+        if super.tle.perigee > 220 {
             let _delM₀ = 1.0 + super.η * cos(super.tle.M₀)
             delM₀³ = _delM₀ * _delM₀ * _delM₀
 
@@ -82,7 +82,7 @@ class SGP4: TLEPropagator {
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆ if above 220Kms, do some more work .. adjust xmp, tempa, tempe, templ ..                         ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
-        if super.perigee > 220 {
+        if super.tle.perigee > 220 {
             let delomg = omgcof * minsAfterEpoch
             var delm = 1.0 + super.η * cos(anomdf)
             delm = xmcof * (delm * delm * delm - delM₀³)
@@ -117,7 +117,7 @@ class SGP4: TLEPropagator {
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃ example:  g211 =    3.616  -   13.247  * super.tle.e₀ +   16.290  * super.e₀²                    ┃
-  ┃           g211 = CubicPoly(x: super.tle.e₀, co: 3.616, l: -13.247, s: +16.290, cu: 0.0)          ┃
+  ┃           g211 = CubicPoly(x: super.tle.e₀, p⁰: 3.616, p¹: -13.247, p²: +16.290, p³: 0.0)        ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 public func CubicPoly(x: Double, p⁰: Double, p¹: Double, p²: Double, p³: Double) -> Double {
     return p⁰ + x * (p¹ + x * (p² + x * p³))

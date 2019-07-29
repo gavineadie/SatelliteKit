@@ -57,6 +57,9 @@ public struct TLE {
     private let tleNumber: Int                          // Element number.
     private let revNumber: Int                          // Revolution number at epoch.
 
+    internal let apogee: Double                         // TLE apogee altitude, expressed in Kms.
+    internal let perigee: Double                        // TLE perigee altitude, expressed in Kms.
+
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public init(_ line0: String, _ line1: String, _ line2: String) throws {
@@ -205,6 +208,8 @@ public struct TLE {
             self.a₀ = a₁  / (1.0 - δ₀)                               //             a₀
         }
 
+        self.apogee = (self.a₀ * (1.0 + self.e₀) - 1.0) * TLEConstants.Rₑ
+        self.perigee = (self.a₀ * (1.0 - self.e₀) - 1.0) * TLEConstants.Rₑ
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
