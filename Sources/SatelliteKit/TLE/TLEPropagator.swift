@@ -34,7 +34,7 @@ import Foundation
   ┃  @author Fabien Maussion (java translation)                                                      ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 
-struct TLEConstants {
+public struct TLEConstants {
 
      public static let Rₑ = 6378.135                    // Earth radius (Km)
 
