@@ -15,12 +15,12 @@ enum SatKitError: Error {
 }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │  An epoch of 98001.00000000 corresponds to 0000 UT on 1998 January 01—in other words, midnight   │
-  │  between 1997 December 31 and 1998 January 01. An epoch of 98000.00000000 would actually         │
-  │  correspond to the beginning of 1997 December 31. Note that the epoch day starts at UT midnight  │
-  │  (not noon) and that all times are measured mean solar rather than sidereal time units.          │
+  │ An epoch of 98001.00000000 corresponds to 0000 UT on 1998 January 01 — in other words, midnight  │
+  │ between 1997 December 31 and 1998 January 01. An epoch of 98000.00000000 would actually          │
+  │ correspond to the beginning of 1997 December 31. Note that the epoch day starts at UT midnight   │
+  │ (not noon) and that all times are measured mean solar rather than sidereal time units.           │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-private func epochDays(year: Int, days: Double) -> Double {
+ func epochDays(year: Int, days: Double) -> Double {
     return Double(year-1950)*365.0 + Double((year-1949)/4) + days
 }
 
@@ -52,7 +52,7 @@ public struct TLE {
     private let launchSequ: Int                         // Launch number.
     private let launchPart: String                      // Piece of launch (from "A" to "ZZZ").
 
-    private let ephemType: Int                          // Type of ephemeris.
+    public let ephemType: Int                           // Type of ephemeris.
     private let tleClass: Character                     // Classification (U for unclassified).
     private let tleNumber: Int                          // Element number.
     private let revNumber: Int                          // Revolution number at epoch.
@@ -134,9 +134,6 @@ public struct TLE {
 
         stringlet = String(bytes: lineOneBytes[62...62], encoding: .utf8)!
         self.ephemType = Int(stringlet) ?? 0
-        guard self.ephemType == 0 else {
-            throw SatKitError.TLE("Line1 ephemerisType ≠ 0 .. [\(self.ephemType)]")
-        }
 
         stringlet = String(bytes: lineOneBytes[64...67], encoding: .utf8)!
         self.tleNumber = Int(stringlet.trimmingCharacters(in: .whitespaces))!
@@ -210,6 +207,10 @@ public struct TLE {
 
         self.apogee = (self.a₀ * (1.0 + self.e₀) - 1.0) * TLEConstants.Rₑ
         self.perigee = (self.a₀ * (1.0 - self.e₀) - 1.0) * TLEConstants.Rₑ
+
+        guard (self.ephemType == 0 || self.ephemType == 2 || self.ephemType == 3) else {
+            throw SatKitError.TLE("Line1 ephemerisType ≠ 0, 2 or 3 .. [\(self.ephemType)]")
+        }
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐

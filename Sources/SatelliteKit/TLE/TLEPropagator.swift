@@ -363,6 +363,9 @@ public class TLEPropagator {
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
 public func selectPropagator(tle: TLE) -> TLEPropagator {
 
-    return (π*2) / (tle.n₀ * TimeConstants.day2min) < (1.0 / 6.4) ? SGP4(tle) : DeepSDP4(tle)
+    if tle.ephemType == 2 { return SGP4(tle) }
+    else if tle.ephemType == 3 { return DeepSDP4(tle) }
+    else { return (π*2) / (tle.n₀ * TimeConstants.day2min) < (1.0 / 6.4) ? SGP4(tle) :
+                                                                           DeepSDP4(tle) }
 
 }

@@ -77,4 +77,17 @@ class TimeTests: XCTestCase {
 
     }
 
+    func testEpochTime() {
+
+        print(epochDays(year: 1950, days: 1.0))
+        print(Date(daysSince1950: epochDays(year: 1950, days: 1.0)))
+
+        print(epochDays(year: 1957, days: 1.0))
+        print(Date(daysSince1950: epochDays(year: 1957, days: 1.0)))
+
+        print(epochDays(year: 2056, days: 1.0))
+        print(Date(daysSince1950: epochDays(year: 2056, days: 1.0)))
+
+    }
+
 }
