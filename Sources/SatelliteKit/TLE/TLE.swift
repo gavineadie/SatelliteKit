@@ -20,7 +20,7 @@ enum SatKitError: Error {
   │ correspond to the beginning of 1997 December 31. Note that the epoch day starts at UT midnight   │
   │ (not noon) and that all times are measured mean solar rather than sidereal time units.           │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
- func epochDays(year: Int, days: Double) -> Double {
+func epochDays(year: Int, days: Double) -> Double {
     return Double(year-1950)*365.0 + Double((year-1949)/4) + days
 }
 
@@ -308,12 +308,13 @@ func base10ID(_ noradID: String) -> Int {
     return value
 }
 
+//MARK: - Extra Fun !
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ Convert silly NORAD ID ("B1234") into an integer .. "B" * 10000 + 1234, where "B" is base-34 ..  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
 func base34ID(_ noradID: String) -> Int {               //      "B1234"      "5"
-    let zeroPadded = "00000" + noradID.uppercased()     // "00000B1234  "000005"
-    let lastFive = String(zeroPadded.suffix(5))         //      "B1234"  "00005"
+    let lastFive = ("00000" + noradID.uppercased())     // "00000B1234  "000005"
+                                            .suffix(5)  //      "B1234"  "00005"
     let byte1 = (lastFive.first)!
     if let seqNo = Int(lastFive.dropFirst()) {
 
