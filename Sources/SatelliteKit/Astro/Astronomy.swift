@@ -18,6 +18,18 @@ public struct EarthConstants {
 
 }
 
+public struct LatLonAlt {
+    public var lat: Double                         // latitude (degrees)
+    public var lon: Double                         // longitude (degrees)
+    public var alt: Double                         // altitude
+}
+
+public struct AziEleDst {
+    public var azim: Double                        // azimuth (degrees)
+    public var elev: Double                        // elevation (degrees)
+    public var dist: Double                        // distance/range
+}
+
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃ References: The 1992 Astronomical Almanac, page B6.                                              ┃
   ┃             http://celestrak.com/columns/v02n02/ and http://aa.usno.navy.mil/faq/docs/GAST.php   ┃
@@ -161,12 +173,6 @@ public func azel(time: Date,
   ┃          : longitude (degrees)                                                                   ┃
   ┃          : altitude (Kms above geoid)                                                            ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-public struct LatLonAlt {
-    public var lat: Double                         // latitude (degrees)
-    public var lon: Double                         // longitude (degrees)
-    public var alt: Double                         // altitude
-}
-
 public func eci2geo(julianDays: Double, celestial: Vector) -> LatLonAlt {
 
     let     positionXY = sqrt(celestial.x*celestial.x + celestial.y*celestial.y)
@@ -227,14 +233,8 @@ public func geo2xyz(julianDays: Double, geodetic: LatLonAlt) -> Vector {
                   (geodetic.alt+TLEConstants.Rₑ) * sinLatitude)
 }
 
-public struct AziEleDst {
-    var azim: Double                        // azimuth (degrees)
-    var elev: Double                        // elevation (degrees)
-    var dist: Double                        // distance/range
-}
-
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-    eci2top .. JD, sat(x, y, z), obs(lat°, lon°, alt) -> (x, y, z)
+  ┃ eci2top .. JD, sat(x, y, z), obs(lat°, lon°, alt) -> (x, y, z)                                   ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 public func eci2top(julianDays: Double, satVector: Vector, geoVector: LatLonAlt) -> Vector {
     let     latitudeRads = geoVector.lat * deg2rad
