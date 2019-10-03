@@ -155,5 +155,9 @@ Translation from C++ and Java, testing and distribution by [Gavin Eadie](mailto:
 
   First Swift Package Manager (SwiftPM) version.
 
+- `version/tag 1.0.8 .. (2019 Oct 03)`
+
+  Corrects an error in the computation of azimuth-elevation-distance.
+
 ---
 
