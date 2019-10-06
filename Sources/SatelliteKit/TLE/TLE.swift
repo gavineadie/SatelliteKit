@@ -54,8 +54,8 @@ public struct TLE {
 
     public let ephemType: Int                           // Type of ephemeris.
     private let tleClass: Character                     // Classification (U for unclassified).
-    private let tleNumber: Int                          // Element number.
-    private let revNumber: Int                          // Revolution number at epoch.
+    public let tleNumber: Int                           // Element number.
+    public let revNumber: Int                           // Revolution number at epoch.
 
     internal let apogee: Double                         // TLE apogee altitude, expressed in Kms.
     internal let perigee: Double                        // TLE perigee altitude, expressed in Kms.
@@ -212,32 +212,6 @@ public struct TLE {
             throw SatKitError.TLE("Line1 ephemerisType ≠ 0, 2 or 3 .. [\(self.ephemType)]")
         }
     }
-
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public func debugDescription() -> String {
-
-        return String(format: """
-
-        ┌─[tle]─────────────────────────────────────────────────────────────────
-        │  %@    %05d = %@    rev#:%05d tle#:%04d
-        │     t₀:  %@    %+14.8f days after 1950
-        │
-        │    inc: %8.4f°     aop: %8.4f°    mot:  %11.8f (rev/day)
-        │   raan: %8.4f°    anom: %8.4f°    ecc:   %9.7f
-        │                                        drag:  %+11.4e
-        └───────────────────────────────────────────────────────────────────────
-        """,
-                      self.commonName.padding(toLength: 24, withPad: " ", startingAt: 0),
-                      self.noradIndex,
-                      self.launchName.padding(toLength: 8, withPad: " ", startingAt: 0),
-                      self.revNumber, self.tleNumber,
-                      String(describing: Date(daysSince1950: self.t₀)), self.t₀,
-                      self.i₀ * rad2deg, self.ω₀ * rad2deg, self.n₀ / (π/720.0),
-                      self.Ω₀ * rad2deg, self.M₀ * rad2deg, self.e₀, self.dragCoeff)
-
-    }
-
 }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
