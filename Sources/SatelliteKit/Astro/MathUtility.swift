@@ -43,8 +43,16 @@ prefix func √ <T: FloatingPoint>(float: T) -> T {
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 public func almostEqual(_ a: Double, _ b: Double) -> Bool {
     return a == b || a == b.nextUp || a == b.nextDown
-//           a == nextafter(b, +.greatestFiniteMagnitude) ||
-//           a == nextafter(b, -.greatestFiniteMagnitude)
+}
+
+extension Double {
+    func roundTo3Places() -> Double {
+        return (self*1_000.0).rounded(.toNearestOrEven) / 1_000
+    }
+
+    func roundTo6Places() -> Double {
+        return (self*1_000_000.0).rounded(.toNearestOrEven) / 1_000_000
+    }
 }
 
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗

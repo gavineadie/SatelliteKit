@@ -83,7 +83,7 @@ class MathTests: XCTestCase {
         func testnormalizeAngle() {
 
             for angle in stride(from: -400.0, to: +400.0, by: 20.0) {
-                print("   \(angle) : \(fmod2pi_0(angle*deg2rad)*rad2deg)")
+                print("   \(angle) : \((fmod2pi_0(angle*deg2rad)*rad2deg).roundTo6Places())")
             }
 
         }

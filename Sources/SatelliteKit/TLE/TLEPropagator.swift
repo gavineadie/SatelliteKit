@@ -1,6 +1,7 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ TLEPropagator.swift                                                                       SatKit ║
   ║ Created by Gavin Eadie on 5/24/17.         Copyright © 2017-19 Gavin Eadie. All rights reserved. ║
+  ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 import Foundation
@@ -162,29 +163,34 @@ public class TLEPropagator {
             (-3.0 * x3thm1 * (1.0 - 2.0 * self.eeta + self.η² * (1.5 - 0.5 * self.eeta)) +
                 0.75 * x1mth2 * (2.0 * self.η² - self.eeta * (1.0 + self.η²)) * cos(2.0 * self.tle.ω₀)))
 
-        let pinv = 1.0 / (self.tle.a₀ * self.β₀²)
-        let pinv² = pinv * pinv
-        let temp1 =   3.0 * TLEConstants.K₂ * pinv² * self.tle.n₀
-        let temp2 = temp1 * TLEConstants.K₂ * pinv²
-        let temp3 =  1.25 * TLEConstants.K₄ * pinv² * pinv² * self.tle.n₀
+        do {
+            let pinv = 1.0 / (self.tle.a₀ * self.β₀²)
+            let pinv² = pinv * pinv
+
+            let temp1 =   3.0 * TLEConstants.K₂ * pinv² * self.tle.n₀
+            let temp2 = temp1 * TLEConstants.K₂ * pinv²
+            let temp3 =  1.25 * TLEConstants.K₄ * pinv² * pinv² * self.tle.n₀
 
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆ atmospheric and gravitation coefs :(Mdf and OMEGAdf)                                             ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
-        let θ⁴ = self.θ² * self.θ²
-        self.M_dot = self.tle.n₀ + 0.5 * temp1 * self.β₀ * x3thm1 +
-                               0.0625 * temp2 * self.β₀ * (13.0 - 78.0 * self.θ² + 137.0 * θ⁴)
+            do {
+                let θ⁴ = self.θ² * self.θ²
+                self.M_dot = self.tle.n₀ + 0.5 * temp1 * self.β₀ * x3thm1 +
+                                       0.0625 * temp2 * self.β₀ * (13.0 - 78.0 * self.θ² + 137.0 * θ⁴)
 
-        let x1m5θ² = 1.0 - 5.0 * self.θ²                    //              1-5θ²
+                let x1m5θ² = 1.0 - 5.0 * self.θ²                    //              1-5θ²
 
-        self.ω_dot = -0.5 * temp1 * x1m5θ² + 0.0625 * temp2 * (7.0 - 114.0 * self.θ² + 395.0 * θ⁴) +
-                                                      temp3 * (3.0 -  36.0 * self.θ² +  49.0 * θ⁴)
+                self.ω_dot = -0.5 * temp1 * x1m5θ² + 0.0625 * temp2 * (7.0 - 114.0 * self.θ² + 395.0 * θ⁴) +
+                                                              temp3 * (3.0 -  36.0 * self.θ² +  49.0 * θ⁴)
+            }
 
-        let xhdot1 = -temp1 * self.cosi₀
+            let xhdot1 = -temp1 * self.cosi₀
 
-        self.Ω_dot = xhdot1 + (0.5 * temp2 * (4.0 - 19.0 * self.θ²) +
-                                 2.0 * temp3 * (3.0 - 7.0 * self.θ²)) * self.cosi₀
-        self.xnodcf = 3.5 * self.β₀² * xhdot1 * self.c₁
+            self.Ω_dot = xhdot1 + (0.5 * temp2 * (4.0 - 19.0 * self.θ²) +
+                                     2.0 * temp3 * (3.0 - 7.0 * self.θ²)) * self.cosi₀
+            self.xnodcf = 3.5 * self.β₀² * xhdot1 * self.c₁
+        }
         self.t2cof = 1.5 * self.c₁
 
         try! sxpInitialize()

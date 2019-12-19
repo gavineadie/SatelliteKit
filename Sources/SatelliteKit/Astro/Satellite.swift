@@ -1,6 +1,7 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ Satellite.swift                                                                           SatKit ║
   ║ Created by Gavin Eadie on Sep07/15 ... Copyright 2015-19 Ramsay Consulting. All rights reserved. ║
+  ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 // swiftlint:disable identifier_name
@@ -26,16 +27,11 @@ public struct Satellite {
   │  Initialize Satellite with the three lines of a three line element set                           │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public init(_ line0: String, _ line1: String, _ line2: String) {
-
         do {
             let tleSat = try TLE(line0, line1, line2)
-
             self.init(withTLE: tleSat)
-
         } catch {
-
             fatalError("Satellite.init failure ..")
-
         }
     }
 
@@ -43,21 +39,19 @@ public struct Satellite {
   │  Initialize Satellite with TLE struct ..                                                         │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public init(withTLE tle: TLE) {
-
         propagator = selectPropagator(tle: tle)
 
         noradIdent = String(propagator.tle.noradIndex)      // convert Int to String
         commonName = propagator.tle.commonName
         t₀Days1950 = propagator.tle.t₀
-
     }
 
     public func julianDay(_ minsAfterEpoch: Double) -> Double {
-        return (self.t₀Days1950 + JD.epoch1950) + minsAfterEpoch * TimeConstants.min2day
+        (self.t₀Days1950 + JD.epoch1950) + minsAfterEpoch * TimeConstants.min2day
     }
 
     public func minsAfterEpoch(_ julianDays: Double) -> Double {
-        return (julianDays - (self.t₀Days1950 + JD.epoch1950)) * TimeConstants.day2min
+        (julianDays - (self.t₀Days1950 + JD.epoch1950)) * TimeConstants.day2min
     }
 
 // MARK: - inertial position and velocity
@@ -90,21 +84,21 @@ public struct Satellite {
   ┃ return satellite's earth centered inertial position (Kilometers) at Julian Date                  ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
     public func position(julianDays: Double) -> Vector {
-        return position(minsAfterEpoch: minsAfterEpoch(julianDays))
+        position(minsAfterEpoch: minsAfterEpoch(julianDays))
     }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃ return satellite's earth centered inertial velocity (Kms/second) at Julian Date                  ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
     public func velocity(julianDays: Double) -> Vector {
-        return velocity(minsAfterEpoch: minsAfterEpoch(julianDays))
+        velocity(minsAfterEpoch: minsAfterEpoch(julianDays))
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public func debugDescription() -> String {
 
-        return String(format: """
+        String(format: """
 
         ┌─[tle]─────────────────────────────────────────────────────────────────
         │  %@    %05d = %@    rev#:%05d tle#:%04d
@@ -124,7 +118,6 @@ public struct Satellite {
                       self.propagator.tle.n₀ / (π/720.0), self.propagator.tle.Ω₀ * rad2deg,
                       self.propagator.tle.M₀ * rad2deg, self.propagator.tle.e₀,
                       self.propagator.tle.dragCoeff)
-
     }
 
 }

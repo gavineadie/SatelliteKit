@@ -52,7 +52,6 @@ The public properties that are exposed from the `TLE` structure are:
 	public let M₀: Double                               // Mean anomaly (rad).
 	public let n₀: Double                               // Mean motion (rads/min)  << [un'Kozai'd]
 	public let a₀: Double                               // semi-major axis (Eᵣ)    << [un'Kozai'd]
-	public let dragCoeff: Double                        // Ballistic coefficient.
 
 Note that the operation to "un Kozai" the element data is performed inside the initialization because
 both SGP4 and SDP4 need that adjustment.
@@ -158,6 +157,12 @@ Translation from C++ and Java, testing and distribution by [Gavin Eadie](mailto:
 - `version/tag 1.0.8 .. (2019 Oct 03)`
 
   Corrects an error in the computation of azimuth-elevation-distance.
+
+- `version/tag 1.0.9 .. (2019 Oct 03)`
+
+move "debugDescription()" from "tle" to "sat"
+
+remove public access to "dragCoeff"
 
 ---
 

@@ -1,6 +1,7 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ TLE.swift                                                                                 SatKit ║
   ║ Created by Gavin Eadie on 5/24/17.         Copyright © 2017-19 Gavin Eadie. All rights reserved. ║
+  ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 import Foundation
@@ -14,13 +15,10 @@ enum SatKitError: Error {
     case SGP(String)
 }
 
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ An epoch of 98001.00000000 corresponds to 0000 UT on 1998 January 01 — in other words, midnight  │
-  │ between 1997 December 31 and 1998 January 01. An epoch of 98000.00000000 would actually          │
-  │ correspond to the beginning of 1997 December 31. Note that the epoch day starts at UT midnight   │
-  │ (not noon) and that all times are measured mean solar rather than sidereal time units.           │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-func epochDays(year: Int, days: Double) -> Double {
+/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+  ┆ Convenience function .. converts the YYDDD.DDDDDDDD TLE epoch time to days since 1950 reference. ┆
+  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+private func epochDays(year: Int, days: Double) -> Double {
     return Double(year-1950)*365.0 + Double((year-1949)/4) + days
 }
 
@@ -46,14 +44,14 @@ public struct TLE {
     public let M₀: Double                               // Mean anomaly (rad).
     public let n₀: Double                               // Mean motion (rads/min)  << [un'Kozai'd]
     public let a₀: Double                               // semi-major axis (Eᵣ)    << [un'Kozai'd]
-    public let dragCoeff: Double                        // Ballistic coefficient.
+    internal let dragCoeff: Double                      // Ballistic coefficient.
 
     private let launchYear: Int                         // Launch year.
     private let launchSequ: Int                         // Launch number.
     private let launchPart: String                      // Piece of launch (from "A" to "ZZZ").
 
     public let ephemType: Int                           // Type of ephemeris.
-    private let tleClass: Character                     // Classification (U for unclassified).
+    public let tleClass: Character                      // Classification (U for unclassified).
     public let tleNumber: Int                           // Element number.
     public let revNumber: Int                           // Revolution number at epoch.
 

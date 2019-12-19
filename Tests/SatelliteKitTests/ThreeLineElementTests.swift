@@ -34,9 +34,7 @@ class ThreeLineElementTests: XCTestCase {
             XCTAssertEqual(tle.Ω₀, 0.0)                         // Right Ascension of the Ascending node (rad).
 
         } catch {
-
             print(error)
-
         }
 
     }
@@ -62,9 +60,7 @@ class ThreeLineElementTests: XCTestCase {
             XCTAssertEqual(tle.Ω₀, 0.0)                         // Right Ascension of the Ascending node (rad).
 
         } catch {
-
             print(error)
-
         }
 
     }
@@ -90,9 +86,7 @@ class ThreeLineElementTests: XCTestCase {
             XCTAssertEqual(tle.Ω₀, 0.0)                         // Right Ascension of the Ascending node (rad).
 
         } catch {
-
             print(error)
-
         }
 
     }
@@ -169,15 +163,15 @@ class ThreeLineElementTests: XCTestCase {
             let contents = try String(contentsOfFile: "/Users/gavin/Development/sat_code/all_tle.txt")
             processTLEs(contents)
         } catch {
-            // contents could not be loaded
+            print(error)
         }
 
     }
 
     func testBase34() {
-        XCTAssert(base10ID("") == 0)
+        XCTAssert(base10ID(     "") == 0)
 
-        XCTAssert(base34ID("5") == 5)
+        XCTAssert(base34ID(    "5") == 5)
         XCTAssert(base34ID("10000") == 10000, "got \(base34ID("10000"))")
 
         // numerical checks
@@ -219,8 +213,8 @@ class ThreeLineElementTests: XCTestCase {
 }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃ This function reads the file records and searches for a TLE-1 record with a good checksum.       ┃
-  ┃ If that is followed by a good TLE-2, then TLE-0, TLE-1 and TLE-2 are kept, else we throw the     ┃
+  ┃ This function reads the file records and searches for a TLE-1 record with a good checksum.  If   ┃
+  ┃ that is followed by a good TLE-2, then TLE-0, TLE-1 and TLE-2 are kept, else we throw the        ┃
   ┃ records away.  The candidate records used to generate a SatelliteModel to add to the collection. ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 func processTLEs(_ tleChunk: String) {

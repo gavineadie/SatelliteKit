@@ -1,6 +1,7 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ TimeUtility.swift                                                                         SatKit ║
   ║ Created by Gavin Eadie on Jan07/17 ... Copyright 2017-19 Ramsay Consulting. All rights reserved. ║
+  ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 // swiftlint:disable type_name
@@ -116,8 +117,8 @@ extension Date {
   │ create a Date from decimal days since the TLE epoch                                              │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public init(daysSince1950: Double) {
-        self = Date(timeInterval: daysSince1950 * TimeConstants.day2sec,
-                    since: TimeConstants.tleEpochReferenceDate)            // seconds since 1950
+        self = Date(timeInterval: daysSince1950 * TimeConstants.day2sec,    // seconds since 1950
+                    since: TimeConstants.tleEpochReferenceDate)
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -170,17 +171,17 @@ extension Date {
   ┃  some angle functions hms <-> degrees ...                                                        ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 public func deg2hms(decimalDegrees: Double) -> (Int, Int, Double) {
-    let hour = decimalDegrees.remainder(dividingBy: 360.0) * deg2hrs
-    let mins = (hour - floor(hour)) * 60.0
-    let secs = (mins - floor(mins)) * 60.0
+    let hour = decimalDegrees.truncatingRemainder(dividingBy: 360.0) * deg2hrs
+    let mins = ((hour - floor(hour)) * 60.0).roundTo6Places()
+    let secs = ((mins - floor(mins)) * 60.0).roundTo3Places()
 
     return (Int(hour), Int(mins), secs)
 }
 
 public func hms2deg(hms: (Int, Int, Double)) -> Double {
-    return (Double((hms.0*60 + hms.1)*60) + hms.2) / 240.0
+    return ((Double((hms.0*60 + hms.1)*60) + hms.2) / 240.0).roundTo3Places()
 }
 
 public func stringHMS(hms: (Int, Int, Double)) -> String {
-    return String(format: "%02dʰ%02dᵐ%05.2f", hms.0, hms.1, hms.2)
+    return String(format: "%02dʰ%02dᵐ%06.3f", hms.0, hms.1, hms.2)
 }

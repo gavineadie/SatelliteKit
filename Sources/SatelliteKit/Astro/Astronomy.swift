@@ -1,6 +1,7 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ Astronomy.swift                                                                           SatKit ║
   ║ Created by Gavin Eadie on Jul06/15.    Copyright 2015-19 Ramsay Consulting. All rights reserved. ║
+  ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 // swiftlint:disable identifier_name
@@ -9,9 +10,9 @@ import Foundation
 
 public struct EarthConstants {
 
-     public static let Rₑ = 6378.135                    // Earth radius (Km)
+     public static let Rₑ = 6378.135                        // Earth radius (Km)
 
-     public static let rotationₑ = 1.00273790934        // Earth sidereal rotations per UT day
+     public static let rotationₑ = 1.00273790934            // Earth sidereal rotations per UT day
 
     private static let flatteningₑ = (1.0 / 298.26)
             static let e2 = (flatteningₑ * (2.0 - flatteningₑ))
@@ -19,9 +20,9 @@ public struct EarthConstants {
 }
 
 public struct LatLonAlt {
-    public var lat: Double                         // latitude (degrees)
-    public var lon: Double                         // longitude (degrees)
-    public var alt: Double                         // altitude
+    public var lat: Double                                  // latitude (degrees)
+    public var lon: Double                                  // longitude (degrees)
+    public var alt: Double                                  // altitude
 
     public init(lat: Double, lon: Double, alt: Double) {
         self.lat = lat
@@ -31,9 +32,9 @@ public struct LatLonAlt {
 }
 
 public struct AziEleDst {
-    public var azim: Double                        // azimuth (degrees)
-    public var elev: Double                        // elevation (degrees)
-    public var dist: Double                        // distance/range
+    public var azim: Double                                 // azimuth (degrees)
+    public var elev: Double                                 // elevation (degrees)
+    public var dist: Double                                 // distance/range
 
     public init(azim: Double, elev: Double, dist: Double) {
         self.azim = azim
