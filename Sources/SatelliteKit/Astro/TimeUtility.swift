@@ -110,7 +110,7 @@ extension Date {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public var timeIntervalSince1950: TimeInterval {
-        return self.timeIntervalSinceReferenceDate + Date.timeIntervalBetween1950AndReferenceDate
+        self.timeIntervalSinceReferenceDate + Date.timeIntervalBetween1950AndReferenceDate
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -124,12 +124,12 @@ extension Date {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ convert a Date to days since 1950 (TLE epoch-zero) ..                                            │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public var daysSince1950: Double { return julianDate - JD.epoch1950 }
+    public var daysSince1950: Double { julianDate - JD.epoch1950 }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public var UTC: String {
-        return dateFormatterUTC.string(from: self)
+        dateFormatterUTC.string(from: self)
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -151,19 +151,19 @@ extension Date {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ convert a Date to a Julian date ..                                                               │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public var julianDate: Double { return JD.appleZero +
+    public var julianDate: Double { JD.appleZero +
                                             timeIntervalSinceReferenceDate * TimeConstants.sec2day }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ convert a Date to days since 1900 ..                                                             │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public var daysSince1900: Double { return julianDate - JD.epoch1900 }
+    public var daysSince1900: Double { julianDate - JD.epoch1900 }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ stringify a Date to current locale ..                                                            │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public var localDescription: String {
-        return DateFormatter.localizedString(from: self, dateStyle: .medium, timeStyle: .long)
+        DateFormatter.localizedString(from: self, dateStyle: .medium, timeStyle: .long)
     }
 }
 
@@ -179,9 +179,9 @@ public func deg2hms(decimalDegrees: Double) -> (Int, Int, Double) {
 }
 
 public func hms2deg(hms: (Int, Int, Double)) -> Double {
-    return ((Double((hms.0*60 + hms.1)*60) + hms.2) / 240.0).roundTo3Places()
+    ((Double((hms.0*60 + hms.1)*60) + hms.2) / 240.0).roundTo3Places()
 }
 
 public func stringHMS(hms: (Int, Int, Double)) -> String {
-    return String(format: "%02dʰ%02dᵐ%06.3f", hms.0, hms.1, hms.2)
+    String(format: "%02dʰ%02dᵐ%06.3f", hms.0, hms.1, hms.2)
 }

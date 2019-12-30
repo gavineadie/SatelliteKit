@@ -62,7 +62,9 @@ public struct Satellite {
     public func position(minsAfterEpoch: Double) -> Vector {
         do {
             let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
-            return Vector((pv.position.x)/1000.0, (pv.position.y)/1000.0, (pv.position.z)/1000.0)
+            return Vector((pv.position.x)/1000.0,
+                          (pv.position.y)/1000.0,
+                          (pv.position.z)/1000.0)
         } catch let error as NSError {
             fatalError("Satellite Position Error \(self.commonName) .. \(error.domain) (\(error.code))")
         }
@@ -74,9 +76,11 @@ public struct Satellite {
     public func velocity(minsAfterEpoch: Double) -> Vector {
         do {
             let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
-            return Vector((pv.velocity.x)/1000.0, (pv.velocity.y)/1000.0, (pv.velocity.z)/1000.0)
+            return Vector((pv.velocity.x)/1000.0,
+                          (pv.velocity.y)/1000.0,
+                          (pv.velocity.z)/1000.0)
         } catch let error as NSError {
-            fatalError("Satellite Velocity Error \(error.domain) (\(error.code))")
+            fatalError("Satellite Velocity Error \(self.commonName) .. \(error.domain) (\(error.code))")
         }
     }
 

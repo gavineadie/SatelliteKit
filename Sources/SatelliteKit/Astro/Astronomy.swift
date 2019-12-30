@@ -24,11 +24,11 @@ public struct LatLonAlt {
     public var lon: Double                                  // longitude (degrees)
     public var alt: Double                                  // altitude
 
-    public init(lat: Double, lon: Double, alt: Double) {
-        self.lat = lat
-        self.lon = lon
-        self.alt = alt
-    }
+//    public init(lat: Double, lon: Double, alt: Double) {
+//        self.lat = lat
+//        self.lon = lon
+//        self.alt = alt
+//    }
 }
 
 public struct AziEleDst {
@@ -36,11 +36,11 @@ public struct AziEleDst {
     public var elev: Double                                 // elevation (degrees)
     public var dist: Double                                 // distance/range
 
-    public init(azim: Double, elev: Double, dist: Double) {
-        self.azim = azim
-        self.elev = elev
-        self.dist = dist
-    }
+//    public init(azim: Double, elev: Double, dist: Double) {
+//        self.azim = azim
+//        self.elev = elev
+//        self.dist = dist
+//    }
 }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -230,6 +230,30 @@ public func geo2eci(julianDays: Double, geodetic: LatLonAlt) -> Vector {
 }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃ geo2eci .. (lat°, lon°, alt) -> (x, y, z,)                         OBLATE - NO SIDEREAL ROTATION ┃
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+public func geo2eci(geodetic: LatLonAlt) -> Vector {
+    let     latitudeRads = geodetic.lat * deg2rad
+    let     sinLatitude = sin(latitudeRads)
+    let     cosLatitude = cos(latitudeRads)
+
+    let     siderealRads = geodetic.lon * deg2rad
+    let     sinSidereal = sin(siderealRads)
+    let     cosSidereal = cos(siderealRads)
+
+    let flatteningₑ = (1.0 / 298.26)
+    let e2 = (flatteningₑ * (2.0 - flatteningₑ))
+
+    let     c = TLEConstants.Rₑ / sqrt(1.0 + e2 * sinLatitude * sinLatitude)
+    let     s = (1 - e2) * c
+    let     achcp = (c + geodetic.alt) * cosLatitude
+
+    return Vector(achcp * cosSidereal,
+                  achcp * sinSidereal,
+                  (geodetic.alt+s) * sinLatitude)
+}
+
+/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃ geo2xyz .. JD, (lat°, lon°, alt) -> (x, y, z,)                                         SPHERICAL ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 public func geo2xyz(julianDays: Double, geodetic: LatLonAlt) -> Vector {
@@ -238,6 +262,23 @@ public func geo2xyz(julianDays: Double, geodetic: LatLonAlt) -> Vector {
     let     cosLatitude = cos(latitudeRads)
 
     let     siderealRads = siteMeanSiderealTime(julianDate: julianDays, geodetic.lon) * deg2rad
+    let     sinSidereal = sin(siderealRads)
+    let     cosSidereal = cos(siderealRads)
+
+    return Vector((geodetic.alt+TLEConstants.Rₑ) * cosLatitude * cosSidereal,
+                  (geodetic.alt+TLEConstants.Rₑ) * cosLatitude * sinSidereal,
+                  (geodetic.alt+TLEConstants.Rₑ) * sinLatitude)
+}
+
+/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃ geo2xyz .. (lat°, lon°, alt) -> (x, y, z,)                      SPHERICAL - NO SIDEREAL ROTATION ┃
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+public func geo2xyz(geodetic: LatLonAlt) -> Vector {
+    let     latitudeRads = geodetic.lat * deg2rad
+    let     sinLatitude = sin(latitudeRads)
+    let     cosLatitude = cos(latitudeRads)
+
+    let     siderealRads = geodetic.lon * deg2rad
     let     sinSidereal = sin(siderealRads)
     let     cosSidereal = cos(siderealRads)
 
