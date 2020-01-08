@@ -1,10 +1,8 @@
-//
-//  ThreeLineElementTests.swift
-//  SatKit-iOS Tests
-//
-//  Created by Gavin Eadie on 5/5/19.
-//  Copyright © 2019 Ramsay Consulting. All rights reserved.
-//
+/*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+  ║ ThreeLineElementTests.swift                                                                      ║
+  ║                                                                                                  ║
+  ║ Created by Gavin Eadie on May05/19     Copyright 2019-20 Ramsay Consulting. All rights reserved. ║
+  ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 import XCTest
 @testable import SatelliteKit

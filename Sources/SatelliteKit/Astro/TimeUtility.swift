@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ TimeUtility.swift                                                                         SatKit ║
-  ║ Created by Gavin Eadie on Jan07/17 ... Copyright 2017-19 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on Jan07/17 ... Copyright 2017-20 Ramsay Consulting. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
@@ -85,7 +85,7 @@ public let dateFormatterLocal: DateFormatter = {
 
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ DateUtility.swift                                                                         SatKit ║
-  ║ Created by Gavin Eadie on 5/29/17.         Copyright © 2017-19 Gavin Eadie. All rights reserved. ║
+  ║ Created by Gavin Eadie on May29/17         Copyright © 2017-20 Gavin Eadie. All rights reserved. ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 extension Date {

@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ SatelliteKit.swift                                                                  SatelliteKit ║
-  ║ Created by Gavin Eadie on Aug05/17 ... Copyright 2016-19 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on Aug05/17 ... Copyright 2016-20 Ramsay Consulting. All rights reserved. ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 import Foundation
