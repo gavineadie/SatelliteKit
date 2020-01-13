@@ -5,7 +5,8 @@ import PackageDescription
 let package = Package(
     name: "SatelliteKit",
     products: [
-        .library(name: "SatelliteKit", targets: ["SatelliteKit"]),
+        .library(name: "SatelliteKit", type: .dynamic, targets: ["SatelliteKit"]),
+        .library(name: "SatelliteKit", targets: ["SatelliteKit-auto"]),
     ],
     targets: [
         .target(name: "SatelliteKit", dependencies: []),
