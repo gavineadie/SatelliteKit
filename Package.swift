@@ -6,7 +6,7 @@ let package = Package(
     name: "SatelliteKit",
     products: [
         .library(name: "SatelliteKit", type: .dynamic, targets: ["SatelliteKit"]),
-        .library(name: "SatelliteKit", targets: ["SatelliteKit-auto"]),
+        .library(name: "SatelliteKit-auto", targets: ["SatelliteKit"]),
     ],
     targets: [
         .target(name: "SatelliteKit", dependencies: []),
