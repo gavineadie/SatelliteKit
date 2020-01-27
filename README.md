@@ -7,10 +7,10 @@ propagation algorithms first published in the
 and later refined by Vallado et al in
 [Revisiting Spacetrack Report #3](https://celestrak.com/publications/AIAA/2006-6753/).
 
-The code of this library is derived from [Orekit](https://www.orekit.org) which, in part,
-implements the above published algorithms.  Test output from `SatelliteKit` agrees,
-to meaninglessly high precision, with Orekit test output and the test output in
-the above published paper [1].
+The code of this library is derived from [Orekit](https://www.orekit.org) which implements
+the above published algorithms as a small part of it's extensive capabilities.
+Test output from `SatelliteKit` agrees, to meaninglessly high precision, with Orekit
+test output and the test output in the above published paper [1].
 
 [1] "Vallado, David A.; Paul Crawford; Richard Hujsak; T. S. Kelso,
 (August 2006), Revisiting Spacetrack Report #3".
@@ -77,40 +77,35 @@ The `TLE` structure also implements `debugDescription` which will generate this 
     │                                        drag:  +3.2659e-05
     └───────────────────────────────────────────────────────────────────────
 
-### TLEPropagator
+### Satellite
 
-Having obtained the `TLE` for a satellite, it is used to initialize a `TLEPropagator` class which will
+Having obtained the `TLE` for a satellite, it is used to initialize a `Satellite` struct which will
 manage the propagation of the object's position and velocity as time is varied from the epochal
 t=0 of the element set.  Whether the object requires the "deep space" propagator, or not, is
-determined within the `TLEPropagator` initialization.
+determined within the `Satellite` initialization.
 
 The initializer is called internally by the static function:
 
-    public func selectPropagator(tle: TLE) -> TLEPropagator
+    public init(withTLE tle: TLE)
 
-The `TLEPropagator` class offers no public properties and two public functions.  Both functions
-accept a time argument and provide postion and velocity state vectors as output.
+The `Satellite` struct offers some public properties and some public functions.
 
-    public func getPVCoordinates(minsAfterEpoch: Double) throws -> PVCoordinates
-    public func getPVCoordinates(_ date: Date) throws -> PVCoordinates
+The properties provide some naming information and a "grab bag" directory for whatever you want.
 
-These functions will throw exceptions under circumstance when some anomaly in the object's elements
-suggests various problems in the modeled physical world (perigee below the ground, etc).
+    public let commonName: String
+    public let noradIdent: String
+    public let t₀Days1950: Double       		// TLE t=0 (days since 1950)
+    public var extraInfo: [String: AnyObject]
 
-### PVCoordinates
+The functions
+accept a time argument, either minutes after the satellite's TLE epoch, or Julian Days, and provide
+postion (Kilometers) and velocity (Kms.sec) state vectors as output.
 
-The `PVCoordinates` structure returned by the propagator encapsulates position and velocity vectors:
+    public func position(minsAfterEpoch: Double) -> Vector
+    public func velocity(minsAfterEpoch: Double) -> Vector
 
-    public struct Vector {
-        public var x: Double
-        public var y: Double
-        public var z: Double
-    }
-
-    public struct PVCoordinates {
-        public var position: Vector                 // position in meters
-        public var velocity: Vector                 // velocity in m/sec
-    }
+    public func position(julianDays: Double) -> Vector
+    public func velocity(julianDays: Double) -> Vector
 
 ### Sample Usage
 
@@ -121,23 +116,22 @@ This is a simple invocation of the above:
                           "1 25544U 98067A   18039.95265046  .00001678  00000-0  32659-4 0  9999",
                           "2 25544  51.6426 297.9871 0003401  86.7895 100.1959 15.54072469 98577")
 
-        print(tle.debugDescription())
-
-        let propagator = selectPropagator(tle: tle)
-
-        let pv1 = try propagator.getPVCoordinates(minsAfterEpoch: 10.0)
-        print(pv1.debugDescription())
+        let sat = Satellite(withTLE: tle)
+        print(sat.debugDescription())
+        let posInKms = sat.position(minsAfterEpoch: 10.0)
 
     } catch {
-
         print(error)
-
     }
 
-The `debugDescription` of the state vectors in `pv1` is (position in meters, velocity in meters/second):
+### Inclusion
 
-    P:  x=-4888356.5, y=+2748335.4, z=-3825769.7
-    V:  x= -339.3375, y=-6410.3714, z=-4178.6616
+`SatelliteKit` can be added to your project using the Swift Package Manager (SwiftPM) by adding
+the dependency:
+
+    .package(url: "https://github.com/gavineadie/SatelliteKit.git", from: "1.0.0")
+
+and using `import SatelliteKit` in code that needs it.
 
 ### Platforms
 
@@ -150,19 +144,22 @@ exposed to the Unix Swift enviroment.
 Translation from C++ and Java, testing and distribution by [Gavin Eadie](mailto:gavineadie.dev@icloud.com)
 
 ---
-- `version/tag 1.0.0 .. (2019 Jun 14)`
+`version/tag 1.0.0 .. (2019 Jun 14)`
 
-  First Swift Package Manager (SwiftPM) version.
+- First Swift Package Manager (SwiftPM) version.
 
-- `version/tag 1.0.8 .. (2019 Oct 03)`
+`version/tag 1.0.8 .. (2019 Oct 03)`
 
-  Corrects an error in the computation of azimuth-elevation-distance.
+- Corrects an error in the computation of azimuth-elevation-distance.
 
-- `version/tag 1.0.9 .. (2019 Oct 03)`
+`version/tag 1.0.9 .. (2019 Oct 03)`
 
-move "debugDescription()" from "tle" to "sat"
+- move "debugDescription()" from "TLE" to "Satellite"
 
-remove public access to "dragCoeff"
+- remove public access to "dragCoeff" (it's never used)
+
+`version/tag 1.0.16 .. (2020 Jan 27)`
+
+- update copyright year to 2020
 
 ---
-
