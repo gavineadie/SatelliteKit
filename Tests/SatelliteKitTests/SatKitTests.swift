@@ -20,7 +20,7 @@ class SwiftTests: XCTestCase {
 
             print(Satellite(withTLE: tle).debugDescription())
 
-            print("mean altitude    (Kms): \((tle.a₀ - 1.0) * TLEConstants.Rₑ)")
+            print("mean altitude    (Kms): \((tle.a₀ - 1.0) * EarthConstants.Rₑ)")
 
             let propagator = selectPropagator(tle: tle)
 
@@ -55,7 +55,7 @@ class SwiftTests: XCTestCase {
 
             print(Satellite(withTLE: tle).debugDescription())
 
-            print("mean altitude    (Kms): \((tle.a₀ - 1.0) * TLEConstants.Rₑ)")
+            print("mean altitude    (Kms): \((tle.a₀ - 1.0) * EarthConstants.Rₑ)")
 
             let propagator = selectPropagator(tle: tle)
 

@@ -52,7 +52,7 @@ class SDP4: TLEPropagator {
         if n_new < 0 { throw SatKitError.SGP("ERROR 2: mean motion less than zero") }
 
         let tempa = 1.0 - super.c₁ * minsAfterEpoch
-        a = pow(TLEConstants.kₑ / n_new, ⅔) * tempa * tempa
+        a = pow(EarthConstants.kₑ / n_new, ⅔) * tempa * tempa
         e_new -= super.tle.dragCoeff * super.c₄ * minsAfterEpoch
 
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮

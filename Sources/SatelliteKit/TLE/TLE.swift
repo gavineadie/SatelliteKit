@@ -192,9 +192,9 @@ public struct TLE {
             let θ = cos(self.i₀)                                    //         cos(i₀)  ..  θ
             let x3thm1 = 3.0 * θ * θ - 1.0                          //      3×cos²(i₀) - 1
             let β₀ = (1.0 - self.e₀ * self.e₀).squareRoot()         //         √(1-e₀²) ..  β₀
-            let temp = 1.5 * TLEConstants.K₂ * x3thm1 / (β₀ * β₀ * β₀)
+            let temp = 1.5 * EarthConstants.K₂ * x3thm1 / (β₀ * β₀ * β₀)
 
-            let a₀ʹ = pow(TLEConstants.kₑ / n₀ʹ, ⅔)
+            let a₀ʹ = pow(EarthConstants.kₑ / n₀ʹ, ⅔)
             let δ₁ = temp / (a₀ʹ * a₀ʹ)
             let a₁ = a₀ʹ * (1.0 - δ₁ * (⅓ + δ₁ * (1.0 + 134.0 / 81.0 * δ₁)))
             let δ₀ = temp / (a₁ * a₁)
@@ -203,8 +203,8 @@ public struct TLE {
             self.a₀ = a₁  / (1.0 - δ₀)                               //             a₀
         }
 
-        self.apogee = (self.a₀ * (1.0 + self.e₀) - 1.0) * TLEConstants.Rₑ
-        self.perigee = (self.a₀ * (1.0 - self.e₀) - 1.0) * TLEConstants.Rₑ
+        self.apogee = (self.a₀ * (1.0 + self.e₀) - 1.0) * EarthConstants.Rₑ
+        self.perigee = (self.a₀ * (1.0 - self.e₀) - 1.0) * EarthConstants.Rₑ
 
         guard (self.ephemType == 0 || self.ephemType == 2 || self.ephemType == 3) else {
             throw SatKitError.TLE("Line1 ephemerisType ≠ 0, 2 or 3 .. [\(self.ephemType)]")

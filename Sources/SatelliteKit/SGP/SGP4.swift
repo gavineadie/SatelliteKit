@@ -50,7 +50,7 @@ class SGP4: TLEPropagator {
             if tle.e₀ > 1e-4 {
 //              omgcof = 0.0; xmcof = 0.0
 //          } else {
-                let c₃ = super.coef * super.ξ * TLEConstants.J₃OVK₂ * tle.n₀ * super.sini₀ / tle.e₀
+                let c₃ = super.coef * super.ξ * EarthConstants.J₃OVK₂ * tle.n₀ * super.sini₀ / tle.e₀
                 xmcof = -⅔ * super.coef * tle.dragCoeff / super.eeta
                 omgcof = tle.dragCoeff * c₃ * cos(tle.ω₀)
             }

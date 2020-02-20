@@ -25,7 +25,7 @@ class ThreeLineElementTests: XCTestCase {
             XCTAssertEqual(tle.n₀, 0.0653602452742121,
                            accuracy: 1e-12)                     // Mean motion (rads/min)  << [un'Kozai'd]
 
-            print("mean altitude    (Kms): \((tle.a₀ - 1.0) * TLEConstants.Rₑ)")
+            print("mean altitude    (Kms): \((tle.a₀ - 1.0) * EarthConstants.Rₑ)")
 
             XCTAssertEqual(tle.i₀, 0.0)                         // TLE .. inclination (rad).
             XCTAssertEqual(tle.ω₀, 0.0)                         // Argument of perigee (rad).

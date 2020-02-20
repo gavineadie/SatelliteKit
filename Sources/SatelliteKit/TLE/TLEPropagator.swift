@@ -35,20 +35,25 @@ import Foundation
   ┃  @author Fabien Maussion (java translation)                                                      ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 
-public struct TLEConstants {
+public struct EarthConstants {
 
-     public static let Rₑ = 6378.135                    // Earth radius (Km)
+     public static let Rₑ = 6378.137                        // Earth radius (Km) - WGS84
 
-    private static let μₑ = 398600.8                    // gravitational constant (Km³/s²)
-            static let kₑ = 60.0 / sqrt(Rₑ*Rₑ*Rₑ / μₑ)
+     public static let rotationₑ = 1.00273790934            // Earth sidereal rotations per UT day
 
-    private static let J₂ = +1.082616e-3
+    private static let flatteningₑ = (1.0 / 298.25722)
+            static let e2 = (flatteningₑ * (2.0 - flatteningₑ))
+
+    private static let μₑ = 398600.5                    // gravitational constant (Km³/s²)
+            static let kₑ = 60.0 / sqrt(EarthConstants.Rₑ*EarthConstants.Rₑ*EarthConstants.Rₑ / μₑ)
+
+    private static let J₂ = +1.08262998905e-3           // 108262998905 - WGS-84
             static let K₂ =  0.5 * J₂
 
-    private static let J₃ = -2.53881e-6
+    private static let J₃ = -2.53215306e-6              // 253215306
             static let J₃OVK₂ = -J₃ / K₂
 
-    private static let J₄ = -1.65597e-6
+    private static let J₄ = -1.61098761e-6              // 161098761
             static let K₄ = -0.375 * J₄
 
 }
@@ -118,8 +123,8 @@ public class TLEPropagator {
         case 98.0...156.0:  self.s = self.tle.perigee - 78.0
         default:            self.s = 78.0
         }
-        let q₀_s = (120.0 - self.s) / TLEConstants.Rₑ
-        self.s = self.s / TLEConstants.Rₑ + 1.0
+        let q₀_s = (120.0 - self.s) / EarthConstants.Rₑ
+        self.s = self.s / EarthConstants.Rₑ + 1.0
 
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆ Computation of the first commons parameters.                                                     ┆
@@ -150,7 +155,7 @@ public class TLEPropagator {
         let x3thm1 = 3.0 * self.θ² - 1.0                    //      3×cos²(i₀) - 1
         self.c₂ = self.coef1 * self.tle.n₀ *                //            (q₀-s)⁴ξ⁴η₀ʺ(1-η²) ** 7/2 *
                         (self.tle.a₀ * (1.0 + 1.5 * self.η² + self.eeta * (4.0 + self.η²)) +
-                         0.75 * TLEConstants.K₂ * self.ξ / ψ² * x3thm1 * (8.0 + 3.0 * self.η² * (8.0 + self.η²)))
+                         0.75 * EarthConstants.K₂ * self.ξ / ψ² * x3thm1 * (8.0 + 3.0 * self.η² * (8.0 + self.η²)))
         self.c₁ = self.tle.dragCoeff * self.c₂
 
         let x1mth2 = 1.0 - self.θ²
@@ -159,7 +164,7 @@ public class TLEPropagator {
   ┆ C4 coefficient computation :                                                                     ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
         self.c₄ = 2.0 * self.tle.n₀ * self.coef1 * self.tle.a₀ * self.β₀² * (self.η * (2.0 + 0.5 * self.η²) +
-            self.tle.e₀ * (0.5 + 2.0 * self.η²) - 2.0 * TLEConstants.K₂ * self.ξ / (self.tle.a₀ * ψ²) *
+            self.tle.e₀ * (0.5 + 2.0 * self.η²) - 2.0 * EarthConstants.K₂ * self.ξ / (self.tle.a₀ * ψ²) *
             (-3.0 * x3thm1 * (1.0 - 2.0 * self.eeta + self.η² * (1.5 - 0.5 * self.eeta)) +
                 0.75 * x1mth2 * (2.0 * self.η² - self.eeta * (1.0 + self.η²)) * cos(2.0 * self.tle.ω₀)))
 
@@ -167,9 +172,9 @@ public class TLEPropagator {
             let pinv = 1.0 / (self.tle.a₀ * self.β₀²)
             let pinv² = pinv * pinv
 
-            let temp1 =   3.0 * TLEConstants.K₂ * pinv² * self.tle.n₀
-            let temp2 = temp1 * TLEConstants.K₂ * pinv²
-            let temp3 =  1.25 * TLEConstants.K₄ * pinv² * pinv² * self.tle.n₀
+            let temp1 =   3.0 * EarthConstants.K₂ * pinv² * self.tle.n₀
+            let temp2 = temp1 * EarthConstants.K₂ * pinv²
+            let temp3 =  1.25 * EarthConstants.K₄ * pinv² * pinv² * self.tle.n₀
 
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆ atmospheric and gravitation coefs :(Mdf and OMEGAdf)                                             ┆
@@ -232,9 +237,9 @@ public class TLEPropagator {
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
         let axn = self.e * cos(self.ω)
         var temp = 1.0 / (self.a * (1.0 - self.e * self.e))
-        let xlcof = 0.125 * TLEConstants.J₃OVK₂ * self.sini₀ *
+        let xlcof = 0.125 * EarthConstants.J₃OVK₂ * self.sini₀ *
                                                 (3.0 + 5.0 * self.cosi₀) / (1.0 + self.cosi₀)
-        let aycof = 0.250 * TLEConstants.J₃OVK₂ * self.sini₀
+        let aycof = 0.250 * EarthConstants.J₃OVK₂ * self.sini₀
         let aynl = temp * aycof
         let xlt = xl + temp * xlcof * axn
         let ayn = self.e * sin(self.ω) + aynl
@@ -303,7 +308,7 @@ public class TLEPropagator {
         let u = atan2(sinu, cosu)
         let sin2u = 2.0 * sinu * cosu
         let cos2u = 2.0 * cosu * cosu - 1.0
-        let temp1 = TLEConstants.K₂ / pl
+        let temp1 = EarthConstants.K₂ / pl
         temp2 = temp1 / pl
 
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
@@ -331,19 +336,19 @@ public class TLEPropagator {
         let uz = sinik * sinuk
 
         // Position and velocity
-        let cr = 1000.0 * rk * TLEConstants.Rₑ
+        let cr = 1000.0 * rk * EarthConstants.Rₑ
         let pos = Vector(cr * ux, cr * uy, cr * uz)
 
-        let rdot   = TLEConstants.kₑ * sqrt(a) * esinE / r
-        let rfdot  = TLEConstants.kₑ * sqrt(pl) / r
-        let xn     = TLEConstants.kₑ / (a * sqrt(a))
+        let rdot   = EarthConstants.kₑ * sqrt(a) * esinE / r
+        let rfdot  = EarthConstants.kₑ * sqrt(pl) / r
+        let xn     = EarthConstants.kₑ / (a * sqrt(a))
         let rdotk  = rdot - xn * temp1 * x1mth2 * sin2u
         let rfdotk = rfdot + xn * temp1 * (x1mth2 * cos2u + 1.5 * x3thm1)
         let vx     = xmx * cosuk - cosnok * sinuk
         let vy     = xmy * cosuk - sinnok * sinuk
         let vz     = sinik * cosuk
 
-        let cv = 1000.0 * TLEConstants.Rₑ / 60.0
+        let cv = 1000.0 * EarthConstants.Rₑ / 60.0
         let vel = Vector(cv * (rdotk * ux + rfdotk * vx),
                          cv * (rdotk * uy + rfdotk * vy),
                          cv * (rdotk * uz + rfdotk * vz))
