@@ -159,7 +159,7 @@ class ThreeLineElementTests: XCTestCase {
 
         do {
             let contents = try String(contentsOfFile: "/Users/gavin/Development/sat_code/all_tle.txt")
-            _ = processTLEs(contents)
+            _ = preProcessTLEs(contents)
         } catch {
             print(error)
         }
