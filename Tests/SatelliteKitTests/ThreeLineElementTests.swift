@@ -22,7 +22,7 @@ class ThreeLineElementTests: XCTestCase {
 
             XCTAssertEqual(tle.e₀, 0.0)                         // TLE .. eccentricity
             XCTAssertEqual(tle.M₀, 0.0)                         // Mean anomaly (rad).
-            XCTAssertEqual(tle.n₀, 0.0653602452742121,
+            XCTAssertEqual(tle.n₀, 0.0653602440158348,
                            accuracy: 1e-12)                     // Mean motion (rads/min)  << [un'Kozai'd]
 
             print("mean altitude    (Kms): \((tle.a₀ - 1.0) * EarthConstants.Rₑ)")
@@ -50,7 +50,7 @@ class ThreeLineElementTests: XCTestCase {
 
             XCTAssertEqual(tle.e₀, 0.0)                         // TLE .. eccentricity
             XCTAssertEqual(tle.M₀, 0.0)                         // Mean anomaly (rad).
-            XCTAssertEqual(tle.n₀, 0.0653602452742121,
+            XCTAssertEqual(tle.n₀, 0.0653602440158348,
                            accuracy: 1e-12)                     // Mean motion (rads/min)  << [un'Kozai'd]
 
             XCTAssertEqual(tle.i₀, 0.0)                         // TLE .. inclination (rad).
@@ -76,7 +76,7 @@ class ThreeLineElementTests: XCTestCase {
 
             XCTAssertEqual(tle.e₀, 0.0)                         // TLE .. eccentricity
             XCTAssertEqual(tle.M₀, 0.0)                         // Mean anomaly (rad).
-            XCTAssertEqual(tle.n₀, 0.0653602452742121,
+            XCTAssertEqual(tle.n₀, 0.0653602440158348,
                            accuracy: 1e-12)                     // Mean motion (rads/min)  << [un'Kozai'd]
 
             XCTAssertEqual(tle.i₀, 0.0)                         // TLE .. inclination (rad).
@@ -159,7 +159,7 @@ class ThreeLineElementTests: XCTestCase {
 
         do {
             let contents = try String(contentsOfFile: "/Users/gavin/Development/sat_code/all_tle.txt")
-            processTLEs(contents)
+            _ = processTLEs(contents)
         } catch {
             print(error)
         }
@@ -208,69 +208,4 @@ class ThreeLineElementTests: XCTestCase {
 //        }
 //    }
 
-}
-
-/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃ This function reads the file records and searches for a TLE-1 record with a good checksum.  If   ┃
-  ┃ that is followed by a good TLE-2, then TLE-0, TLE-1 and TLE-2 are kept, else we throw the        ┃
-  ┃ records away.  The candidate records used to generate a SatelliteModel to add to the collection. ┃
-  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-func processTLEs(_ tleChunk: String) {
-
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ split the TLE file text into lines, exclude those starting with "#", trim the rest ..            │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    let tleLines = tleChunk.components(separatedBy: "\n")
-
-    let filteredTLEs = tleLines.filter { !$0.hasPrefix("#") }.map {
-        $0.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-    }
-
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ Do the checksum check on a TLE line ("0"..."9" are 0...9; "-" is 1; last digit is checksum).     │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    func checkSumGood(_ tleLine: String) -> Bool {
-        var     checkSum: UInt8 = 0
-        let     bytes = [UInt8](tleLine.utf8)
-
-        for arrayIndex in 0..<bytes.count-1 {
-            checkSum %= 10
-            let byte = bytes[arrayIndex]
-            if 48...57 ~= byte { checkSum += (byte - 48) }      // "0"..."9" -> 0...9
-            if byte == 45 { checkSum += 1 }                     //    "-"    ->   1
-        }
-
-        return checkSum % 10 == bytes[bytes.count-1] - 48
-    }
-
-    var line = 0
-    while line < tleLines.count {
-
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ look for TLE-1 (69 characters long, starting with "1 " and good checksum)                        │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-        let tleLine1 = filteredTLEs[line]
-        line += 1
-        guard [UInt8](tleLine1.utf8).count == 69,
-            tleLine1.hasPrefix("1 "),
-            checkSumGood(tleLine1) else { continue }
-
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ look for TLE-2 (69 characters long, starting with "2 " and good checksum)                        │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-        let tleLine2 = filteredTLEs[line]
-        line += 1
-        guard [UInt8](tleLine2.utf8).count == 69,
-            tleLine2.hasPrefix("2 "),
-            checkSumGood(tleLine2) else { continue }
-
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ got TLE-1 followed by TLE-2, so check for TLE-0 (three lines back) with, or without, a leading   │
-  │ "0" .. it's also possible that we have a "two line" tle file (then, set TLE-0 to "") ..          │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-        let tleLine0 = filteredTLEs[line-3]
-
-        _ = Satellite(tleLine0.hasPrefix("2 ") ? "" : tleLine0, tleLine1, tleLine2)
-
-    }
 }

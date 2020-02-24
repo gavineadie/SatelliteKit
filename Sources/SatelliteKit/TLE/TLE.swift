@@ -213,6 +213,23 @@ public struct TLE {
 }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Do the checksum check on a TLE line ("0"..."9" are 0...9; "-" is 1; last digit is checksum).     │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+private func checkSumGood(_ tleLine: String) -> Bool {
+    var     checkSum: UInt8 = 0
+    let     bytes = [UInt8](tleLine.utf8)
+
+    for arrayIndex in 0..<bytes.count-1 {
+        let byte = bytes[arrayIndex]
+        if 48...57 ~= byte { checkSum += (byte - 48) }      // "0"..."9" -> 0...9
+        if byte == 45 { checkSum += 1 }                     //    "-"    ->   1
+        checkSum %= 10
+    }
+
+    return checkSum == bytes[bytes.count-1] - 48
+}
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ Check the lines format validity.                                                                 │
   │            Return true if lines are 69 characters long, format is valid, and checksums are good. │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
@@ -253,26 +270,66 @@ public func formatOK(_ line1: String, _ line2: String) -> Bool {
     return true
 }
 
+/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃ This function takes a String that is possibly the lines from a TLE file.  It splits it into an   ┃
+  ┃ array of Strings (hopefully, TLE records).  Records starting with "#" are dropped, leading and   ┃
+  ┃ trailing whitespace is stripped, and non-breaking spaces are converted to regular spaces.        ┃
+  ┃  Then, with a presumably clean set of TLEs, the function searches for the first TLE-1 line with  ┃
+  ┃ a good checksum.  If that is followed immediately by a good TLE-2, the line before the TLE-1 is  ┃
+  ┃ assumed to be a TLE-0 (if not a TLE-2) regardless of content.  These three lines are used to     ┃
+  ┃ make a tuple (TLE-0, TLE-1, TLE-2), and the tuple is added to the array of TLE tuples which is   ┃
+  ┃ returned by the function.                                                                        ┃
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+func processTLEs(_ tleChunk: String) -> [(String, String, String)] {
+    var satellites = [(String, String, String)]()
+
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ Do the checksum check on a TLE line ("0"..."9" are 0...9; "-" is 1; last digit is checksum).     │
+  │ split the String into a String array and convert non-breaking spaces ..                          │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-private func checkSumGood(_ tleLine: String) -> Bool {
-    var     checkSum: UInt8 = 0
-    let     bytes = [UInt8](tleLine.utf8)
+    let tles = (tleChunk + "\n#EOF").replacingOccurrences(of: "\r",
+                                                          with: "").components(separatedBy: "\n")
 
-    for arrayIndex in 0..<68 {
-        let byte = bytes[arrayIndex]
-        if 48...57 ~= byte { checkSum += (byte - 48) }      // "0"..."9" -> 0...9
-        if byte == 45 { checkSum += 1 }                     //    "-"    ->   1
-        checkSum %= 10
+    func trimWhitespace(string: String) -> String {
+        return string.trimmingCharacters(in: CharacterSet.whitespaces)
+                                                .replacingOccurrences(of: "\u{00A0}", with: " ")
     }
 
-    guard checkSum == bytes[68] - 48 else {
-        print("TLE checksum failed: wanted '\(Character(Unicode.Scalar(bytes[68])))' and " +
-                                      "got '\(Character(Unicode.Scalar(checkSum + 48)))'")
-        return false
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ drop any blank lines or lines starting with "#" ..                                               │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    let filteredTLEs = ([""] + tles.map(trimWhitespace)
+                                   .filter { !$0.hasPrefix("#") && !$0.isEmpty })
+
+    var index = 0
+    while index < filteredTLEs.count {
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ look for TLE-1 (69 characters long, starting with "1" and good checksum)                         │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+		let tleLine1 = filteredTLEs[index]
+        index += 1
+        guard (tleLine1.utf8).count == 69,
+               tleLine1.hasPrefix("1"),
+               checkSumGood(tleLine1) else { continue }
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ look for TLE-2 (69 characters long, starting with "2" and good checksum)                         │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+		let tleLine2 = filteredTLEs[index]
+        index += 1
+        guard (tleLine2.utf8).count == 69,
+               tleLine2.hasPrefix("2"),
+               checkSumGood(tleLine2) else { continue }
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ got TLE-1 followed by TLE-2, so check for TLE-0 (three lines back) with, or without, a leading   │
+  │ "0" .. it's also possible that we have a "two index" tle file (then, set TLE-0 to "") ..         │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+        let tleLine0 = filteredTLEs[index-3]
+
+        satellites.append((tleLine0.hasPrefix("2 ") ? "" : tleLine0, tleLine1, tleLine2))
     }
-    return true
+
+    return satellites
 }
 
 func base10ID(_ noradID: String) -> Int {
