@@ -280,7 +280,7 @@ public func formatOK(_ line1: String, _ line2: String) -> Bool {
   ┃ make a tuple (TLE-0, TLE-1, TLE-2), and the tuple is added to the array of TLE tuples which is   ┃
   ┃ returned by the function.                                                                        ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-func preProcessTLEs(_ tleChunk: String) -> [(String, String, String)] {
+public func preProcessTLEs(_ tleChunk: String) -> [(String, String, String)] {
     var satellites = [(String, String, String)]()
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
