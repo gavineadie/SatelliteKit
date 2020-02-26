@@ -277,54 +277,61 @@ public func geo2xyz(geodetic: LatLonAlt) -> Vector {
 }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃ eci2top .. JD, sat(x, y, z), obs(lat°, lon°, alt) -> (x, y, z)                                   ┃
+  ┃ eci2top .. JD, sat(x, y, z), obs(lat°, lon°, alt) -> (x, y, z)       [obs→sat in obs topo frame] ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-public func eci2top(julianDays: Double, satVector: Vector, geoVector: LatLonAlt) -> Vector {
-    let     latitudeRads = geoVector.lat * deg2rad
-    let     sinLatitude = sin(latitudeRads)
-    let     cosLatitude = cos(latitudeRads)
-
-    let obsVector = geo2eci(julianDays: julianDays, geodetic: geoVector)
-    let obs2sat = satVector - obsVector
-
-    let     siderealRads = siteMeanSiderealTime(julianDate: julianDays, obsVector.y) * deg2rad
-    let     sinSidereal = sin(siderealRads)
-    let     cosSidereal = cos(siderealRads)
-
-    let topS = +sinLatitude * cosSidereal * obs2sat.x +
-                sinLatitude * sinSidereal * obs2sat.y -
-                cosLatitude * obs2sat.z
-
-    let topE = -sinSidereal * obs2sat.x +
-                cosSidereal * obs2sat.y
-
-    let topZ = +cosLatitude * cosSidereal * obs2sat.x +
-                cosLatitude * sinSidereal * obs2sat.y +
-                sinLatitude * obs2sat.z
-
-    return Vector(topS, topE, topZ)
+public func eci2top(julianDays: Double, satCel: Vector, obsLLA: LatLonAlt) -> Vector {
+   topoVector(julianDays: julianDays, satCel: satCel, obsLLA: obsLLA)
 }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃ cel2top .. JD, sat(x, y, z), obs(x, y, z) -> (x, y, z)        [vector obs→sat in obs topo frame] ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-public func cel2top(julianDays: Double, satVector: Vector, obsVector: Vector) -> Vector {
-    let obsLLA = eci2geo(julianDays: julianDays, celestial: obsVector)
+public func cel2top(julianDays: Double, satCel: Vector, obsCel: Vector) -> Vector {
+    topoVector(julianDays: julianDays, satCel: satCel,
+                                       obsLLA: eci2geo(julianDays: julianDays, celestial: obsCel))
+}
 
-    let     latitudeRads = obsLLA.lat * deg2rad
-    let     sinLatitude = sin(latitudeRads)
-    let     cosLatitude = cos(latitudeRads)
+/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃ eci2top .. JD, sat(x, y, z), obs(lat°, lon°, alt) -> (azi°, ele°, dst)                           ┃
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+public func topPosition(julianDays: Double, satCel: Vector, obsLLA: LatLonAlt) -> AziEleDst {
 
-    let     siderealRads = siteMeanSiderealTime(julianDate: julianDays, obsLLA.lon) * deg2rad
-    let     sinSidereal = sin(siderealRads)
-    let     cosSidereal = cos(siderealRads)
+    let obsCel = geo2eci(julianDays: julianDays, geodetic: obsLLA)    // ECI
 
-    let obs2sat = Vector(satVector.x - obsVector.x,
-                         satVector.y - obsVector.y,
-                         satVector.z - obsVector.z)
+    let top = cel2top(julianDays: julianDays, satCel: satCel, obsCel: obsCel)
 
-    return Vector(
-        obs2sat.x*(+sinLatitude * cosSidereal) + obs2sat.y*(+sinLatitude * sinSidereal) + obs2sat.z*(-cosLatitude),
-        obs2sat.x*(-sinSidereal) + obs2sat.y*(+cosSidereal) + obs2sat.z*0.0,
-        obs2sat.x*(+cosLatitude * cosSidereal) + obs2sat.y*(+cosLatitude * sinSidereal) + obs2sat.z*(+sinLatitude)
+    let d = magnitude(obsCel - satCel)
+
+    return AziEleDst(azim: atan2pi(top.y, -top.x) * rad2deg,
+                     elev: asin(top.z / d) * rad2deg,
+                     dist: d)
+}
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ utility function used in both eci2top and cet2top -> (x, y, z)       [obs→sat in obs topo frame] │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+private func topoVector(julianDays: Double, satCel: Vector, obsLLA: LatLonAlt) -> Vector {
+    let latitudeRads = obsLLA.lat * deg2rad
+    let sinLatitude = sin(latitudeRads)
+    let cosLatitude = cos(latitudeRads)
+
+    let siderealRads = siteMeanSiderealTime(julianDate: julianDays, obsLLA.lon) * deg2rad
+    let sinSidereal = sin(siderealRads)
+    let cosSidereal = cos(siderealRads)
+
+    let obsCel = geo2eci(julianDays: julianDays, geodetic: obsLLA)    // ECI
+    let obs2sat = satCel - obsCel
+
+    return Vector(obs2sat.x*(+sinLatitude * cosSidereal) +
+                  obs2sat.y*(+sinLatitude * sinSidereal) +
+                  obs2sat.z*(-cosLatitude),
+
+                  obs2sat.x*(-sinSidereal) +
+                  obs2sat.y*(+cosSidereal) +
+                  obs2sat.z*0.0,
+
+                  obs2sat.x*(+cosLatitude * cosSidereal) +
+                  obs2sat.y*(+cosLatitude * sinSidereal) +
+                  obs2sat.z*(+sinLatitude)
     )
 }
