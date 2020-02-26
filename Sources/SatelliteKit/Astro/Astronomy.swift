@@ -287,7 +287,7 @@ public func eci2top(julianDays: Double, satVector: Vector, geoVector: LatLonAlt)
     let obsVector = geo2eci(julianDays: julianDays, geodetic: geoVector)
     let obs2sat = satVector - obsVector
 
-    let     siderealRads = siteMeanSiderealTime(julianDate: julianDays, obsVector.y) * deg2rad
+    let     siderealRads = siteMeanSiderealTime(julianDate: julianDays, geoVector.lon) * deg2rad
     let     sinSidereal = sin(siderealRads)
     let     cosSidereal = cos(siderealRads)
 
