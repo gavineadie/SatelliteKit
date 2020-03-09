@@ -30,6 +30,7 @@ test output and the test output in the above published paper [1].
 ### Change Notes
 
 At the end of the README.
+Lastest change: Version/Tag 1.0.21 -- 2020 Mar 09
 
 ### TLE
 
@@ -161,5 +162,13 @@ Translation from C++ and Java, testing and distribution by [Gavin Eadie](mailto:
 `version/tag 1.0.16 .. (2020 Jan 27)`
 
 - update copyright year to 2020
+
+`version/tag 1.0.20 .. (2020 Feb 26)`
+
+- correct and clarify the conversion of satellite position as seen by an observer after a bug in `eci2top(..)` was corrected. 
+
+`version/tag 1.0.21 .. (2020 Mar 09)`
+
+- include the age of the TLE set in its  `debugDescription(..)`. 
 
 ---

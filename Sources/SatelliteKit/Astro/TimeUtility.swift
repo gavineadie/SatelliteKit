@@ -88,19 +88,26 @@ public let dateFormatterLocal: DateFormatter = {
   ║ Created by Gavin Eadie on May29/17         Copyright © 2017-20 Gavin Eadie. All rights reserved. ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
-extension Date {
-
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃  some Date extensions relative to the TLE epoch origin, 1949-Dec-31 00h00m00.0s                  ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+extension Date {
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Creates a Date from decimal days since the TLE epoch                                             │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    public init(daysSince1950: Double) {
+        self = Date(timeInterval: daysSince1950 * TimeConstants.day2sec,    // seconds since 1950
+                    since: TimeConstants.tleEpochReferenceDate)
+    }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │  Seconds from TLE Epoch to the reference date, 2001-Jan-01 00h00m00.0s (CFAbsoluteTime zero)     │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public static let timeIntervalBetween1950AndReferenceDate: TimeInterval = 1_609_545_600.0
+    static let timeIntervalBetween1950AndReferenceDate: TimeInterval = 1_609_545_600.0
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │  Returns a Date initialized relative to the TLE epoch by a given number of seconds ...           │
+  │  Creates a Date from a given number of seconds relative to the TLE epoch ..                      │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public init(timeIntervalSince1950: TimeInterval) {
         self.init(timeIntervalSinceReferenceDate:
@@ -111,14 +118,6 @@ extension Date {
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public var timeIntervalSince1950: TimeInterval {
         self.timeIntervalSinceReferenceDate + Date.timeIntervalBetween1950AndReferenceDate
-    }
-
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ create a Date from decimal days since the TLE epoch                                              │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public init(daysSince1950: Double) {
-        self = Date(timeInterval: daysSince1950 * TimeConstants.day2sec,    // seconds since 1950
-                    since: TimeConstants.tleEpochReferenceDate)
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐

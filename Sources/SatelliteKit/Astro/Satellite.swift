@@ -56,9 +56,9 @@ public struct Satellite {
 
 // MARK: - inertial position and velocity
 
-/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃ return satellite's earth centered inertial position (Kilometers) at minutes after TLE epoch      ┃
-  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ return satellite's earth centered inertial position (Kilometers) at minutes after TLE epoch      │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public func position(minsAfterEpoch: Double) -> Vector {
         do {
             let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
@@ -70,9 +70,9 @@ public struct Satellite {
         }
     }
 
-/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃ return satellite's earth centered inertial velocity (Kms/second) at minutes after TLE epoch      ┃
-  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ return satellite's earth centered inertial velocity (Kms/second) at minutes after TLE epoch      │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public func velocity(minsAfterEpoch: Double) -> Vector {
         do {
             let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
@@ -84,16 +84,16 @@ public struct Satellite {
         }
     }
 
-/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃ return satellite's earth centered inertial position (Kilometers) at Julian Date                  ┃
-  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ return satellite's earth centered inertial position (Kilometers) at Julian Date                  │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public func position(julianDays: Double) -> Vector {
         position(minsAfterEpoch: minsAfterEpoch(julianDays))
     }
 
-/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃ return satellite's earth centered inertial velocity (Kms/second) at Julian Date                  ┃
-  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ return satellite's earth centered inertial velocity (Kms/second) at Julian Date                  │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public func velocity(julianDays: Double) -> Vector {
         velocity(minsAfterEpoch: minsAfterEpoch(julianDays))
     }
@@ -104,7 +104,7 @@ public struct Satellite {
 
         String(format: """
 
-        ┌─[tle]─────────────────────────────────────────────────────────────────
+        ┌─[tle : %5.2f days old]────────────────────────────────────────────────
         │  %@    %05d = %@    rev#:%05d tle#:%04d
         │     t₀:  %@    %+14.8f days after 1950
         │
@@ -113,6 +113,7 @@ public struct Satellite {
         │                                        drag:  %+11.4e
         └───────────────────────────────────────────────────────────────────────
         """,
+                      -Date(daysSince1950: t₀Days1950).timeIntervalSinceNow * TimeConstants.sec2day,
                       self.commonName.padding(toLength: 24, withPad: " ", startingAt: 0),
                       self.propagator.tle.noradIndex,
                       self.propagator.tle.launchName.padding(toLength: 8, withPad: " ", startingAt: 0),

@@ -19,7 +19,7 @@ enum SatKitError: Error {
   ┆ Convenience function .. converts the YYDDD.DDDDDDDD TLE epoch time to days since 1950 reference. ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
 private func epochDays(year: Int, days: Double) -> Double {
-    return Double(year-1950)*365.0 + Double((year-1949)/4) + days
+    Double(year-1950)*365.0 + Double((year-1949)/4) + days
 }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
