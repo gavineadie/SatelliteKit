@@ -58,18 +58,18 @@ Note that the operation to "un Kozai" the element data is performed inside the i
 both SGP4 and SDP4 need that adjustment.
 
 The initializer will throw an exception if the numeric parsing of the element data fails, however,
-it will not do so if the record checksum fails.  The general correctness of the element record can
+it will not do so if the record checksum fails.  More complete correctness of the element record can
 be verified by:
 
 	public func formatOK(_ line1: String, _ line2: String) -> Bool
 
 which will return `true` if the lines are 69 characters long, format is valid, and checksums are good.
 Note that `line0` doesn't take part in the check so is omitted for this function, and that `formatOK` will
-emit more explicit errors into the log.
+emit explicit errors into the log.
 
 The `TLE` structure also implements `debugDescription` which will generate this formatted `String`
 
-    ┌─[tle]─────────────────────────────────────────────────────────────────
+    ┌─[tle :  0.66 days old]]───────────────────────────────────────────────
     │  ISS (ZARYA)                 25544 = 98067A      rev#:09857 tle#:0999
     │     t₀:  2018-02-08 22:51:49 +0000    +24876.95265046 days after 1950
     │
@@ -85,9 +85,10 @@ manage the propagation of the object's position and velocity as time is varied f
 t=0 of the element set.  Whether the object requires the "deep space" propagator, or not, is
 determined within the `Satellite` initialization.
 
-The initializer is called internally by the static function:
+The `Satellite` initializers are:
 
-    public init(withTLE tle: TLE)
+    public init(_: String, _: String, _: String)  // three TLE lines ..
+    public init(withTLE: TLE)                     // a processed TLE struct ..
 
 The `Satellite` struct offers some public properties and some public functions.
 
@@ -124,6 +125,31 @@ This is a simple invocation of the above:
     } catch {
         print(error)
     }
+
+### Dealing with TLE files
+
+The most commonly available form of TLE data is a file containing multiple concatenated TLEs.  The `String` 
+content of such a file may be processed (records that are empty or start with "#" are dropped then
+leading and trailing whitespace is stripped and non-breaking spaces are converted to regular spaces) 
+and checked for quality (line length is 69 characters and the checksum is good) within SatelliteKit with the function:
+
+    public func preProcessTLEs(_: String) -> [(String, String, String)]
+
+`preProcessTLEs` consumes a `String` of, presumably, TLE records, and returns an array of 
+`(String, String, String)` tuples, one per satellite.  The `String`s in the tuple are the zeroth, first 
+and second of one satellites TLE lines. If the TLEs are the two-line variety, the first member of the 
+tuple is an empty `String`.
+
+Thus, the contents of a TLE file would be mapped to an array of `Satellite` by:
+
+    let satArray = preProcessTLEs(fileContents).map( { return Satellite($0.0, $0.1, $0.2) } )
+
+A more rigorous quality check can be preformed using:
+
+    public func formatOK(_: String, _: String) -> Bool
+
+which checks the format of TLE lines "1" and "2" .. using a regex test, a time consuming action
+that is not performed in `preProcessTLEs`.
 
 ### Inclusion
 

@@ -126,9 +126,9 @@ class DeepSDP4: SDP4 {
         let gam = 5.8351514 + 0.0019443680 * days₁₉₀₀                   // longitude of lunar perigee (rads)
 
         let zcosil = 0.91375164 - 0.03568096 * ctem
-        let zsinil = sqrt(1.0 - zcosil * zcosil)
+        let zsinil = (1.0 - zcosil * zcosil).squareRoot()
         let zsinhl = 0.089683511 * stem / zsinil
-        let zcoshl = sqrt(1.0 - zsinhl * zsinhl)
+        let zcoshl = (1.0 - zsinhl * zsinhl).squareRoot()
 
         zmol = fmod2pi_π(c_minus_gam)
 

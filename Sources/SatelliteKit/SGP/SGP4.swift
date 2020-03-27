@@ -11,7 +11,7 @@ import Foundation
 
 class SGP4: TLEPropagator {
 
-    private var delM₀³ = 0.0                // (1 + eta * cos(M0))³
+    private var ΔM₀³ = 0.0                  // (1 + eta * cos(M₀))³
 
     private var d₂ = 0.0
     private var d₃ = 0.0
@@ -30,13 +30,13 @@ class SGP4: TLEPropagator {
     override func sxpInitialize() throws {
 
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
-  ┆ For perigee less than 220 kilometers, the equations are truncated to linear variation in sqrt a  ┆
-  ┆ and quadratic variation in mean anomaly. Also, the c₃ term, the delta omega term, and the delta  ┆
-  ┆ m term are dropped.                                                                              ┆
+  ┆ For perigee less than 220 kilometers, the equations are truncated to linear variation in √a and  ┆
+  ┆ quadratic variation in mean anomaly. Also, the c₃ term, the delta omega term, and the delta m    ┆
+  ┆ term are dropped.                                                                                ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
         if super.tle.perigee > 220 {
-            let _delM₀ = 1.0 + super.η * cos(super.tle.M₀)
-            delM₀³ = _delM₀ * _delM₀ * _delM₀
+            let ΔM₀ = 1.0 + super.η * cos(super.tle.M₀)
+            ΔM₀³ = ΔM₀ * ΔM₀ * ΔM₀
 
             let c₁² = super.c₁ * super.c₁
             d₂ = 4.0 * tle.a₀ * super.ξ * c₁²
@@ -84,10 +84,10 @@ class SGP4: TLEPropagator {
   ┆ if above 220Kms, do some more work .. adjust xmp, tempa, tempe, templ ..                         ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
         if super.tle.perigee > 220 {
-            let delomg = omgcof * minsAfterEpoch
-            var delm = 1.0 + super.η * cos(anomdf)
-            delm = xmcof * (delm * delm * delm - delM₀³)
-            let temp = delomg + delm
+            let Δomg = omgcof * minsAfterEpoch
+            var Δm = 1.0 + super.η * cos(anomdf)
+            Δm = xmcof * (Δm * Δm * Δm - ΔM₀³)
+            let temp = Δomg + Δm
             xmp = anomdf + temp
             super.ω -= temp
             let minsAfterEpoch³ = minsAfterEpoch² * minsAfterEpoch

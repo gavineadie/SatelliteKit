@@ -37,23 +37,24 @@ import Foundation
 
 public struct EarthConstants {
 
-     public static let Rₑ = 6378.137                        // Earth radius (Km) - WGS84
+     public static let Rₑ = 6378.137                    // Earth radius (Km) - WGS84
 
-     public static let rotationₑ = 1.00273790934            // Earth sidereal rotations per UT day
+     public static let rotationₑ = 1.00273790934        // Earth sidereal rotations per UT day
 
     private static let flatteningₑ = (1.0 / 298.25722)
-            static let e2 = (flatteningₑ * (2.0 - flatteningₑ))
+            static let e2 = flatteningₑ * (2.0 - flatteningₑ)
 
     private static let μₑ = 398600.5                    // gravitational constant (Km³/s²)
-            static let kₑ = 60.0 / sqrt(EarthConstants.Rₑ*EarthConstants.Rₑ*EarthConstants.Rₑ / μₑ)
+            static let kₑ = 60.0 /
+                            (EarthConstants.Rₑ*EarthConstants.Rₑ*EarthConstants.Rₑ / μₑ).squareRoot()
 
-    private static let J₂ = +1.08262998905e-3           // 108262998905 - WGS-84
+    private static let J₂ = +1.08262998905e-3
             static let K₂ =  0.5 * J₂
 
-    private static let J₃ = -2.53215306e-6              // 253215306
+    private static let J₃ = -2.53215306e-6
             static let J₃OVK₂ = -J₃ / K₂
 
-    private static let J₄ = -1.61098761e-6              // 161098761
+    private static let J₄ = -1.61098761e-6              
             static let K₄ = -0.375 * J₄
 
 }
@@ -301,7 +302,7 @@ public class TLEPropagator {
         let pl = self.a * temp
         let r = self.a * (1.0 - ecosE)
         var temp2 = a / r
-        let betal = sqrt(temp)
+        let betal = temp.squareRoot()
         temp = esinE / (1.0 + betal)
         let cosu = temp2 * (cosEPW - axn + ayn * temp)
         let sinu = temp2 * (sinEPW - ayn - axn * temp)
@@ -339,9 +340,9 @@ public class TLEPropagator {
         let cr = 1000.0 * rk * EarthConstants.Rₑ
         let pos = Vector(cr * ux, cr * uy, cr * uz)
 
-        let rdot   = EarthConstants.kₑ * sqrt(a) * esinE / r
-        let rfdot  = EarthConstants.kₑ * sqrt(pl) / r
-        let xn     = EarthConstants.kₑ / (a * sqrt(a))
+        let rdot   = EarthConstants.kₑ * √a * esinE / r
+        let rfdot  = EarthConstants.kₑ * √pl / r
+        let xn     = EarthConstants.kₑ / (a * √a)
         let rdotk  = rdot - xn * temp1 * x1mth2 * sin2u
         let rfdotk = rfdot + xn * temp1 * (x1mth2 * cos2u + 1.5 * x3thm1)
         let vx     = xmx * cosuk - cosnok * sinuk

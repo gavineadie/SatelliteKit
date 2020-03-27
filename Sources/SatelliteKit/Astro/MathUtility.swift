@@ -32,9 +32,7 @@ public let  deg2hrs: Double = 1.0/hrs2deg           // not used in library
 prefix operator √
 
 prefix func √ <T: FloatingPoint>(float: T) -> T {
-    if let ff = float as? Double { return (sqrt(ff) as? T)! }
-    if let ff = float as? Float { return (sqrtf(ff) as? T)! }
-    preconditionFailure()
+    float.squareRoot()
 }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓

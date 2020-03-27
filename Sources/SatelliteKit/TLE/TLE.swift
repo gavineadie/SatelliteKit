@@ -185,7 +185,7 @@ public struct TLE {
         self.revNumber = Int(stringlet.trimmingCharacters(in: .whitespaces))!
 
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
-  ┆ recover (un'Kozai) original mean motion and semi-major axis from the input elements for SGP4x.   ┆
+  ┆ recover (un'Kozai) original mean motion and semi-major axis from the input elements for SxP4.    ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
 
         do {
@@ -274,7 +274,8 @@ public func formatOK(_ line1: String, _ line2: String) -> Bool {
   ┃ This function takes a String that is possibly the lines from a TLE file.  It splits it into an   ┃
   ┃ array of Strings (hopefully, TLE records).  Records starting with "#" are dropped, leading and   ┃
   ┃ trailing whitespace is stripped, and non-breaking spaces are converted to regular spaces.        ┃
-  ┃  Then, with a presumably clean set of TLEs, the function searches for the first TLE-1 line with  ┃
+  ┃                                                                                                  ┃
+  ┃ Then, with a presumably clean set of TLEs, the function searches for the first TLE-1 line with   ┃
   ┃ a good checksum.  If that is followed immediately by a good TLE-2, the line before the TLE-1 is  ┃
   ┃ assumed to be a TLE-0 (if not a TLE-2) regardless of content.  These three lines are used to     ┃
   ┃ make a tuple (TLE-0, TLE-1, TLE-2), and the tuple is added to the array of TLE tuples which is   ┃
@@ -309,7 +310,7 @@ public func preProcessTLEs(_ tleChunk: String) -> [(String, String, String)] {
         index += 1
         guard (tleLine1.utf8).count == 69,
                tleLine1.hasPrefix("1"),
-               checkSumGood(tleLine1) else { continue }
+               checkSumGood(tleLine1) else { continue }         // keep looking for TLE-1
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ look for TLE-2 (69 characters long, starting with "2" and good checksum)                         │
@@ -318,7 +319,7 @@ public func preProcessTLEs(_ tleChunk: String) -> [(String, String, String)] {
         index += 1
         guard (tleLine2.utf8).count == 69,
                tleLine2.hasPrefix("2"),
-               checkSumGood(tleLine2) else { continue }
+               checkSumGood(tleLine2) else { continue }         // look for another TLE-1
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ got TLE-1 followed by TLE-2, so check for TLE-0 (three lines back) with, or without, a leading   │

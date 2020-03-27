@@ -139,9 +139,9 @@ public func lunarCel(julianDays: Double) -> Vector {
 public func lunarGeo (julianDays: Double) -> (Double, Double) {
     let     lunarVector: Vector = lunarCel(julianDays: julianDays)
 
-    return (asin(lunarVector.z / sqrt(lunarVector.x * lunarVector.x +
-                                      lunarVector.y * lunarVector.y +
-                                      lunarVector.z * lunarVector.z)) * rad2deg,
+    return (asin(lunarVector.z / (lunarVector.x * lunarVector.x +
+                                  lunarVector.y * lunarVector.y +
+                                  lunarVector.z * lunarVector.z).squareRoot()) * rad2deg,
             atan2pi(lunarVector.y, lunarVector.x) * rad2deg)
 }
 
@@ -177,7 +177,7 @@ public func azel(time: Date,
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 public func eci2geo(julianDays: Double, celestial: Vector) -> LatLonAlt {
 
-    let     positionXY = sqrt(celestial.x*celestial.x + celestial.y*celestial.y)
+    let     positionXY = (celestial.x*celestial.x + celestial.y*celestial.y).squareRoot()
     var     newLatRads = atan2(celestial.z, positionXY)
 
     var     oldLatRads: Double
@@ -185,7 +185,8 @@ public func eci2geo(julianDays: Double, celestial: Vector) -> LatLonAlt {
 
     repeat {
         let sinLatitude = sin(newLatRads)
-        correction = EarthConstants.Rₑ / sqrt(1.0 - (EarthConstants.e2 * sinLatitude*sinLatitude))
+        correction = EarthConstants.Rₑ /
+                            (1.0 - EarthConstants.e2 * sinLatitude*sinLatitude).squareRoot()
         oldLatRads = newLatRads
         newLatRads = atan2(celestial.z + correction * EarthConstants.e2 * sinLatitude, positionXY)
     } while (fabs(newLatRads - oldLatRads) > 0.0001)
@@ -209,9 +210,10 @@ public func geo2eci(julianDays: Double, geodetic: LatLonAlt) -> Vector {
     let     sinSidereal = sin(siderealRads)
     let     cosSidereal = cos(siderealRads)
 
-    let     c = EarthConstants.Rₑ / sqrt(1.0 + EarthConstants.e2 * sinLatitude * sinLatitude)
-    let     s = (1 - EarthConstants.e2) * c
-    let     achcp = (c + geodetic.alt) * cosLatitude
+    let     correction = EarthConstants.Rₑ /
+                            (1.0 + EarthConstants.e2 * sinLatitude*sinLatitude).squareRoot()
+    let     s = (1 - EarthConstants.e2) * correction
+    let     achcp = (correction + geodetic.alt) * cosLatitude
 
     return Vector(achcp * cosSidereal,
                   achcp * sinSidereal,
@@ -230,12 +232,10 @@ public func geo2eci(geodetic: LatLonAlt) -> Vector {
     let     sinSidereal = sin(siderealRads)
     let     cosSidereal = cos(siderealRads)
 
-    let flatteningₑ = (1.0 / 298.26)
-    let e2 = (flatteningₑ * (2.0 - flatteningₑ))
-
-    let     c = EarthConstants.Rₑ / sqrt(1.0 + e2 * sinLatitude * sinLatitude)
-    let     s = (1 - e2) * c
-    let     achcp = (c + geodetic.alt) * cosLatitude
+    let     correction = EarthConstants.Rₑ /
+                            (1.0 + EarthConstants.e2 * sinLatitude*sinLatitude).squareRoot()
+    let     s = (1 - EarthConstants.e2) * correction
+    let     achcp = (correction + geodetic.alt) * cosLatitude
 
     return Vector(achcp * cosSidereal,
                   achcp * sinSidereal,
