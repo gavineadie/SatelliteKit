@@ -158,7 +158,7 @@ public func azel(time: Date,
     let dec = cele.1 * deg2rad
 
     let elev = asin(sin(lat) * sin(dec) + cos(lat) * cos(dec) * cos(hourAngle))
-    let azim = atan2pi(sin(hourAngle), cos(hourAngle) * sin(lat) - tan(dec) * cos(lat))
+    let azim = atan2pi(sin(hourAngle), sin(lat) * cos(hourAngle) - cos(lat) * tan(dec))
 
     return (fmod(elev * rad2deg, 360.0),
             fmod(azim * rad2deg + 540.0, 360.0))

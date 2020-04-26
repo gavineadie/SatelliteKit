@@ -197,4 +197,8 @@ Translation from C++ and Java, testing and distribution by [Gavin Eadie](mailto:
 
 - include the age of the TLE set in its  `debugDescription(..)`. 
 
+`version/tag 1.0.22 .. (2020 Apr 25)`
+
+- Package description specifies: .macOS(.v10_12), .iOS(.v9)` 
+
 ---
