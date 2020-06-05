@@ -56,32 +56,48 @@ public struct TimeConstants {
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-public let dateFormatterUTC: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZ"
-    formatter.timeZone = TimeZone(abbreviation: "UTC")
-    return formatter
-}()
+extension DateFormatter {
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-public let dateFormatterRFC: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
-    formatter.locale = Locale(identifier: "en_US")
-    return formatter
-}()
+    public static let iso8601Micros: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter
+    }()
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-public let dateFormatterLocal: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .medium
-    formatter.timeStyle = .medium
-    formatter.timeZone = TimeZone.current
-    formatter.locale = Locale(identifier: "en_US")
-    return formatter
-}()
+    public static let utc: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZ"
+        formatter.timeZone = TimeZone(abbreviation: "UTC")
+        return formatter
+    }()
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    public static let rfc: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
+        formatter.locale = Locale(identifier: "en_US")
+        return formatter
+    }()
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    public static let local: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .medium
+        formatter.timeZone = TimeZone.current
+        formatter.locale = Locale(identifier: "en_US")
+        return formatter
+    }()
+}
 
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ DateUtility.swift                                                                         SatKit ║
@@ -128,7 +144,7 @@ extension Date {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public var UTC: String {
-        dateFormatterUTC.string(from: self)
+        DateFormatter.utc.string(from: self)
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
