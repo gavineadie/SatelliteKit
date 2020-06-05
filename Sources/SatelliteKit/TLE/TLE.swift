@@ -222,7 +222,6 @@ public struct TLE: Decodable {
         case Ω₀ = "RA_OF_ASC_NODE"
         case M₀ = "MEAN_ANOMALY"
         case n₀ = "MEAN_MOTION"
-        case a₀ = "SEMI_MAJOR_AXIS"         //TODO a₀ made optional to avoid error on missing SEMI_MAJOR_AXIS
         case dragCoeff = "BSTAR"
         case ephemType = "EPHEMERIS_TYPE"
         case tleClass = "CLASSIFICATION_TYPE"
@@ -266,7 +265,6 @@ public struct TLE: Decodable {
         self.ω₀ = try container.decode(Double.self, forKey: .ω₀) * deg2rad
         self.Ω₀ = try container.decode(Double.self, forKey: .Ω₀) * deg2rad
         self.M₀ = try container.decode(Double.self, forKey: .M₀) * deg2rad
-        self.a₀ = try container.decode(Double.self, forKey: .a₀)
         self.dragCoeff = try container.decode(Double.self, forKey: .dragCoeff)
         self.ephemType = try container.decode(Int.self, forKey: .ephemType)
         self.tleClass = try container.decode(String.self, forKey: .tleClass)

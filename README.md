@@ -67,6 +67,10 @@ which will return `true` if the lines are 69 characters long, format is valid, a
 Note that `line0` doesn't take part in the check so is omitted for this function, and that `formatOK` will
 emit explicit errors into the log.
 
+The `TLE` structure can also be initialised from JSON data:
+
+
+
 The `TLE` structure also implements `debugDescription` which will generate this formatted `String`
 
     ┌─[tle :  0.66 days old]]───────────────────────────────────────────────
@@ -207,6 +211,6 @@ Translation from C++ and Java, testing and distribution by [Gavin Eadie](mailto:
 
 `version/tag 1.0.24 .. (2020 Jun 04)`
 
-- provide a TLE initializer than consumes a JSON version of the new NORAD GP Element Set.
+- provide an (**EXPERIMENTAL**) TLE initializer than consumes a JSON version of the new NORAD GP Element Set.
 
 ---

@@ -174,7 +174,6 @@ class ThreeLineElementTests: XCTestCase {
             "ELEMENT_SET_NO":999,
             "REV_AT_EPOCH":343,
             "BSTAR":7.4303e-5,
-            "SEMI_MAJOR_AXIS":1234.56,
             "MEAN_MOTION_DOT":8.83e-6,
             "MEAN_MOTION_DDOT":0}
         """
