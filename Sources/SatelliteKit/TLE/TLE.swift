@@ -10,6 +10,19 @@ import Foundation
 // swiftlint:disable identifier_name
 // swiftlint:disable function_body_length
 
+extension DateFormatter {
+
+  static let iso8601Micros: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+    formatter.calendar = Calendar(identifier: .iso8601)
+    formatter.timeZone = TimeZone(secondsFromGMT: 0)
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    return formatter
+  }()
+
+}
+
 enum SatKitError: Error {
     case TLE(String)
     case SGP(String)
@@ -27,7 +40,7 @@ private func epochDays(year: Int, days: Double) -> Double {
   ┃                                                                                                  ┃
   ┃                                                               MemoryLayout<TLE>.size = 200 bytes ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-public struct TLE {
+public struct TLE: Decodable {
 
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆ Information derived directly from the Two Line Elements ..                                       ┆
@@ -42,21 +55,15 @@ public struct TLE {
     public let ω₀: Double                               // Argument of perigee (rad).
     public let Ω₀: Double                               // Right Ascension of the Ascending node (rad).
     public let M₀: Double                               // Mean anomaly (rad).
-    public let n₀: Double                               // Mean motion (rads/min)  << [un'Kozai'd]
-    public let a₀: Double                               // semi-major axis (Eᵣ)    << [un'Kozai'd]
+    public var n₀: Double                               // Mean motion (rads/min)  << [un'Kozai'd]
+    public var a₀: Double                               // semi-major axis (Eᵣ)    << [un'Kozai'd]
 
     public let ephemType: Int                           // Type of ephemeris.
-    public let tleClass: Character                      // Classification (U for unclassified).
+    public let tleClass: String                         // Classification (U for unclassified).
     public let tleNumber: Int                           // Element number.
     public let revNumber: Int                           // Revolution number at epoch.
 
     internal let dragCoeff: Double                      // Ballistic coefficient.
-
-    private let launchYear: Int                         // Launch year.
-    private let launchPart: String                      // Piece of launch (sequ + part).
-
-    internal let apogee: Double                         // TLE apogee altitude, expressed in Kms.
-    internal let perigee: Double                        // TLE perigee altitude, expressed in Kms.
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
@@ -102,14 +109,14 @@ public struct TLE {
         self.noradIndex = base34ID(stringlet.trimmingCharacters(in: .whitespaces))
 
         stringlet = String(bytes: lineOneBytes[7...7], encoding: .utf8)!
-        self.tleClass = Character(stringlet)
+        self.tleClass = stringlet
         if self.tleClass != "U" { print("self.tleClass is not 'U'") }
 
         stringlet = String(bytes: lineOneBytes[9...10], encoding: .utf8)!
-        self.launchYear = Int(stringlet) ?? 99
+        let launchYear = Int(stringlet) ?? 99
 
         stringlet = String(bytes: lineOneBytes[11...16], encoding: .utf8)!
-        self.launchPart = stringlet.trimmingCharacters(in: .whitespaces)
+        let launchPart = stringlet.trimmingCharacters(in: .whitespaces)
 
         self.launchName = "\(launchYear < 57 ? 2000 : 1900 + launchYear)-" + launchPart
 
@@ -199,13 +206,95 @@ public struct TLE {
             self.a₀ = a₁  / (1.0 - δ₀)                               //             a₀
         }
 
-        self.apogee = (self.a₀ * (1.0 + self.e₀) - 1.0) * EarthConstants.Rₑ
-        self.perigee = (self.a₀ * (1.0 - self.e₀) - 1.0) * EarthConstants.Rₑ
-
         guard (self.ephemType == 0 || self.ephemType == 2 || self.ephemType == 3) else {
             throw SatKitError.TLE("Line1 ephemerisType ≠ 0, 2 or 3 .. [\(self.ephemType)]")
         }
     }
+
+    private enum CodingKeys: String, CodingKey {
+        case commonName = "OBJECT_NAME"
+        case noradIndex = "NORAD_CAT_ID"
+        case launchName = "OBJECT_ID"
+        case t₀ = "EPOCH"
+        case e₀ = "ECCENTRICITY"
+        case i₀ = "INCLINATION"
+        case ω₀ = "ARG_OF_PERICENTER"
+        case Ω₀ = "RA_OF_ASC_NODE"
+        case M₀ = "MEAN_ANOMALY"
+        case n₀ = "MEAN_MOTION"
+        case a₀ = "SEMI_MAJOR_AXIS"         //TODO a₀ made optional to avoid error on missing SEMI_MAJOR_AXIS
+        case dragCoeff = "BSTAR"
+        case ephemType = "EPHEMERIS_TYPE"
+        case tleClass = "CLASSIFICATION_TYPE"
+        case tleNumber = "ELEMENT_SET_NO"
+        case revNumber = "REV_AT_EPOCH"
+    }
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+    Decoding one, or more, TLEs from JSON requires a little work before the init ..
+
+    First, we need to create a JSON decoder and teach it how to decode ISO times with milliseconds
+
+        let jsonDecoder = JSONDecoder()
+        jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)
+
+    Then, if JSON data in the form of a String, convert it to Data (catching any error)
+
+        guard let jsonData = jsonString.data(using: .utf8) else {
+            throw Error("JSON failure converting String to Data ..")
+        }
+
+    Finally let the decoder do it's thing .. (again, catch errors if necessary)
+
+        let tle = try JSONDecoder().decode(TLE.self, from: jsonData)
+
+    or for an array of TLEs
+
+        let tles = try JSONDecoder().decode([TLE].self, from: jsonData)
+
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    public init(from decoder: Decoder) throws {
+        let container = try! decoder.container(keyedBy: CodingKeys.self)
+
+        self.commonName  = try container.decode(String.self, forKey: .commonName)
+        self.noradIndex  = try container.decode(Int.self, forKey: .noradIndex)
+        self.launchName  = try container.decode(String.self, forKey: .launchName)
+        let epoch = try container.decode(Date.self, forKey: .t₀)
+        self.t₀ = epoch.daysSince1950
+        self.e₀ = try container.decode(Double.self, forKey: .e₀)
+        self.i₀ = try container.decode(Double.self, forKey: .i₀) * deg2rad
+        self.ω₀ = try container.decode(Double.self, forKey: .ω₀) * deg2rad
+        self.Ω₀ = try container.decode(Double.self, forKey: .Ω₀) * deg2rad
+        self.M₀ = try container.decode(Double.self, forKey: .M₀) * deg2rad
+        self.a₀ = try container.decode(Double.self, forKey: .a₀)
+        self.dragCoeff = try container.decode(Double.self, forKey: .dragCoeff)
+        self.ephemType = try container.decode(Int.self, forKey: .ephemType)
+        self.tleClass = try container.decode(String.self, forKey: .tleClass)
+        self.tleNumber = try container.decode(Int.self, forKey: .tleNumber)
+        self.revNumber = try container.decode(Int.self, forKey: .revNumber)
+
+        let n₀ʹ = try! container.decode(Double.self, forKey: .n₀) * (π/720.0)
+
+/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+  ┆ recover (un'Kozai) original mean motion and semi-major axis from the input elements for SxP4.    ┆
+  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+
+        do {
+            let θ = cos(self.i₀)                                    //         cos(i₀)  ..  θ
+            let x3thm1 = 3.0 * θ * θ - 1.0                          //      3×cos²(i₀) - 1
+            let β₀ = (1.0 - self.e₀ * self.e₀).squareRoot()         //         √(1-e₀²) ..  β₀
+            let temp = 1.5 * EarthConstants.K₂ * x3thm1 / (β₀ * β₀ * β₀)
+
+            let a₀ʹ = pow(EarthConstants.kₑ / n₀ʹ, ⅔)
+            let δ₁ = temp / (a₀ʹ * a₀ʹ)
+            let a₁ = a₀ʹ * (1.0 - δ₁ * (⅓ + δ₁ * (1.0 + 134.0 / 81.0 * δ₁)))
+            let δ₀ = temp / (a₁ * a₁)
+
+            self.n₀ = n₀ʹ / (1.0 + δ₀)                               //             n₀
+            self.a₀ = a₁  / (1.0 - δ₀)                               //             a₀
+        }
+    }
+
 }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐

@@ -199,6 +199,14 @@ Translation from C++ and Java, testing and distribution by [Gavin Eadie](mailto:
 
 `version/tag 1.0.22 .. (2020 Apr 25)`
 
-- Package description specifies: .macOS(.v10_12), .iOS(.v9)` 
+- Package description specifies: `.macOS(.v10_12), .iOS(.v9)` 
+
+`version/tag 1.0.23 .. (2020 Jun 04)`
+
+- Partial preparation for new NORAD General Perturbations (GP) Element Set formats which accommodate NORAD catalog ID that are more than 5 digits ..
+
+`version/tag 1.0.24 .. (2020 Jun 04)`
+
+- provide a TLE initializer than consumes a JSON version of the new NORAD GP Element Set.
 
 ---

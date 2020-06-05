@@ -11,7 +11,7 @@ import Foundation
 
 class SDP4: TLEPropagator {
 
-    var ω_new = 0.0                                 ///** New perigee argument. */
+    var ω_new = 0.0                                 ///** New arg of perigee argument. */
     var n_new = 0.0                                 ///** New mean motion. */
     var e_new = 0.0                                 ///** New eccentricity. */
     var i_new = 0.0                                 ///** New inclination. */

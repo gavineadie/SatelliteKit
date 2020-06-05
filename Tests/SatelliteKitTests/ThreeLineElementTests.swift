@@ -155,6 +155,45 @@ class ThreeLineElementTests: XCTestCase {
         }
     }
 
+//TODO: EPOCH is a Date .. "EPOCH":"2020-06-03T21:51:26.358336",
+
+    func testJsonTLE() {
+        let jsonString = """
+            {"OBJECT_NAME":"XINGYUN-2 01",
+            "OBJECT_ID":"2020-028A",
+            "EPOCH":"2020-06-03T21:51:26.358336",
+            "MEAN_MOTION":15.00667713,
+            "ECCENTRICITY":0.0011896,
+            "INCLINATION":97.5563,
+            "RA_OF_ASC_NODE":186.395,
+            "ARG_OF_PERICENTER":178.0873,
+            "MEAN_ANOMALY":235.0112,
+            "EPHEMERIS_TYPE":0,
+            "CLASSIFICATION_TYPE":"U",
+            "NORAD_CAT_ID":45602,
+            "ELEMENT_SET_NO":999,
+            "REV_AT_EPOCH":343,
+            "BSTAR":7.4303e-5,
+            "SEMI_MAJOR_AXIS":1234.56,
+            "MEAN_MOTION_DOT":8.83e-6,
+            "MEAN_MOTION_DDOT":0}
+        """
+
+        guard let jsonData = jsonString.data(using: .utf8) else {
+            fatalError("JSON failure converting String to Data ..")
+        }
+
+        let jsonDecoder = JSONDecoder()
+        jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)
+
+        do {
+            let tle = try jsonDecoder.decode(TLE.self, from: jsonData)
+            print(Satellite(withTLE: tle).debugDescription())
+        } catch {
+            print(error)
+        }
+    }
+
     func testLongFile() {
 
         do {

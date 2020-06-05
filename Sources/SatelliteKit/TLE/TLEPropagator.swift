@@ -66,6 +66,7 @@ public class TLEPropagator {
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     let tle: TLE
 
+    let perigee: Double                     // perigee (in Kms)
     let θ²: Double                          //
 
     let M_dot: Double                       // common parameter for mean anomaly (M) computation.
@@ -107,6 +108,7 @@ public class TLEPropagator {
     public init(_ initialTLE: TLE) {
 
         self.tle = initialTLE
+        self.perigee = (self.tle.a₀ * (1.0 - self.tle.e₀) - 1.0) * EarthConstants.Rₑ
 
         self.e = 0.0                        // ECCENT
         self.i = 0.0                        // INCLIN
@@ -119,9 +121,9 @@ public class TLEPropagator {
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆ For perigee below 156Km, the values of s and (q₀-s)⁴ are changed                                 ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
-        switch self.tle.perigee {
+        switch self.perigee {
         case ..<98.0:       self.s = 20.0
-        case 98.0...156.0:  self.s = self.tle.perigee - 78.0
+        case 98.0...156.0:  self.s = self.perigee - 78.0
         default:            self.s = 78.0
         }
         let q₀_s = (120.0 - self.s) / EarthConstants.Rₑ

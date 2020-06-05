@@ -34,7 +34,7 @@ class SGP4: TLEPropagator {
   ┆ quadratic variation in mean anomaly. Also, the c₃ term, the delta omega term, and the delta m    ┆
   ┆ term are dropped.                                                                                ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
-        if super.tle.perigee > 220 {
+        if self.perigee > 220 {
             let ΔM₀ = 1.0 + super.η * cos(super.tle.M₀)
             ΔM₀³ = ΔM₀ * ΔM₀ * ΔM₀
 
@@ -83,7 +83,7 @@ class SGP4: TLEPropagator {
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆ if above 220Kms, do some more work .. adjust xmp, tempa, tempe, templ ..                         ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
-        if super.tle.perigee > 220 {
+        if self.perigee > 220 {
             let Δomg = omgcof * minsAfterEpoch
             var Δm = 1.0 + super.η * cos(anomdf)
             Δm = xmcof * (Δm * Δm * Δm - ΔM₀³)

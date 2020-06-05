@@ -41,8 +41,8 @@ public struct Satellite {
     public init(withTLE tle: TLE) {
         propagator = selectPropagator(tle: tle)
 
-        noradIdent = String(propagator.tle.noradIndex)      // convert Int to String
         commonName = propagator.tle.commonName
+        noradIdent = String(propagator.tle.noradIndex)      // convert Int to String
         t₀Days1950 = propagator.tle.t₀
     }
 
