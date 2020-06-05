@@ -105,7 +105,7 @@ public struct Satellite {
         String(format: """
 
         ┌─[tle : %5.2f days old]────────────────────────────────────────────────
-        │  %@    %05d = %@    rev#:%05d tle#:%04d
+        │  %@    %05d = %@ rev#:%05d tle#:%04d
         │     t₀:  %@    %+14.8f days after 1950
         │
         │    inc: %8.4f°     aop: %8.4f°    mot:  %11.8f (rev/day)
@@ -116,7 +116,7 @@ public struct Satellite {
                       -Date(daysSince1950: t₀Days1950).timeIntervalSinceNow * TimeConstants.sec2day,
                       self.commonName.padding(toLength: 24, withPad: " ", startingAt: 0),
                       self.propagator.tle.noradIndex,
-                      self.propagator.tle.launchName.padding(toLength: 8, withPad: " ", startingAt: 0),
+                      self.propagator.tle.launchName.padding(toLength: 11, withPad: " ", startingAt: 0),
                       self.propagator.tle.revNumber, self.propagator.tle.tleNumber,
                       String(describing: Date(daysSince1950: self.t₀Days1950)), self.t₀Days1950,
                       self.propagator.tle.i₀ * rad2deg, self.propagator.tle.ω₀ * rad2deg,

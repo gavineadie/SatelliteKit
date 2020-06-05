@@ -33,9 +33,9 @@ public struct TLE {
   ┆ Information derived directly from the Two Line Elements ..                                       ┆
   ┆                                               .. and un'Kozai'd mean motion and semi major axis. ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
-    public let commonName: String                       // line zero name (if any)
-    public let noradIndex: Int                          // The satellite number.
-    public let launchName: String                       // International designation
+    public let commonName: String                       // line zero name (if any) [eg: ISS (ZARYA)]
+    public let noradIndex: Int                          // The satellite number [eg: 25544]
+    public let launchName: String                       // International designation [eg: 1998-067A]
     public let t₀: Double                               // the TLE t=0 time (days from 1950)
     public let e₀: Double                               // TLE .. eccentricity
     public let i₀: Double                               // TLE .. inclination (rad).
@@ -44,16 +44,16 @@ public struct TLE {
     public let M₀: Double                               // Mean anomaly (rad).
     public let n₀: Double                               // Mean motion (rads/min)  << [un'Kozai'd]
     public let a₀: Double                               // semi-major axis (Eᵣ)    << [un'Kozai'd]
-    internal let dragCoeff: Double                      // Ballistic coefficient.
-
-    private let launchYear: Int                         // Launch year.
-    private let launchSequ: Int                         // Launch number.
-    private let launchPart: String                      // Piece of launch (from "A" to "ZZZ").
 
     public let ephemType: Int                           // Type of ephemeris.
     public let tleClass: Character                      // Classification (U for unclassified).
     public let tleNumber: Int                           // Element number.
     public let revNumber: Int                           // Revolution number at epoch.
+
+    internal let dragCoeff: Double                      // Ballistic coefficient.
+
+    private let launchYear: Int                         // Launch year.
+    private let launchPart: String                      // Piece of launch (sequ + part).
 
     internal let apogee: Double                         // TLE apogee altitude, expressed in Kms.
     internal let perigee: Double                        // TLE perigee altitude, expressed in Kms.
@@ -108,14 +108,10 @@ public struct TLE {
         stringlet = String(bytes: lineOneBytes[9...10], encoding: .utf8)!
         self.launchYear = Int(stringlet) ?? 99
 
-        stringlet = String(bytes: lineOneBytes[11...13], encoding: .utf8)!
-        self.launchSequ = Int(stringlet) ?? 999
-
-        stringlet = String(bytes: lineOneBytes[14...16], encoding: .utf8)!
+        stringlet = String(bytes: lineOneBytes[11...16], encoding: .utf8)!
         self.launchPart = stringlet.trimmingCharacters(in: .whitespaces)
 
-        stringlet = String(bytes: lineOneBytes[9...16], encoding: .utf8)!
-        self.launchName = stringlet.trimmingCharacters(in: .whitespaces)
+        self.launchName = "\(launchYear < 57 ? 2000 : 1900 + launchYear)-" + launchPart
 
         stringlet = String(bytes: lineOneBytes[18...19], encoding: .utf8)!
         let epochYear = Int(stringlet)!
