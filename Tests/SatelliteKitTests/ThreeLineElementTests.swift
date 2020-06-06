@@ -155,10 +155,8 @@ class ThreeLineElementTests: XCTestCase {
         }
     }
 
-//TODO: EPOCH is a Date .. "EPOCH":"2020-06-03T21:51:26.358336",
-
     func testJsonTLE() {
-        let jsonString = """
+        let jsonData = """
             {"OBJECT_NAME":"XINGYUN-2 01",
             "OBJECT_ID":"2020-028A",
             "EPOCH":"2020-06-03T21:51:26.358336",
@@ -176,11 +174,7 @@ class ThreeLineElementTests: XCTestCase {
             "BSTAR":7.4303e-5,
             "MEAN_MOTION_DOT":8.83e-6,
             "MEAN_MOTION_DDOT":0}
-        """
-
-        guard let jsonData = jsonString.data(using: .utf8) else {
-            fatalError("JSON failure converting String to Data ..")
-        }
+        """.data(using: .utf8)!
 
         let jsonDecoder = JSONDecoder()
         jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)
@@ -188,6 +182,78 @@ class ThreeLineElementTests: XCTestCase {
         do {
             let tle = try jsonDecoder.decode(TLE.self, from: jsonData)
             print(Satellite(withTLE: tle).debugDescription())
+        } catch {
+            print(error)
+        }
+    }
+
+    func testJsonTLEArray() {
+        let jsonData = """
+            [{
+            "OBJECT_NAME": "ATLAS CENTAUR 2",
+            "OBJECT_ID": "1963-047A",
+            "EPOCH": "2020-06-05T19:21:58.044384",
+            "MEAN_MOTION": 14.0260002,
+            "ECCENTRICITY": 0.0585625,
+            "INCLINATION": 30.3559,
+            "RA_OF_ASC_NODE": 314.9437,
+            "ARG_OF_PERICENTER": 85.6228,
+            "MEAN_ANOMALY": 281.1015,
+            "EPHEMERIS_TYPE": 0,
+            "CLASSIFICATION_TYPE": "U",
+            "NORAD_CAT_ID": 694,
+            "ELEMENT_SET_NO": 999,
+            "REV_AT_EPOCH": 83546,
+            "BSTAR": 2.8454e-5,
+            "MEAN_MOTION_DOT": 3.01e-6,
+            "MEAN_MOTION_DDOT": 0
+            },{
+            "OBJECT_NAME": "THOR AGENA D R/B",
+            "OBJECT_ID": "1964-002A",
+            "EPOCH": "2020-06-05T17:39:55.010304",
+            "MEAN_MOTION": 14.32395649,
+            "ECCENTRICITY": 0.0032737,
+            "INCLINATION": 99.0129,
+            "RA_OF_ASC_NODE": 48.8284,
+            "ARG_OF_PERICENTER": 266.0175,
+            "MEAN_ANOMALY": 93.7265,
+            "EPHEMERIS_TYPE": 0,
+            "CLASSIFICATION_TYPE": "U",
+            "NORAD_CAT_ID": 733,
+            "ELEMENT_SET_NO": 999,
+            "REV_AT_EPOCH": 93714,
+            "BSTAR": 2.6247e-5,
+            "MEAN_MOTION_DOT": 2.3e-7,
+            "MEAN_MOTION_DDOT": 0
+            },{
+            "OBJECT_NAME": "SL-3 R/B",
+            "OBJECT_ID": "1964-053B",
+            "EPOCH": "2020-06-05T20:39:17.038368",
+            "MEAN_MOTION": 14.59393422,
+            "ECCENTRICITY": 0.0055713,
+            "INCLINATION": 65.0789,
+            "RA_OF_ASC_NODE": 2.8558,
+            "ARG_OF_PERICENTER": 32.0461,
+            "MEAN_ANOMALY": 328.4005,
+            "EPHEMERIS_TYPE": 0,
+            "CLASSIFICATION_TYPE": "U",
+            "NORAD_CAT_ID": 877,
+            "ELEMENT_SET_NO": 999,
+            "REV_AT_EPOCH": 95980,
+            "BSTAR": 7.6135e-6,
+            "MEAN_MOTION_DOT": -8.4e-7,
+            "MEAN_MOTION_DDOT": 0
+        }]
+        """.data(using: .utf8)!
+
+        let jsonDecoder = JSONDecoder()
+        jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)
+
+        do {
+            let tleArray = try jsonDecoder.decode([TLE].self, from: jsonData)
+            print(Satellite(withTLE: tleArray[0]).debugDescription())
+            print(Satellite(withTLE: tleArray[1]).debugDescription())
+            print(Satellite(withTLE: tleArray[2]).debugDescription())
         } catch {
             print(error)
         }

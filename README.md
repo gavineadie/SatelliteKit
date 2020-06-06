@@ -30,7 +30,7 @@ test output and the test output in the above published paper [1].
 ### Change Notes
 
 At the end of the README.
-Lastest change: Version/Tag 1.0.21 -- 2020 Mar 09
+Lastest change: Version/Tag 1.0.24 -- 2020 Jun 04
 
 ### TLE
 
@@ -67,14 +67,20 @@ which will return `true` if the lines are 69 characters long, format is valid, a
 Note that `line0` doesn't take part in the check so is omitted for this function, and that `formatOK` will
 emit explicit errors into the log.
 
-The `TLE` structure can also be initialised from JSON data:
+#### Other data formats
 
+There has been concern for some time that the three line element sets will become limited, not least of all because
+they only allow 5 digits for a object's unique NORAD numeric identifier.  It has been proposed to provide other, less
+constricted, data formats.  More information on this move will be found at
+[A New Way to Obtain GP Data (aka TLEs)](https://celestrak.com/NORAD/documentation/gp-data-formats.php)
 
+`SatelliteKit` has been changed to allow the ingestion of GP data in a JSON form .. the details are not
+described here, yet, since this work is not in its final form.
 
 The `TLE` structure also implements `debugDescription` which will generate this formatted `String`
 
     ┌─[tle :  0.66 days old]]───────────────────────────────────────────────
-    │  ISS (ZARYA)                 25544 = 98067A      rev#:09857 tle#:0999
+    │  ISS (ZARYA)                 25544 = 1998-067A   rev#:09857 tle#:0999
     │     t₀:  2018-02-08 22:51:49 +0000    +24876.95265046 days after 1950
     │
     │    inc:  51.6426°     aop:  86.7895°    mot:  15.53899203 (rev/day)
@@ -132,16 +138,16 @@ This is a simple invocation of the above:
 
 ### Dealing with TLE files
 
-The most commonly available form of TLE data is a file containing multiple concatenated TLEs.  The `String` 
+The most commonly available form of TLE data is a file containing multiple concatenated TLEs.  The `String`
 content of such a file may be processed (records that are empty or start with "#" are dropped then
-leading and trailing whitespace is stripped and non-breaking spaces are converted to regular spaces) 
+leading and trailing whitespace is stripped and non-breaking spaces are converted to regular spaces)
 and checked for quality (line length is 69 characters and the checksum is good) within SatelliteKit with the function:
 
     public func preProcessTLEs(_: String) -> [(String, String, String)]
 
-`preProcessTLEs` consumes a `String` of, presumably, TLE records, and returns an array of 
-`(String, String, String)` tuples, one per satellite.  The `String`s in the tuple are the zeroth, first 
-and second of one satellites TLE lines. If the TLEs are the two-line variety, the first member of the 
+`preProcessTLEs` consumes a `String` of, presumably, TLE records, and returns an array of
+`(String, String, String)` tuples, one per satellite.  The tuple items are the zeroth, first
+and second of one satellite's TLE lines. If the TLEs are the two-line variety, the first member of the
 tuple is an empty `String`.
 
 Thus, the contents of a TLE file would be mapped to an array of `Satellite` by:
@@ -185,9 +191,9 @@ Translation from C++ and Java, testing and distribution by [Gavin Eadie](mailto:
 
 `version/tag 1.0.9 .. (2019 Oct 03)`
 
-- move "debugDescription()" from "TLE" to "Satellite"
+- move `debugDescription()` from the `TLE` structure to the `Satellite` structure
 
-- remove public access to "dragCoeff" (it's never used)
+- remove public access to `dragCoeff` (it's never used)
 
 `version/tag 1.0.16 .. (2020 Jan 27)`
 
@@ -195,22 +201,25 @@ Translation from C++ and Java, testing and distribution by [Gavin Eadie](mailto:
 
 `version/tag 1.0.20 .. (2020 Feb 26)`
 
-- correct and clarify the conversion of satellite position as seen by an observer after a bug in `eci2top(..)` was corrected. 
+- correct and clarify the conversion of satellite position as seen by an observer after a bug in `eci2top(..)` was corrected.
 
 `version/tag 1.0.21 .. (2020 Mar 09)`
 
-- include the age of the TLE set in its  `debugDescription(..)`. 
+- include the age of the TLE set in its `debugDescription(..)`.
 
 `version/tag 1.0.22 .. (2020 Apr 25)`
 
-- Package description specifies: `.macOS(.v10_12), .iOS(.v9)` 
+- Package description specifies: `.macOS(.v10_12), .iOS(.v9)`
 
 `version/tag 1.0.23 .. (2020 Jun 04)`
 
-- Partial preparation for new NORAD General Perturbations (GP) Element Set formats which accommodate NORAD catalog ID that are more than 5 digits ..
+- Partial preparation for new NORAD General Perturbations (GP) Element Set formats which
+accommodate NORAD catalog IDs that are more than 5 digits ..
 
 `version/tag 1.0.24 .. (2020 Jun 04)`
 
-- provide an (**EXPERIMENTAL**) TLE initializer than consumes a JSON version of the new NORAD GP Element Set.
+- provide an (**EXPERIMENTAL**) TLE initializer that consumes a JSON version of the new NORAD GP Element Set.
+- the TLE property `launchName` has been expanded from, for example: `98067A` to `1998-067A` .. since this property
+is mostly decorative, with no semantic value, this is not treated as an API change
 
 ---

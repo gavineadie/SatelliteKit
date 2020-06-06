@@ -217,27 +217,27 @@ public struct TLE: Decodable {
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    Decoding one, or more, TLEs from JSON requires a little work before the init ..
-
-    First, we need to create a JSON decoder and teach it how to decode ISO times with milliseconds
-
-        let jsonDecoder = JSONDecoder()
-        jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)
-
-    Then, if JSON data in the form of a String, convert it to Data (catching any error)
-
-        guard let jsonData = jsonString.data(using: .utf8) else {
-            throw Error("JSON failure converting String to Data ..")
-        }
-
-    Finally let the decoder do it's thing .. (again, catch errors if necessary)
-
-        let tle = try JSONDecoder().decode(TLE.self, from: jsonData)
-
-    or for an array of TLEs
-
-        let tles = try JSONDecoder().decode([TLE].self, from: jsonData)
-
+  │ Decoding one, or more, TLEs from JSON requires a little work before the init ..                  │
+  │                                                                                                  │
+  │ First, we need to create a JSON decoder and teach it how to decode ISO times with milliseconds   │
+  │                                                                                                  │
+  │     let jsonDecoder = JSONDecoder()                                                              │
+  │     jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)                   │
+  │                                                                                                  │
+  │ Then, if JSON data in the form of a String, convert it to Data (catching any error)              │
+  │                                                                                                  │
+  │     guard let jsonData = jsonString.data(using: .utf8) else {                                    │
+  │         throw Error("JSON failure converting String to Data ..")                                 │
+  │     }                                                                                            │
+  │                                                                                                  │
+  │ Finally let the decoder do it's thing .. (again, catch errors if necessary)                      │
+  │                                                                                                  │
+  │     let tle = try jsonDecoder.decode(TLE.self, from: jsonData)                                   │
+  │                                                                                                  │
+  │ or for an array of TLEs                                                                          │
+  │                                                                                                  │
+  │     let tles = try jsonDecoder.decode([TLE].self, from: jsonData)                                │
+  │                                                                                                  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public init(from decoder: Decoder) throws {
         let container = try! decoder.container(keyedBy: CodingKeys.self)
@@ -279,7 +279,6 @@ public struct TLE: Decodable {
             self.a₀ = a₁  / (1.0 - δ₀)                               //             a₀
         }
     }
-
 }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
