@@ -300,17 +300,17 @@ public struct TLE: Decodable {
         self.launchName = launchName
         self.t₀ = t₀.daysSince1950
         self.e₀ = e₀
-        self.i₀ = i₀
-        self.ω₀ = ω₀
-        self.Ω₀ = Ω₀
-        self.M₀ = M₀
+        self.i₀ = i₀ * deg2rad
+        self.ω₀ = ω₀ * deg2rad
+        self.Ω₀ = Ω₀ * deg2rad
+        self.M₀ = M₀ * deg2rad
         self.ephemType = ephemType
         self.tleClass = tleClass
         self.tleNumber = tleNumber
         self.revNumber = revNumber
         self.dragCoeff = dragCoeff
 
-        let n₀ʹ = n₀
+        let n₀ʹ = n₀ * (π/720.0)
 
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆ recover (un'Kozai) original mean motion and semi-major axis from the input elements for SxP4.    ┆
