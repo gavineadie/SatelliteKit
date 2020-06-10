@@ -259,6 +259,157 @@ class ThreeLineElementTests: XCTestCase {
         }
     }
 
+#if canImport(XMLCoder)
+    func testXmlTLEArray() {
+
+        let xmlData = """
+        <ndm xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="https://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd">
+            <omm>
+                <header>
+                    <CREATION_DATE/>
+                    <ORIGINATOR/>
+                </header>
+                <body>
+                    <segment>
+                        <metadata>
+                            <OBJECT_NAME>ATLAS CENTAUR 2</OBJECT_NAME>
+                            <OBJECT_ID>1963-047A</OBJECT_ID>
+                            <CENTER_NAME>EARTH</CENTER_NAME>
+                            <REF_FRAME>TEME</REF_FRAME>
+                            <TIME_SYSTEM>UTC</TIME_SYSTEM>
+                            <MEAN_ELEMENT_THEORY>SGP4</MEAN_ELEMENT_THEORY>
+                        </metadata>
+                        <data>
+                            <meanElements>
+                                <EPOCH>2020-06-06T10:44:23.559360</EPOCH>
+                                <MEAN_MOTION>14.02600247</MEAN_MOTION>
+                                <ECCENTRICITY>.0585615</ECCENTRICITY>
+                                <INCLINATION>30.3558</INCLINATION>
+                                <RA_OF_ASC_NODE>311.4167</RA_OF_ASC_NODE>
+                                <ARG_OF_PERICENTER>91.1851</ARG_OF_PERICENTER>
+                                <MEAN_ANOMALY>275.5862</MEAN_ANOMALY>
+                            </meanElements>
+                            <tleParameters>
+                                <EPHEMERIS_TYPE>0</EPHEMERIS_TYPE>
+                                <CLASSIFICATION_TYPE>U</CLASSIFICATION_TYPE>
+                                <NORAD_CAT_ID>694</NORAD_CAT_ID>
+                                <ELEMENT_SET_NO>999</ELEMENT_SET_NO>
+                                <REV_AT_EPOCH>83555</REV_AT_EPOCH>
+                                <BSTAR>.28591E-4</BSTAR>
+                                <MEAN_MOTION_DOT>3.03E-6</MEAN_MOTION_DOT>
+                                <MEAN_MOTION_DDOT>0</MEAN_MOTION_DDOT>
+                            </tleParameters>
+                        </data>
+                    </segment>
+                </body>
+            </omm>
+
+            <omm>
+                <header>
+                    <CREATION_DATE/>
+                    <ORIGINATOR/>
+                </header>
+                <body>
+                    <segment>
+                        <metadata>
+                            <OBJECT_NAME>THOR AGENA D R/B</OBJECT_NAME>
+                            <OBJECT_ID>1964-002A</OBJECT_ID>
+                            <CENTER_NAME>EARTH</CENTER_NAME>
+                            <REF_FRAME>TEME</REF_FRAME>
+                            <TIME_SYSTEM>UTC</TIME_SYSTEM>
+                            <MEAN_ELEMENT_THEORY>SGP4</MEAN_ELEMENT_THEORY>
+                        </metadata>
+                        <data>
+                            <meanElements>
+                                <EPOCH>2020-06-06T07:04:37.126560</EPOCH>
+                                <MEAN_MOTION>14.32395701</MEAN_MOTION>
+                                <ECCENTRICITY>.0032725</ECCENTRICITY>
+                                <INCLINATION>99.0129</INCLINATION>
+                                <RA_OF_ASC_NODE>49.4090</RA_OF_ASC_NODE>
+                                <ARG_OF_PERICENTER>264.3266</ARG_OF_PERICENTER>
+                                <MEAN_ANOMALY>95.4185</MEAN_ANOMALY>
+                            </meanElements>
+                            <tleParameters>
+                                <EPHEMERIS_TYPE>0</EPHEMERIS_TYPE>
+                                <CLASSIFICATION_TYPE>U</CLASSIFICATION_TYPE>
+                                <NORAD_CAT_ID>733</NORAD_CAT_ID>
+                                <ELEMENT_SET_NO>999</ELEMENT_SET_NO>
+                                <REV_AT_EPOCH>93722</REV_AT_EPOCH>
+                                <BSTAR>.25433E-4</BSTAR>
+                                <MEAN_MOTION_DOT>2.1E-7</MEAN_MOTION_DOT>
+                                <MEAN_MOTION_DDOT>0</MEAN_MOTION_DDOT>
+                            </tleParameters>
+                        </data>
+                    </segment>
+                </body>
+            </omm>
+
+            <omm>
+                <header>
+                    <CREATION_DATE/>
+                    <ORIGINATOR/>
+                </header>
+                <body>
+                    <segment>
+                        <metadata>
+                            <OBJECT_NAME>SL-3 R/B</OBJECT_NAME>
+                            <OBJECT_ID>1964-053B</OBJECT_ID>
+                            <CENTER_NAME>EARTH</CENTER_NAME>
+                            <REF_FRAME>TEME</REF_FRAME>
+                            <TIME_SYSTEM>UTC</TIME_SYSTEM>
+                            <MEAN_ELEMENT_THEORY>SGP4</MEAN_ELEMENT_THEORY>
+                        </metadata>
+                        <data>
+                            <meanElements>
+                                <EPOCH>2020-06-05T22:17:57.747840</EPOCH>
+                                <MEAN_MOTION>14.59393420</MEAN_MOTION>
+                                <ECCENTRICITY>.0055722</ECCENTRICITY>
+                                <INCLINATION>65.0789</INCLINATION>
+                                <RA_OF_ASC_NODE>2.6555</RA_OF_ASC_NODE>
+                                <ARG_OF_PERICENTER>32.0150</ARG_OF_PERICENTER>
+                                <MEAN_ANOMALY>328.4314</MEAN_ANOMALY>
+                            </meanElements>
+                            <tleParameters>
+                                <EPHEMERIS_TYPE>0</EPHEMERIS_TYPE>
+                                <CLASSIFICATION_TYPE>U</CLASSIFICATION_TYPE>
+                                <NORAD_CAT_ID>877</NORAD_CAT_ID>
+                                <ELEMENT_SET_NO>999</ELEMENT_SET_NO>
+                                <REV_AT_EPOCH>95981</REV_AT_EPOCH>
+                                <BSTAR>.75354E-5</BSTAR>
+                                <MEAN_MOTION_DOT>-8.4E-7</MEAN_MOTION_DOT>
+                                <MEAN_MOTION_DDOT>0</MEAN_MOTION_DDOT>
+                            </tleParameters>
+                        </data>
+                    </segment>
+                </body>
+            </omm>
+        </ndm>
+        """.data(using: .utf8)!
+
+        let result = NavigationDataMessage(from: xmlData)
+
+        let tle = TLE(commonName: result.omms[0].body.segment.metadata.commonName,
+                      noradIndex: result.omms[0].body.segment.data.tleParameters.noradIndex,
+                      launchName: result.omms[0].body.segment.metadata.launchName,
+                      t₀: result.omms[0].body.segment.data.meanElements.t₀,
+                      e₀: result.omms[0].body.segment.data.meanElements.e₀,
+                      i₀: result.omms[0].body.segment.data.meanElements.i₀,
+                      ω₀: result.omms[0].body.segment.data.meanElements.ω₀,
+                      Ω₀: result.omms[0].body.segment.data.meanElements.Ω₀,
+                      M₀: result.omms[0].body.segment.data.meanElements.M₀,
+                      n₀: result.omms[0].body.segment.data.meanElements.n₀,
+                      ephemType:  result.omms[0].body.segment.data.tleParameters.ephemType,
+                      tleClass: result.omms[0].body.segment.data.tleParameters.tleClass,
+                      tleNumber:  result.omms[0].body.segment.data.tleParameters.tleNumber,
+                      revNumber:  result.omms[0].body.segment.data.tleParameters.revNumber,
+                      dragCoeff:  result.omms[0].body.segment.data.tleParameters.dragCoeff)
+
+        print(Satellite(withTLE: tle.debugDescription()))
+
+    }
+#endif
+
     func testLongFile() {
 
         do {

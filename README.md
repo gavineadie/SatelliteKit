@@ -74,8 +74,17 @@ they only allow 5 digits for a object's unique NORAD numeric identifier.  It has
 constricted, data formats.  More information on this move will be found at
 [A New Way to Obtain GP Data (aka TLEs)](https://celestrak.com/NORAD/documentation/gp-data-formats.php)
 
-`SatelliteKit` has been changed to allow the ingestion of GP data in a JSON form .. the details are not
-described here, yet, since this work is not in its final form.
+`SatelliteKit` has been changed to allow the ingestion of GP data in a JSON form .. for example, given JSON
+data, this would decode an array of TLE structures (I'm not catching errors in the example, but you should):
+
+    let jsonDecoder = JSONDecoder()
+    jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)
+
+    let tleArray = try jsonDecoder.decode([TLE].self, from: jsonData)
+    print(Satellite(withTLE: tleArray[0]).debugDescription())
+    print(Satellite(withTLE: tleArray[1]).debugDescription())
+    print(Satellite(withTLE: tleArray[2]).debugDescription())
+
 
 The `TLE` structure also implements `debugDescription` which will generate this formatted `String`
 
@@ -102,16 +111,15 @@ The `Satellite` initializers are:
 
 The `Satellite` struct offers some public properties and some public functions.
 
-The properties provide some naming information and a "grab bag" directory for whatever you want.
+The *properties* provide some naming information and a "grab bag" directory for whatever you want.
 
     public let commonName: String
     public let noradIdent: String
     public let t₀Days1950: Double       		// TLE t=0 (days since 1950)
     public var extraInfo: [String: AnyObject]
 
-The functions
-accept a time argument, either minutes after the satellite's TLE epoch, or Julian Days, and provide
-postion (Kilometers) and velocity (Kms.sec) state vectors as output.
+The *functions* accept a time argument, either minutes after the satellite's TLE epoch, or Julian Days, 
+and provide postion (Kilometers) and velocity (Kms/sec) state vectors as output.
 
     public func position(minsAfterEpoch: Double) -> Vector
     public func velocity(minsAfterEpoch: Double) -> Vector
@@ -146,7 +154,7 @@ and checked for quality (line length is 69 characters and the checksum is good) 
     public func preProcessTLEs(_: String) -> [(String, String, String)]
 
 `preProcessTLEs` consumes a `String` of, presumably, TLE records, and returns an array of
-`(String, String, String)` tuples, one per satellite.  The tuple items are the zeroth, first
+`(String, String, String)` tuples, one per satellite.  The tuple items are the, mildly verified, zeroth, first
 and second of one satellite's TLE lines. If the TLEs are the two-line variety, the first member of the
 tuple is an empty `String`.
 
@@ -221,5 +229,10 @@ accommodate NORAD catalog IDs that are more than 5 digits ..
 - provide an (**EXPERIMENTAL**) TLE initializer that consumes a JSON version of the new NORAD GP Element Set.
 - the TLE property `launchName` has been expanded from, for example: `98067A` to `1998-067A` .. since this property
 is mostly decorative, with no semantic value, this is not treated as an API change
+
+`version/tag 1.0.25 .. (2020 Jun 07)`
+
+- clean up the JSON version of the TLE initializer.
+- start work on an (**EXPERIMENTAL**) XML version of the TLE initializer.
 
 ---

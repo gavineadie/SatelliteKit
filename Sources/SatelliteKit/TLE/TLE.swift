@@ -198,6 +198,8 @@ public struct TLE: Decodable {
         }
     }
 
+//MARK: - JSON initializer
+
     private enum CodingKeys: String, CodingKey {
         case commonName = "OBJECT_NAME"
         case noradIndex = "NORAD_CAT_ID"
@@ -279,7 +281,60 @@ public struct TLE: Decodable {
             self.a₀ = a₁  / (1.0 - δ₀)                               //             a₀
         }
     }
+
+//MARK: - XML initializer
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Decoding one, or more, TLEs from XML requires a little work; it also requires a third-party      │
+  │ library "XMLCoder" .. this library is of a high quality but, if the user of SatelliteKit needs   │
+  │ to avoid anything outside the Swift Standand Library, the use of XMLCoder is conditional ..      │
+  │                                                                                                  │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+
+    init(commonName: String, noradIndex: Int, launchName: String,
+         t₀: Date, e₀: Double, i₀: Double, ω₀: Double, Ω₀: Double, M₀: Double, n₀: Double,
+         ephemType: Int, tleClass: String, tleNumber: Int, revNumber: Int, dragCoeff: Double) {
+
+        self.commonName = commonName
+        self.noradIndex = noradIndex
+        self.launchName = launchName
+        self.t₀ = t₀.daysSince1950
+        self.e₀ = e₀
+        self.i₀ = i₀
+        self.ω₀ = ω₀
+        self.Ω₀ = Ω₀
+        self.M₀ = M₀
+        self.ephemType = ephemType
+        self.tleClass = tleClass
+        self.tleNumber = tleNumber
+        self.revNumber = revNumber
+        self.dragCoeff = dragCoeff
+
+        let n₀ʹ = n₀
+
+/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+  ┆ recover (un'Kozai) original mean motion and semi-major axis from the input elements for SxP4.    ┆
+  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+
+        do {
+            let θ = cos(self.i₀)                                    //         cos(i₀)  ..  θ
+            let x3thm1 = 3.0 * θ * θ - 1.0                          //      3×cos²(i₀) - 1
+            let β₀ = (1.0 - self.e₀ * self.e₀).squareRoot()         //         √(1-e₀²) ..  β₀
+            let temp = 1.5 * EarthConstants.K₂ * x3thm1 / (β₀ * β₀ * β₀)
+
+            let a₀ʹ = pow(EarthConstants.kₑ / n₀ʹ, ⅔)
+            let δ₁ = temp / (a₀ʹ * a₀ʹ)
+            let a₁ = a₀ʹ * (1.0 - δ₁ * (⅓ + δ₁ * (1.0 + 134.0 / 81.0 * δ₁)))
+            let δ₀ = temp / (a₁ * a₁)
+
+            self.n₀ = n₀ʹ / (1.0 + δ₀)                               //             n₀
+            self.a₀ = a₁  / (1.0 - δ₀)                               //             a₀
+        }
+    }
+
 }
+
+//MARK: - static functions
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ Do the checksum check on a TLE line ("0"..."9" are 0...9; "-" is 1; last digit is checksum).     │
@@ -408,6 +463,7 @@ func base10ID(_ noradID: String) -> Int {
 }
 
 //MARK: - Extra Fun !
+
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ Convert silly NORAD ID ("B1234") into an integer .. "B" * 10000 + 1234, where "B" is base-34 ..  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
