@@ -291,7 +291,7 @@ public struct TLE: Decodable {
   │                                                                                                  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
 
-    init(commonName: String, noradIndex: Int, launchName: String,
+    public init(commonName: String, noradIndex: Int, launchName: String,
          t₀: Date, e₀: Double, i₀: Double, ω₀: Double, Ω₀: Double, M₀: Double, n₀: Double,
          ephemType: Int, tleClass: String, tleNumber: Int, revNumber: Int, dragCoeff: Double) {
 
