@@ -7,6 +7,10 @@
 import XCTest
 @testable import SatelliteKit
 
+#if canImport(XMLCoder)
+import XMLCoder
+#endif
+
 class ThreeLineElementTests: XCTestCase {
 
     func testNullLine0() {
