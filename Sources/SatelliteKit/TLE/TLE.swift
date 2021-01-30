@@ -36,6 +36,7 @@ public struct TLE: Decodable {
     public let commonName: String                       // line zero name (if any) [eg: ISS (ZARYA)]
     public let noradIndex: Int                          // The satellite number [eg: 25544]
     public let launchName: String                       // International designation [eg: 1998-067A]
+
     public let t₀: Double                               // the TLE t=0 time (days from 1950)
     public let e₀: Double                               // TLE .. eccentricity
     public let i₀: Double                               // TLE .. inclination (rad).

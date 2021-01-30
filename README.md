@@ -30,7 +30,7 @@ test output and the test output in the above published paper [1].
 ### Change Notes
 
 At the end of the README.
-Lastest change: Version/Tag 1.0.24 -- 2020 Jun 04
+Lastest change: Version/Tag 1.0.27 -- 2021 Jan 30
 
 ### TLE
 
@@ -113,9 +113,10 @@ The `Satellite` struct offers some public properties and some public functions.
 
 The *properties* provide some naming information and a "grab bag" directory for whatever you want.
 
+    public let tle: TLE                           // make TLE accessible
     public let commonName: String
     public let noradIdent: String
-    public let t₀Days1950: Double       		// TLE t=0 (days since 1950)
+    public let t₀Days1950: Double       		    // TLE t=0 (days since 1950)
     public var extraInfo: [String: AnyObject]
 
 The *functions* accept a time argument, either minutes after the satellite's TLE epoch, or Julian Days, 
@@ -234,5 +235,13 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 
 - clean up the JSON version of the TLE initializer.
 - start work on an (**EXPERIMENTAL**) XML version of the TLE initializer.
+
+`version/tag 1.0.26 .. (2020 Jun 30)`
+
+- move "Satellite.swift" from "Astro" group to "SGP" group.
+
+`version/tag 1.0.27 .. (2021 Jan 30)`
+
+- make the TLE struct accessible from the Satellite struct.
 
 ---

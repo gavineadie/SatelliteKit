@@ -13,11 +13,6 @@ public struct LatLonAlt {
     public var lon: Double                                  // longitude (degrees)
     public var alt: Double                                  // altitude
 
-    public init(lat: Double, lon: Double, alt: Double) {
-        self.lat = lat
-        self.lon = lon
-        self.alt = alt
-    }
 }
 
 public struct AziEleDst {
@@ -25,11 +20,6 @@ public struct AziEleDst {
     public var elev: Double                                 // elevation (degrees)
     public var dist: Double                                 // distance/range
 
-    public init(azim: Double, elev: Double, dist: Double) {
-        self.azim = azim
-        self.elev = elev
-        self.dist = dist
-    }
 }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓

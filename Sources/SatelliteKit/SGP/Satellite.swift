@@ -11,7 +11,8 @@ import Foundation
 public struct Satellite {
 
     let propagator: TLEPropagator
-
+    
+    public let tle: TLE                                 // make TLE accessible
     public let commonName: String
     public let noradIdent: String
     public let t₀Days1950: Double                       // TLE t=0 (days since 1950)
@@ -40,10 +41,12 @@ public struct Satellite {
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public init(withTLE tle: TLE) {
         propagator = selectPropagator(tle: tle)
+        
+        self.tle = tle
 
-        commonName = propagator.tle.commonName
-        noradIdent = String(propagator.tle.noradIndex)      // convert Int to String
-        t₀Days1950 = propagator.tle.t₀
+        self.commonName = propagator.tle.commonName
+        self.noradIdent = String(propagator.tle.noradIndex)      // convert Int to String
+        self.t₀Days1950 = propagator.tle.t₀
     }
 
     public func julianDay(_ minsAfterEpoch: Double) -> Double {

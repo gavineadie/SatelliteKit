@@ -158,6 +158,16 @@ class ThreeLineElementTests: XCTestCase {
             print(error)
         }
     }
+    
+    func testTleAccess() {
+
+        let sat = Satellite("ISS (ZARYA)",
+                            "1 25544U 98067A   17108.89682041  .00002831  00000-0  50020-4 0  9990",
+                            "2 25544  51.6438 333.8309 0007185  71.6711  62.5473 15.54124690 52531")
+        
+        print("Mean motion:", sat.tle.n₀)
+
+    }
 
     func testJsonTLE() {
         let jsonData = """
