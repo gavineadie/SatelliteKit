@@ -30,7 +30,7 @@ test output and the test output in the above published paper [1].
 ### Change Notes
 
 At the end of the README.
-Lastest change: Version/Tag 1.0.27 -- 2021 Jan 30
+Lastest change: Version/Tag 1.0.27 -- 2021 Mar 05
 
 ### TLE
 
@@ -243,5 +243,10 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 `version/tag 1.0.27 .. (2021 Jan 30)`
 
 - make the TLE struct accessible from the Satellite struct.
+
+`version/tag 1.0.27 .. (2021 Mar 05)`
+
+- TLEs with the new Space-Track Alpha-5 object numbers (`noradIndex`) are processed correctly.  The tag has not changed because
+this feature has been present for some time.
 
 ---

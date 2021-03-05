@@ -94,7 +94,7 @@ public struct TLE: Decodable {
         let lineOneBytes: [UInt8] = Array(line1.utf8)
 
         var stringlet = String(bytes: lineOneBytes[2...6], encoding: .utf8)!
-        self.noradIndex = base34ID(stringlet.trimmingCharacters(in: .whitespaces))
+        self.noradIndex = alpha5ID(stringlet.trimmingCharacters(in: .whitespaces))
 
         stringlet = String(bytes: lineOneBytes[7...7], encoding: .utf8)!
         self.tleClass = stringlet
@@ -148,9 +148,7 @@ public struct TLE: Decodable {
         let lineTwoBytes: [UInt8] = Array(line2.utf8)
 
         stringlet = String(bytes: lineTwoBytes[2...6], encoding: .utf8)!
-        let line2SatNumber = base34ID(stringlet.trimmingCharacters(in: .whitespaces))
-
-        guard self.noradIndex == line2SatNumber else {
+        guard self.noradIndex == alpha5ID(stringlet.trimmingCharacters(in: .whitespaces)) else {
             throw SatKitError.TLE("Line1 and Line2 NORAD IDs don't match ..")
         }
 
@@ -466,17 +464,15 @@ func base10ID(_ noradID: String) -> Int {
 //MARK: - Extra Fun !
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ Convert silly NORAD ID ("B1234") into an integer .. "B" * 10000 + 1234, where "B" is base-34 ..  │
+  │ Convert new Aplha-5 NORAD ID ("B1234") into an integer .. "B" * 10000 + 1234, "B" is base-34 ..  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-func base34ID(_ noradID: String) -> Int {               //      "B1234"      "5"
+func alpha5ID(_ noradID: String) -> Int {               //      "B1234"      "5"
     let lastFive = ("00000" + noradID.uppercased())     // "00000B1234  "000005"
                                             .suffix(5)  //      "B1234"  "00005"
     let byte1 = (lastFive.first)!
     if let seqNo = Int(lastFive.dropFirst()) {
 
         switch String(byte1) {
-        case ..<"0":
-            return 0
         case "0"..."9":
             return Int(byte1.asciiValue!-48)*10000 + seqNo
         case "A"..."H":

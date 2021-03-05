@@ -438,28 +438,33 @@ class ThreeLineElementTests: XCTestCase {
     func testBase34() {
         XCTAssert(base10ID(     "") == 0)
 
-        XCTAssert(base34ID(    "5") == 5)
-        XCTAssert(base34ID("10000") == 10000, "got \(base34ID("10000"))")
+        XCTAssert(alpha5ID(    "5") == 5)
+        XCTAssert(alpha5ID("10000") == 10000, "got \(alpha5ID("10000"))")
 
         // numerical checks
 
-        XCTAssert(base34ID("A0000") == 100000, "got \(base34ID("A0000"))")
-        XCTAssert(base34ID("H0000") == 170000, "got \(base34ID("H0000"))")
-        XCTAssert(base34ID("J0000") == 180000, "got \(base34ID("J0000"))")
-        XCTAssert(base34ID("N0000") == 220000, "got \(base34ID("N0000"))")
-        XCTAssert(base34ID("P0000") == 230000, "got \(base34ID("P0000"))")
-        XCTAssert(base34ID("Z0000") == 330000, "got \(base34ID("Z0000"))")
-        XCTAssert(base34ID("Z9999") == 339999, "got \(base34ID("Z9999"))")
+        XCTAssert(alpha5ID("A0000") == 100000, "got \(alpha5ID("A0000"))")
+        XCTAssert(alpha5ID("H0000") == 170000, "got \(alpha5ID("H0000"))")
+        XCTAssert(alpha5ID("J0000") == 180000, "got \(alpha5ID("J0000"))")
+        XCTAssert(alpha5ID("N0000") == 220000, "got \(alpha5ID("N0000"))")
+        XCTAssert(alpha5ID("P0000") == 230000, "got \(alpha5ID("P0000"))")
+        XCTAssert(alpha5ID("Z0000") == 330000, "got \(alpha5ID("Z0000"))")
+        XCTAssert(alpha5ID("Z9999") == 339999, "got \(alpha5ID("Z9999"))")
+
+        XCTAssert(alpha5ID("J2931") == 182931, "got \(alpha5ID("J2931"))")
+        XCTAssert(alpha5ID("W1928") == 301928, "got \(alpha5ID("W1928"))")
+        XCTAssert(alpha5ID("E8493") == 148493, "got \(alpha5ID("E8493"))")
+        XCTAssert(alpha5ID("P4018") == 234018, "got \(alpha5ID("P4018"))")
 
         // lowercase
 
-        XCTAssert(base34ID("a5678") == 105678, "got \(base34ID("a5678"))")
+        XCTAssert(alpha5ID("a5678") == 105678, "got \(alpha5ID("a5678"))")
 
         // failure modes
 
-        XCTAssert(base34ID("!0000") == 0, "got \(base34ID("!9999"))")
-        XCTAssert(base34ID("~0000") == 0, "got \(base34ID("~9999"))")
-        XCTAssert(base34ID("AAAAA") == 0, "got \(base34ID("AAAAA"))")
+        XCTAssert(alpha5ID("!0000") == 0, "got \(alpha5ID("!9999"))")
+        XCTAssert(alpha5ID("~0000") == 0, "got \(alpha5ID("~9999"))")
+        XCTAssert(alpha5ID("AAAAA") == 0, "got \(alpha5ID("AAAAA"))")
     }
 
     func testBase10() {
