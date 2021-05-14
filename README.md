@@ -246,7 +246,8 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 
 `version/tag 1.0.27 .. (2021 Mar 05)`
 
-- TLEs with the new Space-Track Alpha-5 object numbers (`noradIndex`) are processed correctly.  The tag has not changed because
-this feature has been present for some time.
+- [SpaceTrack Alpha-5](https://www.space-track.org/documentation#tle-alpha5)
+- TLEs with the new Space-Track Alpha-5 object numbers (`noradIndex`) are processed correctly.  
+- The tag has not changed because this feature has been present for some time.  
 
 ---

@@ -438,6 +438,7 @@ class ThreeLineElementTests: XCTestCase {
     func testBase34() {
         XCTAssert(base10ID(     "") == 0)
 
+        XCTAssert(alpha5ID(     "") == 0)
         XCTAssert(alpha5ID(    "5") == 5)
         XCTAssert(alpha5ID("10000") == 10000, "got \(alpha5ID("10000"))")
 
@@ -455,6 +456,9 @@ class ThreeLineElementTests: XCTestCase {
         XCTAssert(alpha5ID("W1928") == 301928, "got \(alpha5ID("W1928"))")
         XCTAssert(alpha5ID("E8493") == 148493, "got \(alpha5ID("E8493"))")
         XCTAssert(alpha5ID("P4018") == 234018, "got \(alpha5ID("P4018"))")
+
+        XCTAssert(alpha5ID("I0000") == 0, "got \(alpha5ID("I0000"))")
+        XCTAssert(alpha5ID("0I000") == 0, "got \(alpha5ID("0I000"))")
 
         // lowercase
 
