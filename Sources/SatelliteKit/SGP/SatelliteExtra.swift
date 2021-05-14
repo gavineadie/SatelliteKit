@@ -11,13 +11,6 @@
 
 import SatelliteKit
 
-public struct AziEleDst {
-    public var azim: Double                                 // azimuth (degrees)
-    public var elev: Double                                 // elevation (degrees)
-    public var dist: Double                                 // distance/range
-
-}
-
 // MARK: -
 
 public func ep1950DaysNow() -> Double {
