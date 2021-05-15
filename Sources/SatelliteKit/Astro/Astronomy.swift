@@ -9,6 +9,12 @@
 import Foundation
 
 public struct LatLonAlt {
+    public init(lat: Double, lon: Double, alt: Double) {
+        self.lat = lat
+        self.lon = lon
+        self.alt = alt
+    }
+    
     public var lat: Double                                  // latitude (degrees)
     public var lon: Double                                  // longitude (degrees)
     public var alt: Double                                  // altitude
@@ -16,6 +22,12 @@ public struct LatLonAlt {
 }
 
 public struct AziEleDst {
+    public init(azim: Double, elev: Double, dist: Double) {
+        self.azim = azim
+        self.elev = elev
+        self.dist = dist
+    }
+    
     public var azim: Double                                 // azimuth (degrees)
     public var elev: Double                                 // elevation (degrees)
     public var dist: Double                                 // distance/range

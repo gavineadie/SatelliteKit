@@ -9,8 +9,6 @@
     import Cocoa
 #endif
 
-import SatelliteKit
-
 // MARK: -
 
 public func ep1950DaysNow() -> Double {
