@@ -38,10 +38,13 @@ The `TLE` structure is initialized from the three lines of elements in a traditi
 Some sources of TLEs provide no first line (which would contain the object's informal name) and,
 in that case, it is OK to pass a null `String` into the initializer.
 
+```swift
 	public init(_ line0: String, _ line1: String, _ line2: String) throws
+```
 
 The public properties that are exposed from the `TLE` structure are:
 
+```swift
 	public let commonName: String                       // line zero name (if any)
 	public let noradIndex: Int                          // The satellite number.
 	public let launchName: String                       // International designation
@@ -53,6 +56,7 @@ The public properties that are exposed from the `TLE` structure are:
 	public let M₀: Double                               // Mean anomaly (rad).
 	public let n₀: Double                               // Mean motion (rads/min)  << [un'Kozai'd]
 	public let a₀: Double                               // semi-major axis (Eᵣ)    << [un'Kozai'd]
+```
 
 Note that the operation to "un Kozai" the element data is performed inside the initialization because
 both SGP4 and SDP4 need that adjustment.
@@ -61,7 +65,9 @@ The initializer will throw an exception if the numeric parsing of the element da
 it will not do so if the record checksum fails.  More complete correctness of the element record can
 be verified by:
 
+```swift
 	public func formatOK(_ line1: String, _ line2: String) -> Bool
+```
 
 which will return `true` if the lines are 69 characters long, format is valid, and checksums are good.
 Note that `line0` doesn't take part in the check so is omitted for this function, and that `formatOK` will
@@ -77,6 +83,7 @@ constricted, data formats.  More information on this move will be found at
 `SatelliteKit` has been changed to allow the ingestion of GP data in a JSON form .. for example, given JSON
 data, this would decode an array of TLE structures (I'm not catching errors in the example, but you should):
 
+```swift
     let jsonDecoder = JSONDecoder()
     jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)
 
@@ -84,10 +91,11 @@ data, this would decode an array of TLE structures (I'm not catching errors in t
     print(Satellite(withTLE: tleArray[0]).debugDescription())
     print(Satellite(withTLE: tleArray[1]).debugDescription())
     print(Satellite(withTLE: tleArray[2]).debugDescription())
-
+```
 
 The `TLE` structure also implements `debugDescription` which will generate this formatted `String`
 
+```swift
     ┌─[tle :  0.66 days old]]───────────────────────────────────────────────
     │  ISS (ZARYA)                 25544 = 1998-067A   rev#:09857 tle#:0999
     │     t₀:  2018-02-08 22:51:49 +0000    +24876.95265046 days after 1950
@@ -96,6 +104,7 @@ The `TLE` structure also implements `debugDescription` which will generate this 
     │   raan: 297.9871°    anom: 100.1959°    ecc:   0.0003401
     │                                        drag:  +3.2659e-05
     └───────────────────────────────────────────────────────────────────────
+```
 
 ### Satellite
 
@@ -106,32 +115,39 @@ determined within the `Satellite` initialization.
 
 The `Satellite` initializers are:
 
+```swift
     public init(_: String, _: String, _: String)  // three TLE lines ..
     public init(withTLE: TLE)                     // a processed TLE struct ..
+```
 
 The `Satellite` struct offers some public properties and some public functions.
 
 The *properties* provide some naming information and a "grab bag" directory for whatever you want.
 
+```swift
     public let tle: TLE                           // make TLE accessible
     public let commonName: String
     public let noradIdent: String
     public let t₀Days1950: Double       		    // TLE t=0 (days since 1950)
     public var extraInfo: [String: AnyObject]
+```
 
 The *functions* accept a time argument, either minutes after the satellite's TLE epoch, or Julian Days, 
 and provide postion (Kilometers) and velocity (Kms/sec) state vectors as output.
 
+```swift
     public func position(minsAfterEpoch: Double) -> Vector
     public func velocity(minsAfterEpoch: Double) -> Vector
 
     public func position(julianDays: Double) -> Vector
     public func velocity(julianDays: Double) -> Vector
+```
 
 ### Sample Usage
 
 This is a simple invocation of the above:
 
+```swift
     do {
         let tle = try TLE("ISS (ZARYA)",
                           "1 25544U 98067A   18039.95265046  .00001678  00000-0  32659-4 0  9999",
@@ -144,6 +160,7 @@ This is a simple invocation of the above:
     } catch {
         print(error)
     }
+```
 
 ### Dealing with TLE files
 
@@ -152,7 +169,9 @@ content of such a file may be processed (records that are empty or start with "#
 leading and trailing whitespace is stripped and non-breaking spaces are converted to regular spaces)
 and checked for quality (line length is 69 characters and the checksum is good) within SatelliteKit with the function:
 
+```swift
     public func preProcessTLEs(_: String) -> [(String, String, String)]
+```
 
 `preProcessTLEs` consumes a `String` of, presumably, TLE records, and returns an array of
 `(String, String, String)` tuples, one per satellite.  The tuple items are the, mildly verified, zeroth, first
@@ -161,11 +180,15 @@ tuple is an empty `String`.
 
 Thus, the contents of a TLE file would be mapped to an array of `Satellite` by:
 
+```swift
     let satArray = preProcessTLEs(fileContents).map( { return Satellite($0.0, $0.1, $0.2) } )
+```
 
 A more rigorous quality check can be preformed using:
 
+```swift
     public func formatOK(_: String, _: String) -> Bool
+```
 
 which checks the format of TLE lines "1" and "2" .. using a regex test, a time consuming action
 that is not performed in `preProcessTLEs`.
@@ -175,7 +198,9 @@ that is not performed in `preProcessTLEs`.
 `SatelliteKit` can be added to your project using the Swift Package Manager (SwiftPM) by adding
 the dependency:
 
+```swift
     .package(url: "https://github.com/gavineadie/SatelliteKit.git", from: "1.0.0")
+```
 
 and using `import SatelliteKit` in code that needs it.
 
