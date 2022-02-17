@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ SatelliteExtra.swift                                                                    DemosKit ║
-  ║ Created by Gavin Eadie on Feb17/19 ... Copyright 2017-20 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on Feb17/19 ... Copyright 2017-22 Ramsay Consulting. All rights reserved. ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 #if os(iOS) || os(tvOS) || os(watchOS)

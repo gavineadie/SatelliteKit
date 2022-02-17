@@ -1,7 +1,7 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ TimeTests.swift                                                                                  ║
   ║                                                                                                  ║
-  ║ Created by Gavin Eadie on Mar31/19     Copyright 2019-20 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on Mar31/19     Copyright 2019-22 Ramsay Consulting. All rights reserved. ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 /// swiftlint:disable comma

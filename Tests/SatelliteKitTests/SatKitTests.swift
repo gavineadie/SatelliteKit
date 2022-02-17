@@ -1,7 +1,7 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ SatKitTests.swift                                                                                ║
   ║                                                                                                  ║
-  ║ Created by Gavin Eadie on Jan07/17 ... Copyright 2017-20 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on Jan07/17 ... Copyright 2017-22 Ramsay Consulting. All rights reserved. ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 // swiftlint statement_position

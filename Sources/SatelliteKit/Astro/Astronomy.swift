@@ -1,10 +1,10 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ Astronomy.swift                                                                           SatKit ║
-  ║ Created by Gavin Eadie on Jul06/15.    Copyright 2015-20 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on Jul06/15.    Copyright 2015-22 Ramsay Consulting. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
-// swiftlint:disable identifier_name
+//swiftlint:disable identifier_name
 
 import Foundation
 
