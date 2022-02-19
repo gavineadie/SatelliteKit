@@ -10,6 +10,14 @@ import Foundation
 // swiftlint:disable identifier_name
 // swiftlint:disable function_body_length
 
+extension String {
+    var isBlank: Bool { return allSatisfy({ $0.isWhitespace })}
+}
+
+extension Dictionary {
+    var isNotEmpty: Bool { !self.isEmpty }
+}
+
 enum SatKitError: Error {
     case TLE(String)
     case SGP(String)
@@ -283,6 +291,35 @@ public struct TLE: Decodable {
 
 //MARK: - XML initializer
 
+    init?(xmlData: Data) {
+        let parser = TLEParser()
+            
+        parser.parseXML(xmlData)
+        
+        if let satelliteInfo = parser.satInfoArray.first {
+            
+            self.init(commonName: satelliteInfo["OBJECT_NAME"]!,
+                      noradIndex: Int(satelliteInfo["NORAD_CAT_ID"]!)!,
+                      launchName: satelliteInfo["OBJECT_ID"]!,
+                      t₀: DateFormatter.iso8601Micros.date(from: satelliteInfo["EPOCH"]!)!,
+                      e₀: Double(satelliteInfo["ECCENTRICITY"]!)!,
+                      i₀: Double(satelliteInfo["INCLINATION"]!)!,
+                      ω₀: Double(satelliteInfo["ARG_OF_PERICENTER"]!)!,
+                      Ω₀: Double(satelliteInfo["RA_OF_ASC_NODE"]!)!,
+                      M₀: Double(satelliteInfo["MEAN_ANOMALY"]!)!,
+                      n₀: Double(satelliteInfo["MEAN_MOTION"]!)!,
+                      ephemType: Int(satelliteInfo["EPHEMERIS_TYPE"]!)!,
+                      tleClass: satelliteInfo["CLASSIFICATION_TYPE"]!,
+                      tleNumber: Int(satelliteInfo["ELEMENT_SET_NO"]!)!,
+                      revNumber: Int(satelliteInfo["REV_AT_EPOCH"]!)!,
+                      dragCoeff: Double(satelliteInfo["BSTAR"]!)!)
+            
+        } else {
+            return nil
+        }
+        
+    }
+
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ Decoding one, or more, TLEs from XML requires a little work; it also requires a third-party      │
   │ library "XMLCoder" .. this library is of a high quality but, if the user of SatelliteKit needs   │
@@ -488,4 +525,44 @@ func alpha5ID(_ noradID: String) -> Int {               //      "B1234"      "5"
     }
 
     return 0
+}
+
+
+class TLEParser : NSObject, XMLParserDelegate {
+    
+    var satelliteInfo: [String : String] = [:]
+    var satInfoArray: [[String : String]] = []
+    var tleCollection: [TLE] = []
+    
+    func parseXML(_ data: Data) {
+        let parser = XMLParser(data: data)
+        parser.delegate = self
+        if !parser.parse() { print("error \(parser.parserError!)") }
+    }
+    
+    var eName: String = ""
+    
+    func parser(_ parser: XMLParser, didStartElement elementName: String,
+                namespaceURI: String?, qualifiedName qName: String?,
+                attributes attributeDict: [String : String] = [:]) {
+        
+        if elementName == "segment" {
+            if satelliteInfo.isNotEmpty { satInfoArray.append(satelliteInfo) }
+        }
+        
+        eName = elementName                 // remember "elementName" for later ..
+    }
+    
+    func parser(_ parser: XMLParser, foundCharacters string: String) {
+        if !string.isBlank { satelliteInfo[eName] = string }
+    }
+    
+    func parserDidEndDocument(_ parser: XMLParser) {
+        if satelliteInfo.isNotEmpty { satInfoArray.append(satelliteInfo) }
+    }
+    
+//  func parserDidStartDocument(_ parser: XMLParser) { }
+
+//  func parser(_ parser: XMLParser, didEndElement elementName: String,
+//              namespaceURI: String?, qualifiedName qName: String?) { }
 }

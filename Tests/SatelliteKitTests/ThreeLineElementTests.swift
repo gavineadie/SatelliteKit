@@ -7,10 +7,6 @@
 import XCTest
 @testable import SatelliteKit
 
-#if canImport(XMLCoder)
-import XMLCoder
-#endif
-
 class ThreeLineElementTests: XCTestCase {
 
     func testNullLine0() {
@@ -273,7 +269,6 @@ class ThreeLineElementTests: XCTestCase {
         }
     }
 
-#if canImport(XMLCoder)
     func testXmlTLEArray() {
 
         let xmlData = """
@@ -401,28 +396,11 @@ class ThreeLineElementTests: XCTestCase {
         </ndm>
         """.data(using: .utf8)!
 
-        let result = NavigationDataMessage(from: xmlData)
+        let tle = TLE(xmlData: xmlData)
 
-        let tle = TLE(commonName: result.omms[0].body.segment.metadata.commonName,
-                      noradIndex: result.omms[0].body.segment.data.tleParameters.noradIndex,
-                      launchName: result.omms[0].body.segment.metadata.launchName,
-                      t₀: result.omms[0].body.segment.data.meanElements.t₀,
-                      e₀: result.omms[0].body.segment.data.meanElements.e₀,
-                      i₀: result.omms[0].body.segment.data.meanElements.i₀,
-                      ω₀: result.omms[0].body.segment.data.meanElements.ω₀,
-                      Ω₀: result.omms[0].body.segment.data.meanElements.Ω₀,
-                      M₀: result.omms[0].body.segment.data.meanElements.M₀,
-                      n₀: result.omms[0].body.segment.data.meanElements.n₀,
-                      ephemType:  result.omms[0].body.segment.data.tleParameters.ephemType,
-                      tleClass: result.omms[0].body.segment.data.tleParameters.tleClass,
-                      tleNumber:  result.omms[0].body.segment.data.tleParameters.tleNumber,
-                      revNumber:  result.omms[0].body.segment.data.tleParameters.revNumber,
-                      dragCoeff:  result.omms[0].body.segment.data.tleParameters.dragCoeff)
-
-        print(Satellite(withTLE: tle.debugDescription()))
+        print(Satellite(withTLE: tle!).debugDescription())
 
     }
-#endif
 
     func testLongFile() {
 
