@@ -198,7 +198,7 @@ class ThreeLineElementTests: XCTestCase {
     }
 
     func testJsonTLEArray() {
-        let jsonData = """
+        let jsonText = """
             [{
             "OBJECT_NAME": "ATLAS CENTAUR 2",
             "OBJECT_ID": "1963-047A",
@@ -254,7 +254,9 @@ class ThreeLineElementTests: XCTestCase {
             "MEAN_MOTION_DOT": -8.4e-7,
             "MEAN_MOTION_DDOT": 0
         }]
-        """.data(using: .utf8)!
+        """
+            
+        let jsonData = jsonText.data(using: .utf8)!
 
         let jsonDecoder = JSONDecoder()
         jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)
@@ -271,7 +273,7 @@ class ThreeLineElementTests: XCTestCase {
 
     func testXmlTLEArray() {
 
-        let xmlData = """
+        var xmlText = """
         <ndm xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
                xsi:noNamespaceSchemaLocation="https://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd">
             <omm>
@@ -394,11 +396,23 @@ class ThreeLineElementTests: XCTestCase {
                 </body>
             </omm>
         </ndm>
-        """.data(using: .utf8)!
+        """
+        
+        let ommRange = xmlText.range(of: "<omm>")      // find the first <omm>
+        let newRange = xmlText.startIndex ... xmlText.index(ommRange!.lowerBound, offsetBy: -4)
+        xmlText.removeSubrange(newRange)
 
-        let tle = TLE(xmlData: xmlData)
+        xmlText = xmlText.replacingOccurrences(of: "   ", with: "")
+        xmlText = xmlText.replacingOccurrences(of: "</omm>", with: "</omm>###")
+        let subStrings = xmlText.components(separatedBy: "###")
+            
+        for subString in subStrings.dropLast() {
 
-        print(Satellite(withTLE: tle!).debugDescription())
+            if let tle = TLE(xmlData: subString.data(using: .ascii)!) {
+                print(Satellite(withTLE: tle).debugDescription())
+            }
+
+        }
 
     }
 

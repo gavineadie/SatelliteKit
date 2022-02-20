@@ -10,14 +10,6 @@ import Foundation
 // swiftlint:disable identifier_name
 // swiftlint:disable function_body_length
 
-extension String {
-    var isBlank: Bool { return allSatisfy({ $0.isWhitespace })}
-}
-
-extension Dictionary {
-    var isNotEmpty: Bool { !self.isEmpty }
-}
-
 enum SatKitError: Error {
     case TLE(String)
     case SGP(String)
@@ -31,7 +23,7 @@ private func epochDays(year: Int, days: Double) -> Double {
 }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃                                                                                                  ┃
+  ┃ The TLE struct .. Decodable for JSON usage ..                                                    ┃
   ┃                                                                                                  ┃
   ┃                                                               MemoryLayout<TLE>.size = 200 bytes ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
@@ -39,7 +31,7 @@ public struct TLE: Decodable {
 
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆ Information derived directly from the Two Line Elements ..                                       ┆
-  ┆                                               .. and un'Kozai'd mean motion and semi major axis. ┆
+  ┆                                          .. then un'Kozai'd for mean motion and semi major axis. ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
     public let commonName: String                       // line zero name (if any) [eg: ISS (ZARYA)]
     public let noradIndex: Int                          // The satellite number [eg: 25544]
@@ -51,8 +43,8 @@ public struct TLE: Decodable {
     public let ω₀: Double                               // Argument of perigee (rad).
     public let Ω₀: Double                               // Right Ascension of the Ascending node (rad).
     public let M₀: Double                               // Mean anomaly (rad).
-    public var n₀: Double                               // Mean motion (rads/min)  << [un'Kozai'd]
-    public var a₀: Double                               // semi-major axis (Eᵣ)    << [un'Kozai'd]
+    public var n₀: Double = 0.0                         // Mean motion (rads/min)  << [un'Kozai'd]
+    public var a₀: Double = 0.0                         // semi-major axis (Eᵣ)    << [un'Kozai'd]
 
     public let ephemType: Int                           // Type of ephemeris.
     public let tleClass: String                         // Classification (U for unclassified).
@@ -61,7 +53,10 @@ public struct TLE: Decodable {
 
     internal let dragCoeff: Double                      // Ballistic coefficient.
 
+    private var n₀ʹ: Double
+    
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ generate one TLE (this struct) from the three lines of element info ..                           │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public init(_ line0: String, _ line1: String, _ line2: String) throws {
 
@@ -176,14 +171,22 @@ public struct TLE: Decodable {
         self.M₀ = Double(stringlet.trimmingCharacters(in: .whitespaces))! * deg2rad
 
         stringlet = String(bytes: lineTwoBytes[52...62], encoding: .utf8)!
-        let n₀ʹ = Double(stringlet.trimmingCharacters(in: .whitespaces))! * (π/720.0)
+        n₀ʹ = Double(stringlet.trimmingCharacters(in: .whitespaces))! * (π/720.0)
 
         stringlet = String(bytes: lineTwoBytes[63...67], encoding: .utf8)!
         self.revNumber = Int(stringlet.trimmingCharacters(in: .whitespaces))!
 
+        unKozai()
+
+        guard (self.ephemType == 0 || self.ephemType == 2 || self.ephemType == 3) else {
+            throw SatKitError.TLE("Line1 ephemerisType ≠ 0, 2 or 3 .. [\(self.ephemType)]")
+        }
+    }
+
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆ recover (un'Kozai) original mean motion and semi-major axis from the input elements for SxP4.    ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+    private mutating func unKozai() {
 
         do {
             let θ = cos(self.i₀)                                    //         cos(i₀)  ..  θ
@@ -200,10 +203,11 @@ public struct TLE: Decodable {
             self.a₀ = a₁  / (1.0 - δ₀)                               //             a₀
         }
 
-        guard (self.ephemType == 0 || self.ephemType == 2 || self.ephemType == 3) else {
-            throw SatKitError.TLE("Line1 ephemerisType ≠ 0, 2 or 3 .. [\(self.ephemType)]")
-        }
     }
+
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
 
 //MARK: - JSON initializer
 
@@ -249,7 +253,7 @@ public struct TLE: Decodable {
   │                                                                                                  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public init(from decoder: Decoder) throws {
-        let container = try! decoder.container(keyedBy: CodingKeys.self)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
 
         self.commonName  = try container.decode(String.self, forKey: .commonName)
         self.noradIndex  = try container.decode(Int.self, forKey: .noradIndex)
@@ -267,27 +271,13 @@ public struct TLE: Decodable {
         self.tleNumber = try container.decode(Int.self, forKey: .tleNumber)
         self.revNumber = try container.decode(Int.self, forKey: .revNumber)
 
-        let n₀ʹ = try! container.decode(Double.self, forKey: .n₀) * (π/720.0)
+        n₀ʹ = try! container.decode(Double.self, forKey: .n₀) * (π/720.0)
 
-/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
-  ┆ recover (un'Kozai) original mean motion and semi-major axis from the input elements for SxP4.    ┆
-  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
-
-        do {
-            let θ = cos(self.i₀)                                    //         cos(i₀)  ..  θ
-            let x3thm1 = 3.0 * θ * θ - 1.0                          //      3×cos²(i₀) - 1
-            let β₀ = (1.0 - self.e₀ * self.e₀).squareRoot()         //         √(1-e₀²) ..  β₀
-            let temp = 1.5 * EarthConstants.K₂ * x3thm1 / (β₀ * β₀ * β₀)
-
-            let a₀ʹ = pow(EarthConstants.kₑ / n₀ʹ, ⅔)
-            let δ₁ = temp / (a₀ʹ * a₀ʹ)
-            let a₁ = a₀ʹ * (1.0 - δ₁ * (⅓ + δ₁ * (1.0 + 134.0 / 81.0 * δ₁)))
-            let δ₀ = temp / (a₁ * a₁)
-
-            self.n₀ = n₀ʹ / (1.0 + δ₀)                               //             n₀
-            self.a₀ = a₁  / (1.0 - δ₀)                               //             a₀
-        }
+        unKozai()
     }
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
 
 //MARK: - XML initializer
 
@@ -321,10 +311,6 @@ public struct TLE: Decodable {
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ Decoding one, or more, TLEs from XML requires a little work; it also requires a third-party      │
-  │ library "XMLCoder" .. this library is of a high quality but, if the user of SatelliteKit needs   │
-  │ to avoid anything outside the Swift Standand Library, the use of XMLCoder is conditional ..      │
-  │                                                                                                  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
 
     public init(commonName: String, noradIndex: Int, launchName: String,
@@ -346,28 +332,11 @@ public struct TLE: Decodable {
         self.revNumber = revNumber
         self.dragCoeff = dragCoeff
 
-        let n₀ʹ = n₀ * (π/720.0)
+        n₀ʹ = n₀ * (π/720.0)
 
-/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
-  ┆ recover (un'Kozai) original mean motion and semi-major axis from the input elements for SxP4.    ┆
-  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+        unKozai()
 
-        do {
-            let θ = cos(self.i₀)                                    //         cos(i₀)  ..  θ
-            let x3thm1 = 3.0 * θ * θ - 1.0                          //      3×cos²(i₀) - 1
-            let β₀ = (1.0 - self.e₀ * self.e₀).squareRoot()         //         √(1-e₀²) ..  β₀
-            let temp = 1.5 * EarthConstants.K₂ * x3thm1 / (β₀ * β₀ * β₀)
-
-            let a₀ʹ = pow(EarthConstants.kₑ / n₀ʹ, ⅔)
-            let δ₁ = temp / (a₀ʹ * a₀ʹ)
-            let a₁ = a₀ʹ * (1.0 - δ₁ * (⅓ + δ₁ * (1.0 + 134.0 / 81.0 * δ₁)))
-            let δ₀ = temp / (a₁ * a₁)
-
-            self.n₀ = n₀ʹ / (1.0 + δ₀)                               //             n₀
-            self.a₀ = a₁  / (1.0 - δ₀)                               //             a₀
-        }
     }
-
 }
 
 //MARK: - static functions
@@ -525,44 +494,4 @@ func alpha5ID(_ noradID: String) -> Int {               //      "B1234"      "5"
     }
 
     return 0
-}
-
-
-class TLEParser : NSObject, XMLParserDelegate {
-    
-    var satelliteInfo: [String : String] = [:]
-    var satInfoArray: [[String : String]] = []
-    var tleCollection: [TLE] = []
-    
-    func parseXML(_ data: Data) {
-        let parser = XMLParser(data: data)
-        parser.delegate = self
-        if !parser.parse() { print("error \(parser.parserError!)") }
-    }
-    
-    var eName: String = ""
-    
-    func parser(_ parser: XMLParser, didStartElement elementName: String,
-                namespaceURI: String?, qualifiedName qName: String?,
-                attributes attributeDict: [String : String] = [:]) {
-        
-        if elementName == "segment" {
-            if satelliteInfo.isNotEmpty { satInfoArray.append(satelliteInfo) }
-        }
-        
-        eName = elementName                 // remember "elementName" for later ..
-    }
-    
-    func parser(_ parser: XMLParser, foundCharacters string: String) {
-        if !string.isBlank { satelliteInfo[eName] = string }
-    }
-    
-    func parserDidEndDocument(_ parser: XMLParser) {
-        if satelliteInfo.isNotEmpty { satInfoArray.append(satelliteInfo) }
-    }
-    
-//  func parserDidStartDocument(_ parser: XMLParser) { }
-
-//  func parser(_ parser: XMLParser, didEndElement elementName: String,
-//              namespaceURI: String?, qualifiedName qName: String?) { }
 }
