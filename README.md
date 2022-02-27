@@ -30,7 +30,7 @@ test output and the test output in the above published paper [1].
 ### Change Notes
 
 At the end of the README.
-Lastest change: Version/Tag 1.0.27 -- 2021 Mar 05
+Lastest change: Version/Tag 1.1.0 -- 2022 Feb 27
 
 ### TLE
 
@@ -119,7 +119,7 @@ The *properties* provide some naming information and a "grab bag" directory for 
     public let t₀Days1950: Double       		    // TLE t=0 (days since 1950)
     public var extraInfo: [String: AnyObject]
 
-The *functions* accept a time argument, either minutes after the satellite's TLE epoch, or Julian Days, 
+The *functions* accept a time argument, either minutes after the satellite's TLE epoch, or Julian Days,
 and provide postion (Kilometers) and velocity (Kms/sec) state vectors as output.
 
     public func position(minsAfterEpoch: Double) -> Vector
@@ -247,7 +247,30 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 `version/tag 1.0.27 .. (2021 Mar 05)`
 
 - [SpaceTrack Alpha-5](https://www.space-track.org/documentation#tle-alpha5)
-- TLEs with the new Space-Track Alpha-5 object numbers (`noradIndex`) are processed correctly.  
-- The tag has not changed because this feature has been present for some time.  
+- TLEs with the new Space-Track Alpha-5 object numbers (`noradIndex`) are processed correctly.
+- The tag has not changed because this feature has been present for some time.
+
+`version/tag 1.0.28 .. (2021 May 14)`
+
+- Alpha-5 NORAD numbers are decoded correctly (no functional change).
+
+`version/tag 1.0.30 .. (2022 Feb 17)`
+
+- SwiftPM: remove linkerSettings .. adjust copyright year "..-22"
+
+`version/tag 1.0.31 .. (2022 Feb 19)`
+
+- TLE initialization: factored out unKozai()
+- moved XML parsing to own file
+- revised the XML unit test
+
+`version/tag 1.1.0 .. (2022 Feb 27)`
+
+- **NOTE: API CHANGES (backward compatible, for now)**
+- `TLE` typealias'd to `Elements` (putting emphasis on `Elements`, rather `Satellite`)
+- (for example) `debugDescription()` is now a method on `Element`
+- `noradIndex` can't be negative so made `UInt`
+- some time functions moved to `TimeUtility.swift`
+- `TLE.n₀ʹ` removed from `public`
 
 ---

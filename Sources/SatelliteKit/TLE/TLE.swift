@@ -10,6 +10,8 @@ import Foundation
 // swiftlint:disable identifier_name
 // swiftlint:disable function_body_length
 
+public typealias Elements = TLE
+
 enum SatKitError: Error {
     case TLE(String)
     case SGP(String)
@@ -34,7 +36,7 @@ public struct TLE: Decodable {
   ┆                                          .. then un'Kozai'd for mean motion and semi major axis. ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
     public let commonName: String                       // line zero name (if any) [eg: ISS (ZARYA)]
-    public let noradIndex: Int                          // The satellite number [eg: 25544]
+    public let noradIndex: UInt                         // The satellite number [eg: 25544]
     public let launchName: String                       // International designation [eg: 1998-067A]
 
     public let t₀: Double                               // the TLE t=0 time (days from 1950)
@@ -53,7 +55,7 @@ public struct TLE: Decodable {
 
     internal let dragCoeff: Double                      // Ballistic coefficient.
 
-    private var n₀ʹ: Double
+//    private var n₀ʹ: Double
     
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ generate one TLE (this struct) from the three lines of element info ..                           │
@@ -170,13 +172,12 @@ public struct TLE: Decodable {
         stringlet = String(bytes: lineTwoBytes[43...50], encoding: .utf8)!
         self.M₀ = Double(stringlet.trimmingCharacters(in: .whitespaces))! * deg2rad
 
-        stringlet = String(bytes: lineTwoBytes[52...62], encoding: .utf8)!
-        n₀ʹ = Double(stringlet.trimmingCharacters(in: .whitespaces))! * (π/720.0)
-
         stringlet = String(bytes: lineTwoBytes[63...67], encoding: .utf8)!
         self.revNumber = Int(stringlet.trimmingCharacters(in: .whitespaces))!
 
-        unKozai()
+        stringlet = String(bytes: lineTwoBytes[52...62], encoding: .utf8)!
+
+        unKozai(Double(stringlet.trimmingCharacters(in: .whitespaces))! * (π/720.0))
 
         guard (self.ephemType == 0 || self.ephemType == 2 || self.ephemType == 3) else {
             throw SatKitError.TLE("Line1 ephemerisType ≠ 0, 2 or 3 .. [\(self.ephemType)]")
@@ -186,7 +187,7 @@ public struct TLE: Decodable {
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆ recover (un'Kozai) original mean motion and semi-major axis from the input elements for SxP4.    ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
-    private mutating func unKozai() {
+    private mutating func unKozai(_ n₀ʹ: Double) {
 
         do {
             let θ = cos(self.i₀)                                    //         cos(i₀)  ..  θ
@@ -256,7 +257,7 @@ public struct TLE: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         self.commonName  = try container.decode(String.self, forKey: .commonName)
-        self.noradIndex  = try container.decode(Int.self, forKey: .noradIndex)
+        self.noradIndex  = UInt(try container.decode(Int.self, forKey: .noradIndex))
         self.launchName  = try container.decode(String.self, forKey: .launchName)
         let epoch = try container.decode(Date.self, forKey: .t₀)
         self.t₀ = epoch.daysSince1950
@@ -271,9 +272,7 @@ public struct TLE: Decodable {
         self.tleNumber = try container.decode(Int.self, forKey: .tleNumber)
         self.revNumber = try container.decode(Int.self, forKey: .revNumber)
 
-        n₀ʹ = try! container.decode(Double.self, forKey: .n₀) * (π/720.0)
-
-        unKozai()
+        unKozai(try! container.decode(Double.self, forKey: .n₀) * (π/720.0))
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -289,7 +288,7 @@ public struct TLE: Decodable {
         if let satelliteInfo = parser.satInfoArray.first {
             
             self.init(commonName: satelliteInfo["OBJECT_NAME"]!,
-                      noradIndex: Int(satelliteInfo["NORAD_CAT_ID"]!)!,
+                      noradIndex: UInt(satelliteInfo["NORAD_CAT_ID"]!)!,
                       launchName: satelliteInfo["OBJECT_ID"]!,
                       t₀: DateFormatter.iso8601Micros.date(from: satelliteInfo["EPOCH"]!)!,
                       e₀: Double(satelliteInfo["ECCENTRICITY"]!)!,
@@ -313,7 +312,7 @@ public struct TLE: Decodable {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
 
-    public init(commonName: String, noradIndex: Int, launchName: String,
+    public init(commonName: String, noradIndex: UInt, launchName: String,
          t₀: Date, e₀: Double, i₀: Double, ω₀: Double, Ω₀: Double, M₀: Double, n₀: Double,
          ephemType: Int, tleClass: String, tleNumber: Int, revNumber: Int, dragCoeff: Double) {
 
@@ -332,11 +331,58 @@ public struct TLE: Decodable {
         self.revNumber = revNumber
         self.dragCoeff = dragCoeff
 
-        n₀ʹ = n₀ * (π/720.0)
-
-        unKozai()
+        unKozai(n₀ * (π/720.0))
 
     }
+    
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    public func debugDescription() -> String {
+        
+        if (-Date(daysSince1950: t₀).timeIntervalSinceNow * TimeConstants.sec2day < 1.0) {
+            return String(format: """
+                
+                ┌─[tle : %4.1f hours old]────────────────────────────────────────────────
+                │  %@    %05d = %@ rev#:%05d tle#:%04d
+                │     t₀:  %@    %+14.8f days after 1950
+                │
+                │    inc: %8.4f°     aop: %8.4f°    mot:  %11.8f (rev/day)
+                │   raan: %8.4f°    anom: %8.4f°    ecc:   %9.7f
+                │                                        drag:  %+11.4e
+                └───────────────────────────────────────────────────────────────────────
+                """,
+                          -Date(daysSince1950: t₀).timeIntervalSinceNow * TimeConstants.sec2day * 24.0,
+                          self.commonName.padding(toLength: 24, withPad: " ", startingAt: 0),
+                          self.noradIndex,
+                          self.launchName.padding(toLength: 11, withPad: " ", startingAt: 0),
+                          self.revNumber, self.tleNumber,
+                          String(describing: Date(daysSince1950: self.t₀)), self.t₀,
+                          self.i₀ * rad2deg, self.ω₀ * rad2deg, self.n₀ / (π/720.0), self.Ω₀ * rad2deg,
+                          self.M₀ * rad2deg, self.e₀, self.dragCoeff)
+        } else {
+            return String(format: """
+                
+                ┌─[tle : %5.2f days old]────────────────────────────────────────────────
+                │  %@    %05d = %@ rev#:%05d tle#:%04d
+                │     t₀:  %@    %+14.8f days after 1950
+                │
+                │    inc: %8.4f°     aop: %8.4f°    mot:  %11.8f (rev/day)
+                │   raan: %8.4f°    anom: %8.4f°    ecc:   %9.7f
+                │                                        drag:  %+11.4e
+                └───────────────────────────────────────────────────────────────────────
+                """,
+                          -Date(daysSince1950: t₀).timeIntervalSinceNow * TimeConstants.sec2day,
+                          self.commonName.padding(toLength: 24, withPad: " ", startingAt: 0),
+                          self.noradIndex,
+                          self.launchName.padding(toLength: 11, withPad: " ", startingAt: 0),
+                          self.revNumber, self.tleNumber,
+                          String(describing: Date(daysSince1950: self.t₀)), self.t₀,
+                          self.i₀ * rad2deg, self.ω₀ * rad2deg, self.n₀ / (π/720.0), self.Ω₀ * rad2deg,
+                          self.M₀ * rad2deg, self.e₀, self.dragCoeff)
+        }
+        
+    }
+    
 }
 
 //MARK: - static functions
@@ -472,7 +518,7 @@ func base10ID(_ noradID: String) -> Int {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ Convert new Aplha-5 NORAD ID ("B1234") into an integer .. "B" * 10000 + 1234, "B" is base-34 ..  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-func alpha5ID(_ noradID: String) -> Int {               //      "B1234"      "5"
+func alpha5ID(_ noradID: String) -> UInt {              //      "B1234"      "5"
     let lastFive = ("00000" + noradID.uppercased())     // "00000B1234  "000005"
                                             .suffix(5)  //      "B1234"  "00005"
     let byte1 = (lastFive.first)!
@@ -480,13 +526,13 @@ func alpha5ID(_ noradID: String) -> Int {               //      "B1234"      "5"
 
         switch String(byte1) {
         case "0"..."9":
-            return Int(byte1.asciiValue!-48)*10000 + seqNo
+            return UInt(Int(byte1.asciiValue!-48)*10000 + seqNo)
         case "A"..."H":
-            return Int(byte1.asciiValue!-55)*10000 + seqNo
+            return UInt(Int(byte1.asciiValue!-55)*10000 + seqNo)
         case "J"..."N":
-            return Int(byte1.asciiValue!-56)*10000 + seqNo
+            return UInt(Int(byte1.asciiValue!-56)*10000 + seqNo)
         case "P"..."Z":
-            return Int(byte1.asciiValue!-57)*10000 + seqNo
+            return UInt(Int(byte1.asciiValue!-57)*10000 + seqNo)
         default:
             return 0
         }

@@ -18,7 +18,7 @@ import Foundation
   ┃                                                                                                  ┃
   ┃                                      ---------|-----------------------|---                       ┃
   ┃                                               |                     2001                         ┃
-  ┃                                          NORAD: 0 -- JD: 2433281.5                               ┃
+  ┃                                          NORAD: 0 -- JD: 2433281.5    |                          ┃
   ┃                                                                  Apple: 0 -- JD: 2451910.5       ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 public struct JD {
@@ -199,4 +199,14 @@ public func hms2deg(hms: (Int, Int, Double)) -> Double {
 
 public func stringHMS(hms: (Int, Int, Double)) -> String {
     String(format: "%02dʰ%02dᵐ%06.3f", hms.0, hms.1, hms.2)
+}
+
+// MARK: -
+
+public func ep1950DaysNow() -> Double {
+    return julianDaysNow() - JD.epoch1950
+}
+
+public func julianDaysNow() -> Double {
+    return JD.appleZero + Date().timeIntervalSinceReferenceDate * TimeConstants.sec2day
 }

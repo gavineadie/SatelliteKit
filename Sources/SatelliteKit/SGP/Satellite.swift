@@ -12,7 +12,7 @@ public struct Satellite {
 
     let propagator: TLEPropagator
     
-    public let tle: TLE                                 // make TLE accessible
+    public let tle: Elements                            // make TLE accessible
     public let commonName: String
     public let noradIdent: String
     public let t₀Days1950: Double                       // TLE t=0 (days since 1950)
@@ -25,21 +25,9 @@ public struct Satellite {
     public var extraInfo = [String: AnyObject]()
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │  Initialize Satellite with the three lines of a three line element set                           │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public init(_ line0: String, _ line1: String, _ line2: String) {
-        do {
-            let tleSat = try TLE(line0, line1, line2)
-            self.init(withTLE: tleSat)
-        } catch {
-            fatalError("Satellite.init failure ..")
-        }
-    }
-
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │  Initialize Satellite with TLE struct ..                                                         │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public init(withTLE tle: TLE) {
+    public init(withTLE tle: Elements) {
         propagator = selectPropagator(tle: tle)
         
         self.tle = tle
@@ -49,12 +37,40 @@ public struct Satellite {
         self.t₀Days1950 = propagator.tle.t₀
     }
 
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │  Initialize Satellite with the three lines of a three line element set                           │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    public init(_ line0: String, _ line1: String, _ line2: String) {
+        do {
+            let tleSat = try Elements(line0, line1, line2)
+            self.init(withTLE: tleSat)
+        } catch {
+            fatalError("Satellite.init failure ..")
+        }
+    }
+    
+}
+
+extension Satellite {
+
     public func julianDay(_ minsAfterEpoch: Double) -> Double {
         (self.t₀Days1950 + JD.epoch1950) + minsAfterEpoch * TimeConstants.min2day
     }
 
     public func minsAfterEpoch(_ julianDays: Double) -> Double {
         (julianDays - (self.t₀Days1950 + JD.epoch1950)) * TimeConstants.day2min
+    }
+
+    var daysAfterEpoch: Double {
+        return (ep1950DaysNow() - t₀Days1950)
+    }
+
+    var hoursAfterEpoch: Double {
+        return (ep1950DaysNow() - t₀Days1950) * 24.0
+    }
+
+    var minsAfterEpoch: Double {
+        return (ep1950DaysNow() - t₀Days1950) * 1440.0
     }
 
 // MARK: - inertial position and velocity
@@ -103,29 +119,49 @@ public struct Satellite {
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    @available(*, deprecated, message: "PrettyPrint the elements from the Elements struct")
     public func debugDescription() -> String {
-
-        String(format: """
-
-        ┌─[tle : %5.2f days old]────────────────────────────────────────────────
-        │  %@    %05d = %@ rev#:%05d tle#:%04d
-        │     t₀:  %@    %+14.8f days after 1950
-        │
-        │    inc: %8.4f°     aop: %8.4f°    mot:  %11.8f (rev/day)
-        │   raan: %8.4f°    anom: %8.4f°    ecc:   %9.7f
-        │                                        drag:  %+11.4e
-        └───────────────────────────────────────────────────────────────────────
-        """,
-                      -Date(daysSince1950: t₀Days1950).timeIntervalSinceNow * TimeConstants.sec2day,
-                      self.commonName.padding(toLength: 24, withPad: " ", startingAt: 0),
-                      self.propagator.tle.noradIndex,
-                      self.propagator.tle.launchName.padding(toLength: 11, withPad: " ", startingAt: 0),
-                      self.propagator.tle.revNumber, self.propagator.tle.tleNumber,
-                      String(describing: Date(daysSince1950: self.t₀Days1950)), self.t₀Days1950,
-                      self.propagator.tle.i₀ * rad2deg, self.propagator.tle.ω₀ * rad2deg,
-                      self.propagator.tle.n₀ / (π/720.0), self.propagator.tle.Ω₀ * rad2deg,
-                      self.propagator.tle.M₀ * rad2deg, self.propagator.tle.e₀,
-                      self.propagator.tle.dragCoeff)
+        return tle.debugDescription()
     }
+
+}
+
+public extension Satellite {
+
+// MARK: - latitude, longitude and altitude
+
+/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃  derive latitude, longitude and altitude at given time ..                                        ┃
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+    func geoPosition(minsAfterEpoch: Double) -> LatLonAlt {
+        return geoPosition(julianDays: julianDay(minsAfterEpoch))
+    }
+
+    func geoPosition(julianDays: Double) -> LatLonAlt {
+        return eci2geo(julianDays: julianDays, celestial: position(julianDays: julianDays))
+    }
+
+// MARK: - azimuth, elevation and range
+
+/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃  return topological position (satellite's azimuth, elevation and range) at given time ..         ┃
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+   func topPosition(minsAfterEpoch: Double, obsLatLonAlt: LatLonAlt) -> AziEleDst {
+       topPosition(julianDays: minsAfterEpoch * TimeConstants.min2day +
+                                               (self.t₀Days1950 + JD.epoch1950), observer: obsLatLonAlt)
+   }
+
+   func topPosition(julianDays: Double, observer: LatLonAlt) -> AziEleDst {
+
+       let satCel = self.position(julianDays: julianDays)                  // ECI
+       let obsCel = geo2eci(julianDays: julianDays, geodetic: observer)    // ECI
+
+       let top = cel2top(julianDays: julianDays, satCel: satCel, obsCel: obsCel)
+
+       let z = top.magnitude()
+
+       return AziEleDst(azim: atan2pi(top.y, -top.x) * rad2deg,
+                        elev: asin(top.z / z) * rad2deg, dist: z)
+   }
 
 }
