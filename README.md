@@ -32,9 +32,9 @@ test output and the test output in the above published paper [1].
 At the end of the README.
 Lastest change: Version/Tag 1.1.0 -- 2022 Feb 27
 
-### TLE
+### Elements
 
-The `TLE` structure is initialized from the three lines of elements in a traditional TLE set.
+The `Elements` structure is initialized from the three lines of elements in a traditional TLE set.
 Some sources of TLEs provide no first line (which would contain the object's informal name) and,
 in that case, it is OK to pass a null `String` into the initializer.
 
@@ -69,9 +69,10 @@ emit explicit errors into the log.
 
 #### Other data formats
 
-There has been concern for some time that the three line element sets will become limited, not least of all because
-they only allow 5 digits for a object's unique NORAD numeric identifier.  It has been proposed to provide other, less
-constricted, data formats.  More information on this move will be found at
+There has been concern for some time that the three line element sets will become limited,
+not least of all because they only allow 5 digits for a object's unique NORAD numeric identifier.
+It has been proposed to provide other, less constricted, data formats.
+More information on this move will be found at
 [A New Way to Obtain GP Data (aka TLEs)](https://celestrak.com/NORAD/documentation/gp-data-formats.php)
 
 `SatelliteKit` has been changed to allow the ingestion of GP data in a JSON form .. for example, given JSON
@@ -86,7 +87,7 @@ data, this would decode an array of TLE structures (I'm not catching errors in t
     print(Satellite(withTLE: tleArray[2]).debugDescription())
 
 
-The `TLE` structure also implements `debugDescription` which will generate this formatted `String`
+The `Elements` structure also implements `debugDescription` which will generate this formatted `String`
 
     ┌─[tle :  0.66 days old]]───────────────────────────────────────────────
     │  ISS (ZARYA)                 25544 = 1998-067A   rev#:09857 tle#:0999
@@ -99,21 +100,22 @@ The `TLE` structure also implements `debugDescription` which will generate this 
 
 ### Satellite
 
-Having obtained the `TLE` for a satellite, it is used to initialize a `Satellite` struct which will
+Having obtained the `Elements` for a satellite, it is used to initialize a `Satellite` struct which will
 manage the propagation of the object's position and velocity as time is varied from the epochal
 t=0 of the element set.  Whether the object requires the "deep space" propagator, or not, is
 determined within the `Satellite` initialization.
 
 The `Satellite` initializers are:
 
-    public init(_: String, _: String, _: String)  // three TLE lines ..
-    public init(withTLE: TLE)                     // a processed TLE struct ..
+    public init(_: String, _: String, _: String)  	// three TLE lines ..
+    public init(withTLE: TLE)                     	// an Elements struct ..
+    public init(elements: Elements)             	// an Elements struct ..
 
 The `Satellite` struct offers some public properties and some public functions.
 
 The *properties* provide some naming information and a "grab bag" directory for whatever you want.
 
-    public let tle: TLE                           // make TLE accessible
+    public let tle: Elements                    	// make TLE accessible
     public let commonName: String
     public let noradIdent: String
     public let t₀Days1950: Double       		    // TLE t=0 (days since 1950)
@@ -133,11 +135,11 @@ and provide postion (Kilometers) and velocity (Kms/sec) state vectors as output.
 This is a simple invocation of the above:
 
     do {
-        let tle = try TLE("ISS (ZARYA)",
-                          "1 25544U 98067A   18039.95265046  .00001678  00000-0  32659-4 0  9999",
-                          "2 25544  51.6426 297.9871 0003401  86.7895 100.1959 15.54072469 98577")
+        let elements = try Elements("ISS (ZARYA)",
+                                    "1 25544U 98067A   18039.95265046  .00001678  00000-0  32659-4 0  9999",
+                                    "2 25544  51.6426 297.9871 0003401  86.7895 100.1959 15.54072469 98577")
 
-        let sat = Satellite(withTLE: tle)
+        let sat = Satellite(elements)
         print(sat.debugDescription())
         let posInKms = sat.position(minsAfterEpoch: 10.0)
 

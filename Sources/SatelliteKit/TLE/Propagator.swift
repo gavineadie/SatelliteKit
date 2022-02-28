@@ -1,5 +1,5 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
-  ║ TLEPropagator.swift                                                                       SatKit ║
+  ║ Propagator.swift                                                                          SatKit ║
   ║ Created by Gavin Eadie on May24/17         Copyright © 2017-20 Gavin Eadie. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
@@ -59,7 +59,7 @@ public struct EarthConstants {
 
 }
 
-public class TLEPropagator {
+public class Propagator {
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ c o n s t a n t s   set in init(..)                                                              │
@@ -363,11 +363,11 @@ public class TLEPropagator {
     }
 
     func sxpInitialize() throws {
-        preconditionFailure("'TLEPropagator.sxpInitialize' must be overridden")
+        preconditionFailure("'Propagator.sxpInitialize' must be overridden")
     }
 
     func sxpPropagate(minsAfterEpoch: Double) throws {
-        preconditionFailure(" 'TLEPropagator.sxpPropagate' must be overridden")
+        preconditionFailure(" 'Propagator.sxpPropagate' must be overridden")
     }
 
 }
@@ -375,7 +375,7 @@ public class TLEPropagator {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ Period >= 225 minutes is deep space                                                              │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-public func selectPropagator(tle: TLE) -> TLEPropagator {
+public func selectPropagator(tle: Elements) -> Propagator {
 
     if tle.ephemType == 2 { return SGP4(tle) }
     else if tle.ephemType == 3 { return DeepSDP4(tle) }
@@ -386,7 +386,7 @@ public func selectPropagator(tle: TLE) -> TLEPropagator {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ Period >= 225 minutes is deep space                                                              │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-public func selectPropagator(_ elements: Elements) -> TLEPropagator {
+public func selectPropagator(_ elements: Elements) -> Propagator {
 
     if elements.ephemType == 2 { return SGP4(elements) }
     else if elements.ephemType == 3 { return DeepSDP4(elements) }

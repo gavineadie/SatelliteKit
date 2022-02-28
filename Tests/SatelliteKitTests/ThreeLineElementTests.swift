@@ -16,7 +16,7 @@ class ThreeLineElementTests: XCTestCase {
                               "1 00000  57001    98001.00000000  .00000000  00000-0  00000-0 0  0000",
                               "2 00000   0.0000   0.0000 0000000   0.0000   0.0000 15.00000000 00000")
 
-            print(Satellite(withTLE: tle).debugDescription())
+            print(Satellite(elements: tle).debugDescription())
 
             XCTAssertEqual(tle.t₀, 17533.000)                   // the TLE t=0 time (days from 1950)
 

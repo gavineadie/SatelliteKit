@@ -9,7 +9,7 @@ import Foundation
 // swiftlint:disable identifier_name
 // swiftlint:disable shorthand_operator
 
-class SGP4: TLEPropagator {
+class SGP4: Propagator {
 
     private var ΔM₀³ = 0.0                  // (1 + eta * cos(M₀))³
 

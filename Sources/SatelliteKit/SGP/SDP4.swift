@@ -9,7 +9,7 @@ import Foundation
 // swiftlint:disable force_try
 // swiftlint:disable identifier_name
 
-class SDP4: TLEPropagator {
+class SDP4: Propagator {
 
     var ω_new = 0.0                                 ///** New arg of perigee argument. */
     var n_new = 0.0                                 ///** New mean motion. */

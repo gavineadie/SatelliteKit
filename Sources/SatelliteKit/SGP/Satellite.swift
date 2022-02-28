@@ -10,8 +10,8 @@ import Foundation
 
 public struct Satellite {
 
-    let propagator: TLEPropagator
-    
+    let propagator: Propagator
+
     public let tle: Elements                            // make TLE accessible
     public let commonName: String                       // "COSMOS .."
     public let noradIdent: String
@@ -24,12 +24,15 @@ public struct Satellite {
 
     public var extraInfo = [String: AnyObject]()
 
+}
+
+public extension Satellite {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │  Initialize Satellite with TLE struct ..                                                         │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public init(withTLE tle: Elements) {
+    init(withTLE tle: Elements) {
         propagator = selectPropagator(tle: tle)
-        
+
         self.tle = tle
 
         self.commonName = propagator.tle.commonName
@@ -37,9 +40,9 @@ public struct Satellite {
         self.t₀Days1950 = propagator.tle.t₀
     }
 
-    public init(_ elements: Elements) {
+    init(elements: Elements) {
         propagator = selectPropagator(tle: elements)
-        
+
         self.tle = elements
 
         self.commonName = propagator.tle.commonName
@@ -50,7 +53,7 @@ public struct Satellite {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │  Initialize Satellite with the three lines of a three line element set                           │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public init(_ line0: String, _ line1: String, _ line2: String) {
+    init(_ line0: String, _ line1: String, _ line2: String) {
         do {
             let elements = try Elements(line0, line1, line2)
             self.init(withTLE: elements)
@@ -58,7 +61,7 @@ public struct Satellite {
             fatalError("Satellite.init failure ..")
         }
     }
-    
+
 }
 
 public extension Satellite {
@@ -174,7 +177,7 @@ public extension Satellite {
 }
 
 public extension Satellite {
-    
+
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     @available(*, deprecated, message: "PrettyPrint the elements from the Elements struct")
