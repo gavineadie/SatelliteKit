@@ -379,7 +379,18 @@ public func selectPropagator(tle: TLE) -> TLEPropagator {
 
     if tle.ephemType == 2 { return SGP4(tle) }
     else if tle.ephemType == 3 { return DeepSDP4(tle) }
-    else { return (π*2) / (tle.n₀ * TimeConstants.day2min) < (1.0 / 6.4) ? SGP4(tle) :
-                                                                           DeepSDP4(tle) }
+    else { return (π*2) / (tle.n₀ * TimeConstants.day2min) < (1.0 / 6.4) ? SGP4(tle) : DeepSDP4(tle) }
+
+}
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Period >= 225 minutes is deep space                                                              │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+public func selectPropagator(_ elements: Elements) -> TLEPropagator {
+
+    if elements.ephemType == 2 { return SGP4(elements) }
+    else if elements.ephemType == 3 { return DeepSDP4(elements) }
+    else { return (π*2) / (elements.n₀ * TimeConstants.day2min) < (1.0 / 6.4) ?
+                                                            SGP4(elements) : DeepSDP4(elements) }
 
 }

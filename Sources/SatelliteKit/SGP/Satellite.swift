@@ -13,7 +13,7 @@ public struct Satellite {
     let propagator: TLEPropagator
     
     public let tle: Elements                            // make TLE accessible
-    public let commonName: String
+    public let commonName: String                       // "COSMOS .."
     public let noradIdent: String
     public let t₀Days1950: Double                       // TLE t=0 (days since 1950)
 
@@ -33,7 +33,17 @@ public struct Satellite {
         self.tle = tle
 
         self.commonName = propagator.tle.commonName
-        self.noradIdent = String(propagator.tle.noradIndex)      // convert Int to String
+        self.noradIdent = String(propagator.tle.noradIndex)      // convert UInt to String
+        self.t₀Days1950 = propagator.tle.t₀
+    }
+
+    public init(_ elements: Elements) {
+        propagator = selectPropagator(tle: elements)
+        
+        self.tle = elements
+
+        self.commonName = propagator.tle.commonName
+        self.noradIdent = String(propagator.tle.noradIndex)      // convert UInt to String
         self.t₀Days1950 = propagator.tle.t₀
     }
 
@@ -51,13 +61,13 @@ public struct Satellite {
     
 }
 
-extension Satellite {
+public extension Satellite {
 
-    public func julianDay(_ minsAfterEpoch: Double) -> Double {
+    func julianDay(_ minsAfterEpoch: Double) -> Double {
         (self.t₀Days1950 + JD.epoch1950) + minsAfterEpoch * TimeConstants.min2day
     }
 
-    public func minsAfterEpoch(_ julianDays: Double) -> Double {
+    func minsAfterEpoch(_ julianDays: Double) -> Double {
         (julianDays - (self.t₀Days1950 + JD.epoch1950)) * TimeConstants.day2min
     }
 
@@ -73,12 +83,16 @@ extension Satellite {
         return (ep1950DaysNow() - t₀Days1950) * 1440.0
     }
 
+}
+
+public extension Satellite {
+
 // MARK: - inertial position and velocity
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial position (Kilometers) at minutes after TLE epoch      │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public func position(minsAfterEpoch: Double) -> Vector {
+    func position(minsAfterEpoch: Double) -> Vector {
         do {
             let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
             return Vector((pv.position.x)/1000.0,
@@ -92,7 +106,7 @@ extension Satellite {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial velocity (Kms/second) at minutes after TLE epoch      │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public func velocity(minsAfterEpoch: Double) -> Vector {
+    func velocity(minsAfterEpoch: Double) -> Vector {
         do {
             let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
             return Vector((pv.velocity.x)/1000.0,
@@ -106,22 +120,15 @@ extension Satellite {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial position (Kilometers) at Julian Date                  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public func position(julianDays: Double) -> Vector {
+    func position(julianDays: Double) -> Vector {
         position(minsAfterEpoch: minsAfterEpoch(julianDays))
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial velocity (Kms/second) at Julian Date                  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public func velocity(julianDays: Double) -> Vector {
+    func velocity(julianDays: Double) -> Vector {
         velocity(minsAfterEpoch: minsAfterEpoch(julianDays))
-    }
-
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    @available(*, deprecated, message: "PrettyPrint the elements from the Elements struct")
-    public func debugDescription() -> String {
-        return tle.debugDescription()
     }
 
 }
@@ -165,3 +172,15 @@ public extension Satellite {
    }
 
 }
+
+public extension Satellite {
+    
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    @available(*, deprecated, message: "PrettyPrint the elements from the Elements struct")
+    func debugDescription() -> String {
+        return tle.debugDescription()
+    }
+
+}
+
