@@ -52,8 +52,8 @@ public struct Satellite {
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public init(_ line0: String, _ line1: String, _ line2: String) {
         do {
-            let tleSat = try Elements(line0, line1, line2)
-            self.init(withTLE: tleSat)
+            let elements = try Elements(line0, line1, line2)
+            self.init(withTLE: elements)
         } catch {
             fatalError("Satellite.init failure ..")
         }

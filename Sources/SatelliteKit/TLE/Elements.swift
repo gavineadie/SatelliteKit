@@ -1,5 +1,5 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
-  ║ TLE.swift                                                                                 SatKit ║
+  ║ Elements.swift                                                                            SatKit ║
   ║ Created by Gavin Eadie on May24/17         Copyright © 2017-20 Gavin Eadie. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
@@ -10,7 +10,7 @@ import Foundation
 // swiftlint:disable identifier_name
 // swiftlint:disable function_body_length
 
-public typealias Elements = TLE
+public typealias TLE = Elements
 
 enum SatKitError: Error {
     case TLE(String)
@@ -29,7 +29,7 @@ private func epochDays(year: Int, days: Double) -> Double {
   ┃                                                                                                  ┃
   ┃                                                               MemoryLayout<TLE>.size = 200 bytes ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-public struct TLE: Codable {
+public struct Elements: Codable {
 
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆ Information derived directly from the Two Line Elements ..                                       ┆
@@ -55,8 +55,11 @@ public struct TLE: Codable {
 
     internal let dragCoeff: Double                      // Ballistic coefficient.
 
-//    private var n₀ʹ: Double
-    
+}
+
+
+extension Elements {
+
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ generate one TLE (this struct) from the three lines of element info ..                           │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
@@ -282,11 +285,11 @@ public struct TLE: Codable {
 
     init?(xmlData: Data) {
         let parser = TLEParser()
-            
+
         parser.parseXML(xmlData)
-        
+
         if let satelliteInfo = parser.satInfoArray.first {
-            
+
             self.init(commonName: satelliteInfo["OBJECT_NAME"]!,
                       noradIndex: UInt(satelliteInfo["NORAD_CAT_ID"]!)!,
                       launchName: satelliteInfo["OBJECT_ID"]!,
@@ -302,11 +305,11 @@ public struct TLE: Codable {
                       tleNumber: Int(satelliteInfo["ELEMENT_SET_NO"]!)!,
                       revNumber: Int(satelliteInfo["REV_AT_EPOCH"]!)!,
                       dragCoeff: Double(satelliteInfo["BSTAR"]!)!)
-            
+
         } else {
             return nil
         }
-        
+
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -334,14 +337,14 @@ public struct TLE: Codable {
         unKozai(n₀ * (π/720.0))
 
     }
-    
+
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public func debugDescription() -> String {
-        
+
         if (-Date(daysSince1950: t₀).timeIntervalSinceNow * TimeConstants.sec2day < 1.0) {
             return String(format: """
-                
+
                 ┌─[tle : %4.1f hours old]────────────────────────────────────────────────
                 │  %@    %05d = %@ rev#:%05d tle#:%04d
                 │     t₀:  %@    %+14.8f days after 1950
@@ -361,7 +364,7 @@ public struct TLE: Codable {
                           self.M₀ * rad2deg, self.e₀, self.dragCoeff)
         } else {
             return String(format: """
-                
+
                 ┌─[tle : %5.2f days old]────────────────────────────────────────────────
                 │  %@    %05d = %@ rev#:%05d tle#:%04d
                 │     t₀:  %@    %+14.8f days after 1950
@@ -380,9 +383,9 @@ public struct TLE: Codable {
                           self.i₀ * rad2deg, self.ω₀ * rad2deg, self.n₀ / (π/720.0), self.Ω₀ * rad2deg,
                           self.M₀ * rad2deg, self.e₀, self.dragCoeff)
         }
-        
+
     }
-    
+
 }
 
 //MARK: - static functions
@@ -513,31 +516,31 @@ func base10ID(_ noradID: String) -> Int {
     return value
 }
 
-//MARK: - Extra Fun !
+    //MARK: - Extra Fun !
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ Convert new Aplha-5 NORAD ID ("B1234") into an integer .. "B" * 10000 + 1234, "B" is base-34 ..  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
 func alpha5ID(_ noradID: String) -> UInt {              //      "B1234"      "5"
-    let lastFive = ("00000" + noradID.uppercased())     // "00000B1234  "000005"
-                                            .suffix(5)  //      "B1234"  "00005"
-    let byte1 = (lastFive.first)!
-    if let seqNo = Int(lastFive.dropFirst()) {
+	let lastFive = ("00000" + noradID.uppercased())     // "00000B1234  "000005"
+											.suffix(5)  //      "B1234"  "00005"
+	let byte1 = (lastFive.first)!
+	if let seqNo = Int(lastFive.dropFirst()) {
 
-        switch String(byte1) {
-        case "0"..."9":
-            return UInt(Int(byte1.asciiValue!-48)*10000 + seqNo)
-        case "A"..."H":
-            return UInt(Int(byte1.asciiValue!-55)*10000 + seqNo)
-        case "J"..."N":
-            return UInt(Int(byte1.asciiValue!-56)*10000 + seqNo)
-        case "P"..."Z":
-            return UInt(Int(byte1.asciiValue!-57)*10000 + seqNo)
-        default:
-            return 0
-        }
+		switch String(byte1) {
+		case "0"..."9":
+			return UInt(Int(byte1.asciiValue!-48)*10000 + seqNo)
+		case "A"..."H":
+			return UInt(Int(byte1.asciiValue!-55)*10000 + seqNo)
+		case "J"..."N":
+			return UInt(Int(byte1.asciiValue!-56)*10000 + seqNo)
+		case "P"..."Z":
+			return UInt(Int(byte1.asciiValue!-57)*10000 + seqNo)
+		default:
+			return 0
+		}
 
-    }
+	}
 
-    return 0
+	return 0
 }
