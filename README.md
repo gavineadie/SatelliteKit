@@ -30,7 +30,7 @@ test output and the test output in the above published paper [1].
 ### Change Notes
 
 At the end of the README.
-Lastest change: Version/Tag 1.1.0 -- 2022 Feb 27
+Lastest change: Version/Tag 1.1.0 -- 2022 Feb 28
 
 ### Elements
 
@@ -89,7 +89,7 @@ data, this would decode an array of TLE structures (I'm not catching errors in t
 
 The `Elements` structure also implements `debugDescription` which will generate this formatted `String`
 
-    ┌─[tle :  0.66 days old]]───────────────────────────────────────────────
+    ┌─[elements :  0.66 days old]]──────────────────────────────────────────
     │  ISS (ZARYA)                 25544 = 1998-067A   rev#:09857 tle#:0999
     │     t₀:  2018-02-08 22:51:49 +0000    +24876.95265046 days after 1950
     │
@@ -266,11 +266,13 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 - moved XML parsing to own file
 - revised the XML unit test
 
-`version/tag 1.1.0 .. (2022 Feb 27)`
+`version/tag 1.1.0 .. (2022 Feb 28)`
 
 - **NOTE: API CHANGES (backward compatible, for now)**
-- `TLE` typealias'd to `Elements` (putting emphasis on `Elements`, rather `Satellite`)
+- `TLE` struct replaced with `Elements`
+- `TLE` typealias'd to `Elements` (for backward compatibility)
 - (for example) `debugDescription()` is now a method on `Element`
+- `TLEPropagator` class replaced with `Propagator` .. (private anyway)
 - `noradIndex` can't be negative so made `UInt`
 - some time functions moved to `TimeUtility.swift`
 - `TLE.n₀ʹ` removed from `public`

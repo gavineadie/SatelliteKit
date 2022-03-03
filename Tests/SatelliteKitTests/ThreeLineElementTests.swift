@@ -16,7 +16,7 @@ class ThreeLineElementTests: XCTestCase {
                               "1 00000  57001    98001.00000000  .00000000  00000-0  00000-0 0  0000",
                               "2 00000   0.0000   0.0000 0000000   0.0000   0.0000 15.00000000 00000")
 
-            print(Satellite(elements: tle).debugDescription())
+            print(tle.debugDescription())
 
             XCTAssertEqual(tle.t₀, 17533.000)                   // the TLE t=0 time (days from 1950)
 
@@ -44,7 +44,7 @@ class ThreeLineElementTests: XCTestCase {
                               "1 00000  57001    98001.00000000  .00000000  00000-0  00000-0 0  0000",
                               "2 00000   0.0000   0.0000 0000000   0.0000   0.0000 15.00000000 00000")
 
-            print(Satellite(withTLE: tle).debugDescription())
+            print(tle.debugDescription())
 
             XCTAssertEqual(tle.t₀, 17533.000)                   // the TLE t=0 time (days from 1950)
 
@@ -70,7 +70,7 @@ class ThreeLineElementTests: XCTestCase {
                               "1 00000  57001    98001.00000000  .00000000  00000-0  00000-0 0  0000",
                               "2 00000   0.0000   0.0000 0000000   0.0000   0.0000 15.00000000 00000")
 
-            print(Satellite(withTLE: tle).debugDescription())
+            print(tle.debugDescription())
 
             XCTAssertEqual(tle.t₀, 17533.000)                   // the TLE t=0 time (days from 1950)
 
@@ -149,7 +149,7 @@ class ThreeLineElementTests: XCTestCase {
                               "1 44433U 19040B   19196.49919926  .00000000  00000-0  00000-0 2  5669",
                               "2 44433 052.6278 127.6338 9908875 004.4926 008.9324 00.01340565    01")
 
-            print(Satellite(withTLE: tle).debugDescription())
+            print(tle.debugDescription())
         } catch {
             print(error)
         }
@@ -191,7 +191,7 @@ class ThreeLineElementTests: XCTestCase {
 
         do {
             let tle = try jsonDecoder.decode(TLE.self, from: jsonData)
-            print(Satellite(withTLE: tle).debugDescription())
+            print(tle.debugDescription())
         } catch {
             print(error)
         }
@@ -263,9 +263,9 @@ class ThreeLineElementTests: XCTestCase {
 
         do {
             let tleArray = try jsonDecoder.decode([TLE].self, from: jsonData)
-            print(Satellite(withTLE: tleArray[0]).debugDescription())
-            print(Satellite(withTLE: tleArray[1]).debugDescription())
-            print(Satellite(withTLE: tleArray[2]).debugDescription())
+            print(tleArray[0].debugDescription())
+            print(tleArray[1].debugDescription())
+            print(tleArray[2].debugDescription())
         } catch {
             print(error)
         }
@@ -409,7 +409,7 @@ class ThreeLineElementTests: XCTestCase {
         for subString in subStrings.dropLast() {
 
             if let tle = TLE(xmlData: subString.data(using: .ascii)!) {
-                print(Satellite(withTLE: tle).debugDescription())
+                print(tle.debugDescription())
             }
 
         }

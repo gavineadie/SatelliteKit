@@ -10,6 +10,7 @@ import Foundation
 // swiftlint:disable identifier_name
 // swiftlint:disable function_body_length
 
+@available(*, deprecated, renamed: "Elements")
 public typealias TLE = Elements
 
 enum SatKitError: Error {
@@ -17,24 +18,16 @@ enum SatKitError: Error {
     case SGP(String)
 }
 
-/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
-  ┆ Convenience function .. converts the YYDDD.DDDDDDDD TLE epoch time to days since 1950 reference. ┆
-  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
-private func epochDays(year: Int, days: Double) -> Double {
-    Double(year-1950)*365.0 + Double((year-1949)/4) + days
-}
-
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃ The TLE struct .. Decodable for JSON usage ..                                                    ┃
   ┃                                                                                                  ┃
   ┃                                                               MemoryLayout<TLE>.size = 200 bytes ┃
+  ┃                                                                                                  ┃
+  ┃ Information derived directly from the Two Line Elements ..                                       ┃
+  ┃                                          .. then un'Kozai'd for mean motion and semi major axis. ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 public struct Elements: Codable {
 
-/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
-  ┆ Information derived directly from the Two Line Elements ..                                       ┆
-  ┆                                          .. then un'Kozai'd for mean motion and semi major axis. ┆
-  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
     public let commonName: String                       // line zero name (if any) [eg: ISS (ZARYA)]
     public let noradIndex: UInt                         // The satellite number [eg: 25544]
     public let launchName: String                       // International designation [eg: 1998-067A]
@@ -54,16 +47,48 @@ public struct Elements: Codable {
     public let revNumber: Int                           // Revolution number at epoch.
 
     internal let dragCoeff: Double                      // Ballistic coefficient.
+    internal var n₀ʹ: Double = 0.0                      // Kozai version (keep for re-encoding
 
 }
 
+//MARK: - elements initializer
 
-extension Elements {
+public extension Elements {
 
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ generate one TLE (this struct) from the three lines of element info ..                           │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public init(_ line0: String, _ line1: String, _ line2: String) throws {
+/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+    init(commonName: String, noradIndex: UInt, launchName: String,
+         t₀: Date, e₀: Double, i₀: Double, ω₀: Double, Ω₀: Double, M₀: Double, n₀: Double,
+         ephemType: Int, tleClass: String, tleNumber: Int, revNumber: Int, dragCoeff: Double) {
+
+        self.commonName = commonName
+        self.noradIndex = noradIndex
+        self.launchName = launchName
+        self.t₀ = t₀.daysSince1950
+        self.e₀ = e₀
+        self.i₀ = i₀ * deg2rad
+        self.ω₀ = ω₀ * deg2rad
+        self.Ω₀ = Ω₀ * deg2rad
+        self.M₀ = M₀ * deg2rad
+        self.ephemType = ephemType
+        self.tleClass = tleClass
+        self.tleNumber = tleNumber
+        self.revNumber = revNumber
+        self.dragCoeff = dragCoeff
+
+        unKozai(n₀ * (π/720.0))
+
+    }
+}
+
+//MARK: - three line initializer
+
+public extension Elements {
+
+/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃ generate one TLE (this struct) from the three lines of element info ..                           ┃
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+    init(_ line0: String, _ line1: String, _ line2: String) throws {
 
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆                                                                                                  ┆
@@ -104,12 +129,11 @@ extension Elements {
         var stringlet = String(bytes: lineOneBytes[2...6], encoding: .utf8)!
         self.noradIndex = alpha5ID(stringlet.trimmingCharacters(in: .whitespaces))
 
-        stringlet = String(bytes: lineOneBytes[7...7], encoding: .utf8)!
-        self.tleClass = stringlet
+        self.tleClass = String(bytes: lineOneBytes[7...7], encoding: .utf8)!
         if self.tleClass != "U" { print("self.tleClass is not 'U'") }
 
         stringlet = String(bytes: lineOneBytes[9...10], encoding: .utf8)!
-        let launchYear = Int(stringlet) ?? 99
+        let launchYear = Int(stringlet) ?? 56                               // fails to year 2056
 
         stringlet = String(bytes: lineOneBytes[11...16], encoding: .utf8)!
         let launchPart = stringlet.trimmingCharacters(in: .whitespaces)
@@ -175,45 +199,47 @@ extension Elements {
         stringlet = String(bytes: lineTwoBytes[43...50], encoding: .utf8)!
         self.M₀ = Double(stringlet.trimmingCharacters(in: .whitespaces))! * deg2rad
 
+        stringlet = String(bytes: lineTwoBytes[52...62], encoding: .utf8)!
+        self.n₀ʹ = Double(stringlet.trimmingCharacters(in: .whitespaces))!
+
         stringlet = String(bytes: lineTwoBytes[63...67], encoding: .utf8)!
         self.revNumber = Int(stringlet.trimmingCharacters(in: .whitespaces))!
 
-        stringlet = String(bytes: lineTwoBytes[52...62], encoding: .utf8)!
-
-        unKozai(Double(stringlet.trimmingCharacters(in: .whitespaces))! * (π/720.0))
+        unKozai(self.n₀ʹ * (π/720.0))
 
         guard (self.ephemType == 0 || self.ephemType == 2 || self.ephemType == 3) else {
             throw SatKitError.TLE("Line1 ephemerisType ≠ 0, 2 or 3 .. [\(self.ephemType)]")
         }
     }
-
-/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
-  ┆ recover (un'Kozai) original mean motion and semi-major axis from the input elements for SxP4.    ┆
-  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
-    private mutating func unKozai(_ n₀ʹ: Double) {
-
-        do {
-            let θ = cos(self.i₀)                                    //         cos(i₀)  ..  θ
-            let x3thm1 = 3.0 * θ * θ - 1.0                          //      3×cos²(i₀) - 1
-            let β₀ = (1.0 - self.e₀ * self.e₀).squareRoot()         //         √(1-e₀²) ..  β₀
-            let temp = 1.5 * EarthConstants.K₂ * x3thm1 / (β₀ * β₀ * β₀)
-
-            let a₀ʹ = pow(EarthConstants.kₑ / n₀ʹ, ⅔)
-            let δ₁ = temp / (a₀ʹ * a₀ʹ)
-            let a₁ = a₀ʹ * (1.0 - δ₁ * (⅓ + δ₁ * (1.0 + 134.0 / 81.0 * δ₁)))
-            let δ₀ = temp / (a₁ * a₁)
-
-            self.n₀ = n₀ʹ / (1.0 + δ₀)                               //             n₀
-            self.a₀ = a₁  / (1.0 - δ₀)                               //             a₀
-        }
-
-    }
-
-
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+}
 
 //MARK: - JSON initializer
+
+public extension Elements {
+
+/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  │ Decoding one, or more, Elements from JSON requires a little work before the init ..              │
+  │                                                                                                  │
+  │ First, we need to create a JSON decoder and teach it how to decode ISO times with milliseconds   │
+  │                                                                                                  │
+  │     let jsonDecoder = JSONDecoder()                                                              │
+  │     jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)                   │
+  │                                                                                                  │
+  │ Then, if JSON data in the form of a String, convert it to Data (catching any error)              │
+  │                                                                                                  │
+  │     guard let jsonData = jsonString.data(using: .utf8) else {                                    │
+  │         throw Error("JSON failure converting String to Data ..")                                 │
+  │     }                                                                                            │
+  │                                                                                                  │
+  │ Finally let the decoder do it's thing .. (again, catch errors if necessary)                      │
+  │                                                                                                  │
+  │     let elements = try jsonDecoder.decode(Elements.self, from: jsonData)                         │
+  │                                                                                                  │
+  │ or for an array of Elements                                                                      │
+  │                                                                                                  │
+  │     let ElementsArray = try jsonDecoder.decode([Elements].self, from: jsonData)                  │
+  │                                                                                                  │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
 
     private enum CodingKeys: String, CodingKey {
         case commonName = "OBJECT_NAME"
@@ -233,37 +259,13 @@ extension Elements {
         case revNumber = "REV_AT_EPOCH"
     }
 
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ Decoding one, or more, TLEs from JSON requires a little work before the init ..                  │
-  │                                                                                                  │
-  │ First, we need to create a JSON decoder and teach it how to decode ISO times with milliseconds   │
-  │                                                                                                  │
-  │     let jsonDecoder = JSONDecoder()                                                              │
-  │     jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)                   │
-  │                                                                                                  │
-  │ Then, if JSON data in the form of a String, convert it to Data (catching any error)              │
-  │                                                                                                  │
-  │     guard let jsonData = jsonString.data(using: .utf8) else {                                    │
-  │         throw Error("JSON failure converting String to Data ..")                                 │
-  │     }                                                                                            │
-  │                                                                                                  │
-  │ Finally let the decoder do it's thing .. (again, catch errors if necessary)                      │
-  │                                                                                                  │
-  │     let tle = try jsonDecoder.decode(TLE.self, from: jsonData)                                   │
-  │                                                                                                  │
-  │ or for an array of TLEs                                                                          │
-  │                                                                                                  │
-  │     let tles = try jsonDecoder.decode([TLE].self, from: jsonData)                                │
-  │                                                                                                  │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         self.commonName  = try container.decode(String.self, forKey: .commonName)
         self.noradIndex  = UInt(try container.decode(Int.self, forKey: .noradIndex))
         self.launchName  = try container.decode(String.self, forKey: .launchName)
-        let epoch = try container.decode(Date.self, forKey: .t₀)
-        self.t₀ = epoch.daysSince1950
+        self.t₀ = try container.decode(Date.self, forKey: .t₀).daysSince1950
         self.e₀ = try container.decode(Double.self, forKey: .e₀)
         self.i₀ = try container.decode(Double.self, forKey: .i₀) * deg2rad
         self.ω₀ = try container.decode(Double.self, forKey: .ω₀) * deg2rad
@@ -274,14 +276,40 @@ extension Elements {
         self.tleClass = try container.decode(String.self, forKey: .tleClass)
         self.tleNumber = try container.decode(Int.self, forKey: .tleNumber)
         self.revNumber = try container.decode(Int.self, forKey: .revNumber)
+        self.n₀ = try container.decode(Double.self, forKey: .n₀)
+        
+        n₀ʹ = n₀                                            // capture pre-Kozai n₀
 
         unKozai(try! container.decode(Double.self, forKey: .n₀) * (π/720.0))
     }
-
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encode(commonName, forKey: .commonName)
+        try container.encode(noradIndex, forKey: .noradIndex)
+        try container.encode(launchName, forKey: .launchName)
+        try container.encode(Date(daysSince1950: t₀), forKey: .t₀)  //### do the Date conversion (26358.4923347 -> "2022-02-27T20:54:43.564320")
+        try container.encode(e₀, forKey: .e₀)
+        try container.encode(i₀ * rad2deg, forKey: .i₀)
+        try container.encode(ω₀ * rad2deg, forKey: .ω₀)
+        try container.encode(Ω₀ * rad2deg, forKey: .Ω₀)
+        try container.encode(M₀ * rad2deg, forKey: .M₀)
+        try container.encode(dragCoeff, forKey: .dragCoeff)
+        try container.encode(ephemType, forKey: .ephemType)
+        try container.encode(tleClass, forKey: .tleClass)
+        try container.encode(tleNumber, forKey: .tleNumber)
+        try container.encode(revNumber, forKey: .revNumber)
+        try container.encode(self.n₀ʹ, forKey: .n₀)         // use the previously captured n₀ʹ
+    }
+}
 
 //MARK: - XML initializer
+
+extension Elements {
+
+/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 
     init?(xmlData: Data) {
         let parser = TLEParser()
@@ -309,43 +337,46 @@ extension Elements {
         } else {
             return nil
         }
-
     }
+}
+
+//MARK privates
+
+extension Elements {
+/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+  ┆ recover (un'Kozai) original mean motion and semi-major axis from the input elements for SxP4.    ┆
+  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+    private mutating func unKozai(_ n₀ʹ: Double) {
+
+        do {
+            let θ = cos(self.i₀)                                    //         cos(i₀)  ..  θ
+            let x3thm1 = 3.0 * θ * θ - 1.0                          //      3×cos²(i₀) - 1
+            let β₀ = (1.0 - self.e₀ * self.e₀).squareRoot()         //         √(1-e₀²) ..  β₀
+            let temp = 1.5 * EarthConstants.K₂ * x3thm1 / (β₀ * β₀ * β₀)
+
+            let a₀ʹ = pow(EarthConstants.kₑ / n₀ʹ, ⅔)
+            let δ₁ = temp / (a₀ʹ * a₀ʹ)
+            let a₁ = a₀ʹ * (1.0 - δ₁ * (⅓ + δ₁ * (1.0 + 134.0 / 81.0 * δ₁)))
+            let δ₀ = temp / (a₁ * a₁)
+
+            self.n₀ = n₀ʹ / (1.0 + δ₀)                               //             n₀
+            self.a₀ = a₁  / (1.0 - δ₀)                               //             a₀
+        }
+    }
+}
+
+//MARK: - Pretty Printer
+
+public extension Elements {
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-
-    public init(commonName: String, noradIndex: UInt, launchName: String,
-         t₀: Date, e₀: Double, i₀: Double, ω₀: Double, Ω₀: Double, M₀: Double, n₀: Double,
-         ephemType: Int, tleClass: String, tleNumber: Int, revNumber: Int, dragCoeff: Double) {
-
-        self.commonName = commonName
-        self.noradIndex = noradIndex
-        self.launchName = launchName
-        self.t₀ = t₀.daysSince1950
-        self.e₀ = e₀
-        self.i₀ = i₀ * deg2rad
-        self.ω₀ = ω₀ * deg2rad
-        self.Ω₀ = Ω₀ * deg2rad
-        self.M₀ = M₀ * deg2rad
-        self.ephemType = ephemType
-        self.tleClass = tleClass
-        self.tleNumber = tleNumber
-        self.revNumber = revNumber
-        self.dragCoeff = dragCoeff
-
-        unKozai(n₀ * (π/720.0))
-
-    }
-
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public func debugDescription() -> String {
+    func debugDescription() -> String {
 
         if (-Date(daysSince1950: t₀).timeIntervalSinceNow * TimeConstants.sec2day < 1.0) {
             return String(format: """
 
-                ┌─[tle : %4.1f hours old]────────────────────────────────────────────────
+                ┌─[elements : %4.1f hours old]───────────────────────────────────────────
                 │  %@    %05d = %@ rev#:%05d tle#:%04d
                 │     t₀:  %@    %+14.8f days after 1950
                 │
@@ -365,7 +396,7 @@ extension Elements {
         } else {
             return String(format: """
 
-                ┌─[tle : %5.2f days old]────────────────────────────────────────────────
+                ┌─[elements : %5.2f days old]───────────────────────────────────────────
                 │  %@    %05d = %@ rev#:%05d tle#:%04d
                 │     t₀:  %@    %+14.8f days after 1950
                 │
@@ -383,12 +414,40 @@ extension Elements {
                           self.i₀ * rad2deg, self.ω₀ * rad2deg, self.n₀ / (π/720.0), self.Ω₀ * rad2deg,
                           self.M₀ * rad2deg, self.e₀, self.dragCoeff)
         }
-
     }
-
 }
 
 //MARK: - static functions
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  ┆ Convenience function .. converts the YYDDD.DDDDDDDD TLE epoch time to days since 1950 reference. ┆
+  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+fileprivate func epochDays(year: Int, days: Double) -> Double {
+    Double(year-1950)*365.0 + Double((year-1949)/4) + days
+}
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ round a Double to a given precision ..                                                           │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+enum RoundingPrecision {        // 5.1916999
+    case ones                   // 5.2
+    case tenths                 // 5.19
+    case hundredths             // 5.192
+    case thousandths            // 5.1917
+}
+
+func preciseRound(_ value: Double, precision: RoundingPrecision = .ones) -> Double {
+    switch precision {
+    case .ones:
+        return round(value)
+    case .tenths:
+        return round(value * 10.0) / 10.0
+    case .hundredths:
+        return round(value * 100.0) / 100.0
+    case .thousandths:
+        return round(value * 1000.0) / 1000.0
+    }
+}
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ Do the checksum check on a TLE line ("0"..."9" are 0...9; "-" is 1; last digit is checksum).     │
@@ -459,13 +518,14 @@ public func formatOK(_ line1: String, _ line2: String) -> Bool {
   ┃ make a tuple (TLE-0, TLE-1, TLE-2), and the tuple is added to the array of TLE tuples which is   ┃
   ┃ returned by the function.                                                                        ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-public func preProcessTLEs(_ tleChunk: String) -> [(String, String, String)] {
-    var satellites = [(String, String, String)]()
+public func preProcessTLEs(_ elementsString: String) -> [(String, String, String)] {
+    var tuplesArray = [(String, String, String)]()
 
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ split the String into a String array and convert non-breaking spaces ..                          │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    let tles = (tleChunk + "\n#EOF").replacingOccurrences(of: "\r",
+/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+  ┆ make sure there is a last line ("#END"), split the String into an array of Strings at <return>   ┆
+  ┆ and convert non-breaking spaces ..                                                               ┆
+  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+    var stringArray = (elementsString + "\n#EOF").replacingOccurrences(of: "\r",
                                                           with: "").components(separatedBy: "\n")
 
     func trimWhitespace(string: String) -> String {
@@ -473,50 +533,57 @@ public func preProcessTLEs(_ tleChunk: String) -> [(String, String, String)] {
                                                 .replacingOccurrences(of: "\u{00A0}", with: " ")
     }
 
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ drop any blank lines or lines starting with "#" ..                                               │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    let filteredTLEs = ([""] + tles.map(trimWhitespace)
+/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+  ┆ drop any blank lines or lines starting with "#" and trim whitespace                              ┆
+  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+    stringArray = ([""] + stringArray.map(trimWhitespace)
                                    .filter { !$0.hasPrefix("#") && !$0.isEmpty })
 
-    var index = 0
-    while index < filteredTLEs.count {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ look for TLE-1 (69 characters long, starting with "1" and good checksum)                         │
+  │ with a cleaned Array(String) look for TLEs based on the first characters of each line expecting  │
+  │     0 ...           <- may be absent, may not have a "0"                                         │
+  │     1  ...          <- 69 characters long, starting with "1" and good checksum                   │
+  │     2    ...        <- 69 characters long, starting with "2" and good checksum                   │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-		let tleLine1 = filteredTLEs[index]
+    var index = 0
+    while index < stringArray.count {
+/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+  ┆ look for TLE-1  (loop till we find one)                                                          ┆
+  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+		let tleLine1 = stringArray[index]
         index += 1
         guard (tleLine1.utf8).count == 69,
                tleLine1.hasPrefix("1"),
                checkSumGood(tleLine1) else { continue }         // keep looking for TLE-1
 
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ look for TLE-2 (69 characters long, starting with "2" and good checksum)                         │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-		let tleLine2 = filteredTLEs[index]
+/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+  ┆ look for TLE-2 following TLE-1 (if absent, loop till we find a TLE-1)                            ┆
+  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+		let tleLine2 = stringArray[index]
         index += 1
         guard (tleLine2.utf8).count == 69,
                tleLine2.hasPrefix("2"),
                checkSumGood(tleLine2) else { continue }         // look for another TLE-1
 
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ got TLE-1 followed by TLE-2, so check for TLE-0 (three lines back) with, or without, a leading   │
-  │ "0" .. it's also possible that we have a "two index" tle file (then, set TLE-0 to "") ..         │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-        let tleLine0 = filteredTLEs[index-3]
+/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+  ┆ got TLE-1 followed by TLE-2, so check for TLE-0 (three lines back) with, or without, a leading   ┆
+  ┆ "0" .. it's not computationally significant so, if it's not a TLE-2, make it TLE-0.              ┆
+  ┆                                                                                                  ┆
+  ┆ If it APPEARS to be a TLE-2 (starts with "2") it probably belongs to the previous satellite and  ┆
+  ┆ we have a "two index" tle file (then, set TLE-0 to "") ..                                        ┆
+  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+        let tleLine0 = stringArray[index-3]
 
-        satellites.append((tleLine0.hasPrefix("2 ") ? "" : tleLine0, tleLine1, tleLine2))
+        tuplesArray.append(((tleLine0.hasPrefix("2 ") ? "" : tleLine0), tleLine1, tleLine2))
     }
 
-    return satellites
+    return tuplesArray
 }
 
 func base10ID(_ noradID: String) -> Int {
     guard let value = Int(noradID) else { return 0 }
     return value
 }
-
-    //MARK: - Extra Fun !
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ Convert new Aplha-5 NORAD ID ("B1234") into an integer .. "B" * 10000 + 1234, "B" is base-34 ..  │
@@ -543,4 +610,8 @@ func alpha5ID(_ noradID: String) -> UInt {              //      "B1234"      "5"
 	}
 
 	return 0
+}
+
+private func stringFrom(_ line: [UInt8], range: ClosedRange<Int>) -> String {
+    String(bytes: line[range], encoding: .utf8)!.trimmingCharacters(in: .whitespaces)
 }

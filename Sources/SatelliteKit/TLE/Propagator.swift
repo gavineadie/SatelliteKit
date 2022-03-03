@@ -64,7 +64,7 @@ public class Propagator {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ c o n s t a n t s   set in init(..)                                                              │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    let tle: TLE
+    let tle: Elements
 
     let perigee: Double                     // perigee (in Kms)
     let θ²: Double                          //
@@ -105,7 +105,7 @@ public class Propagator {
     var s: Double                           // s* new value for the contant s.
     var xl: Double                          //   L from SPTRCK #3.
 
-    public init(_ initialTLE: TLE) {
+    public init(_ initialTLE: Elements) {
 
         self.tle = initialTLE
         self.perigee = (self.tle.a₀ * (1.0 - self.tle.e₀) - 1.0) * EarthConstants.Rₑ

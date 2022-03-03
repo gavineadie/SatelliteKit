@@ -23,7 +23,7 @@ class TLEParser : NSObject, XMLParserDelegate {
     
     var satelliteInfo: [String : String] = [:]      // NMD key : NMD value (all text)
     var satInfoArray: [[String : String]] = []      // a collections (array) of the above
-    var tleCollection: [TLE] = []                   // a TLE collection, mapped from the above
+    var tleCollection: [Elements] = []              // an Elements collection, mapped from the above
     
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/

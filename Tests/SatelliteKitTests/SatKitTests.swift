@@ -18,7 +18,7 @@ class SwiftTests: XCTestCase {
                                    "1 25544U 98067A   18039.95265046  .00001678  00000-0  32659-4 0  9999",
                                    "2 25544  51.6426 297.9871 0003401  86.7895 100.1959 15.54072469 98577")
 
-            print(Satellite(elements: elements).debugDescription())
+            print(elements.debugDescription())
 
             print("mean altitude    (Kms): \((elements.a₀ - 1.0) * EarthConstants.Rₑ)")
 
@@ -53,7 +53,7 @@ class SwiftTests: XCTestCase {
                               "1 44476U 19049B   19348.07175972  .00000049  00000-0  00000+0 0  9993",
                               "2 44476   0.0178 355.6330 0000615 323.6584 210.9460  1.00270455  1345")
 
-            print(Satellite(withTLE: tle).debugDescription())
+            print(tle.debugDescription())
 
             print("mean altitude    (Kms): \((tle.a₀ - 1.0) * EarthConstants.Rₑ)")
 
