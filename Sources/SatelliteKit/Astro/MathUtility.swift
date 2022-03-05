@@ -45,11 +45,11 @@ public func almostEqual(_ a: Double, _ b: Double) -> Bool {
 
 extension Double {
     func roundTo3Places() -> Double {
-        return (self*1_000.0).rounded(.toNearestOrEven) / 1_000
+        return (self*1_000.0).rounded(.toNearestOrAwayFromZero) / 1_000.0
     }
 
     func roundTo6Places() -> Double {
-        return (self*1_000_000.0).rounded(.toNearestOrEven) / 1_000_000
+        return (self*1_000_000.0).rounded(.toNearestOrAwayFromZero) / 1_000_000.0
     }
 }
 

@@ -130,7 +130,6 @@ public extension Elements {
         self.noradIndex = alpha5ID(stringlet.trimmingCharacters(in: .whitespaces))
 
         self.tleClass = String(bytes: lineOneBytes[7...7], encoding: .utf8)!
-        if self.tleClass != "U" { print("self.tleClass is not 'U'") }
 
         stringlet = String(bytes: lineOneBytes[9...10], encoding: .utf8)!
         let launchYear = Int(stringlet) ?? 56                               // fails to year 2056
@@ -262,23 +261,23 @@ public extension Elements {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        self.commonName  = try container.decode(String.self, forKey: .commonName)
-        self.noradIndex  = UInt(try container.decode(Int.self, forKey: .noradIndex))
-        self.launchName  = try container.decode(String.self, forKey: .launchName)
+        self.commonName = try container.decode(String.self, forKey: .commonName)
+        self.noradIndex = UInt(try container.decode(Int.self, forKey: .noradIndex))
+        self.launchName = try container.decode(String.self, forKey: .launchName)
         self.t₀ = try container.decode(Date.self, forKey: .t₀).daysSince1950
         self.e₀ = try container.decode(Double.self, forKey: .e₀)
         self.i₀ = try container.decode(Double.self, forKey: .i₀) * deg2rad
         self.ω₀ = try container.decode(Double.self, forKey: .ω₀) * deg2rad
         self.Ω₀ = try container.decode(Double.self, forKey: .Ω₀) * deg2rad
         self.M₀ = try container.decode(Double.self, forKey: .M₀) * deg2rad
+        self.n₀ = try container.decode(Double.self, forKey: .n₀)
         self.dragCoeff = try container.decode(Double.self, forKey: .dragCoeff)
         self.ephemType = try container.decode(Int.self, forKey: .ephemType)
         self.tleClass = try container.decode(String.self, forKey: .tleClass)
         self.tleNumber = try container.decode(Int.self, forKey: .tleNumber)
         self.revNumber = try container.decode(Int.self, forKey: .revNumber)
-        self.n₀ = try container.decode(Double.self, forKey: .n₀)
         
-        n₀ʹ = n₀                                            // capture pre-Kozai n₀
+        n₀ʹ = n₀                                                // capture pre-Kozai n₀
 
         unKozai(try! container.decode(Double.self, forKey: .n₀) * (π/720.0))
     }
@@ -289,7 +288,7 @@ public extension Elements {
         try container.encode(commonName, forKey: .commonName)
         try container.encode(noradIndex, forKey: .noradIndex)
         try container.encode(launchName, forKey: .launchName)
-        try container.encode(Date(daysSince1950: t₀), forKey: .t₀)  //### do the Date conversion (26358.4923347 -> "2022-02-27T20:54:43.564320")
+        try container.encode(Date(daysSince1950: t₀), forKey: .t₀)
         try container.encode(e₀, forKey: .e₀)
         try container.encode(i₀ * rad2deg, forKey: .i₀)
         try container.encode(ω₀ * rad2deg, forKey: .ω₀)
@@ -300,43 +299,45 @@ public extension Elements {
         try container.encode(tleClass, forKey: .tleClass)
         try container.encode(tleNumber, forKey: .tleNumber)
         try container.encode(revNumber, forKey: .revNumber)
-        try container.encode(self.n₀ʹ, forKey: .n₀)         // use the previously captured n₀ʹ
+        try container.encode(self.n₀ʹ, forKey: .n₀)             // use the previously captured n₀ʹ
     }
 }
 
 //MARK: - XML initializer
 
-extension Elements {
+public extension Elements {
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 
-    init?(xmlData: Data) {
-        let parser = TLEParser()
-
+    init(xmlData: Data) {
+        
+        let parser = ElementsParser()
         parser.parseXML(xmlData)
 
-        if let satelliteInfo = parser.satInfoArray.first {
+        let satelliteInfo = parser.satInfoArray.first
 
-            self.init(commonName: satelliteInfo["OBJECT_NAME"]!,
-                      noradIndex: UInt(satelliteInfo["NORAD_CAT_ID"]!)!,
-                      launchName: satelliteInfo["OBJECT_ID"]!,
-                      t₀: DateFormatter.iso8601Micros.date(from: satelliteInfo["EPOCH"]!)!,
-                      e₀: Double(satelliteInfo["ECCENTRICITY"]!)!,
-                      i₀: Double(satelliteInfo["INCLINATION"]!)!,
-                      ω₀: Double(satelliteInfo["ARG_OF_PERICENTER"]!)!,
-                      Ω₀: Double(satelliteInfo["RA_OF_ASC_NODE"]!)!,
-                      M₀: Double(satelliteInfo["MEAN_ANOMALY"]!)!,
-                      n₀: Double(satelliteInfo["MEAN_MOTION"]!)!,
-                      ephemType: Int(satelliteInfo["EPHEMERIS_TYPE"]!)!,
-                      tleClass: satelliteInfo["CLASSIFICATION_TYPE"]!,
-                      tleNumber: Int(satelliteInfo["ELEMENT_SET_NO"]!)!,
-                      revNumber: Int(satelliteInfo["REV_AT_EPOCH"]!)!,
-                      dragCoeff: Double(satelliteInfo["BSTAR"]!)!)
+        self.init(commonName: satelliteInfo!["OBJECT_NAME"]!,
+                  noradIndex: UInt(satelliteInfo!["NORAD_CAT_ID"]!)!,
+                  launchName: satelliteInfo!["OBJECT_ID"]!,
+                  t₀: DateFormatter.iso8601Micros.date(from: satelliteInfo!["EPOCH"]!)!,
+                  e₀: Double(satelliteInfo!["ECCENTRICITY"]!)!,
+                  i₀: Double(satelliteInfo!["INCLINATION"]!)!,
+                  ω₀: Double(satelliteInfo!["ARG_OF_PERICENTER"]!)!,
+                  Ω₀: Double(satelliteInfo!["RA_OF_ASC_NODE"]!)!,
+                  M₀: Double(satelliteInfo!["MEAN_ANOMALY"]!)!,
+                  n₀: Double(satelliteInfo!["MEAN_MOTION"]!)!,
+                  ephemType: Int(satelliteInfo!["EPHEMERIS_TYPE"]!)!,
+                  tleClass: satelliteInfo!["CLASSIFICATION_TYPE"]!,
+                  tleNumber: Int(satelliteInfo!["ELEMENT_SET_NO"]!)!,
+                  revNumber: Int(satelliteInfo!["REV_AT_EPOCH"]!)!,
+                  dragCoeff: Double(satelliteInfo!["BSTAR"]!)!)
 
-        } else {
-            return nil
-        }
+        a₀ = 0.0
+        n₀ʹ = 0.0
+
+        unKozai(n₀ * (π/720.0))
+
     }
 }
 
@@ -424,29 +425,6 @@ public extension Elements {
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
 fileprivate func epochDays(year: Int, days: Double) -> Double {
     Double(year-1950)*365.0 + Double((year-1949)/4) + days
-}
-
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ round a Double to a given precision ..                                                           │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-enum RoundingPrecision {        // 5.1916999
-    case ones                   // 5.2
-    case tenths                 // 5.19
-    case hundredths             // 5.192
-    case thousandths            // 5.1917
-}
-
-func preciseRound(_ value: Double, precision: RoundingPrecision = .ones) -> Double {
-    switch precision {
-    case .ones:
-        return round(value)
-    case .tenths:
-        return round(value * 10.0) / 10.0
-    case .hundredths:
-        return round(value * 100.0) / 100.0
-    case .thousandths:
-        return round(value * 1000.0) / 1000.0
-    }
 }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐

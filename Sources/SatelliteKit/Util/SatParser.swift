@@ -16,14 +16,13 @@ extension Dictionary {
 
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃ This class will consume an XML data set in the form of NMD definitions of one or more satellite  ┃
+  ┃ This class will consume an XML data set in the form of NDM definitions of one or more satellite  ┃
   ┃ elements ..                                                                                      ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-class TLEParser : NSObject, XMLParserDelegate {
+class ElementsParser : NSObject, XMLParserDelegate {
     
-    var satelliteInfo: [String : String] = [:]      // NMD key : NMD value (all text)
+    var satelliteInfo: [String : String] = [:]      // NDM key : NDM value (all text)
     var satInfoArray: [[String : String]] = []      // a collections (array) of the above
-    var tleCollection: [Elements] = []              // an Elements collection, mapped from the above
     
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/

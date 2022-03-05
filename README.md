@@ -30,7 +30,7 @@ test output and the test output in the above published paper [1].
 ### Change Notes
 
 At the end of the README.
-Lastest change: Version/Tag 1.1.0 -- 2022 Feb 28
+Lastest change: Version/Tag 1.1.2 -- 2022 Mar 05
 
 ### Elements
 
@@ -266,9 +266,10 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 - moved XML parsing to own file
 - revised the XML unit test
 
+- NOTE: API CHANGES (minor version number changed .. backward compatible, for now)**
+
 `version/tag 1.1.0 .. (2022 Feb 28)`
 
-- **NOTE: API CHANGES (backward compatible, for now)**
 - `TLE` struct replaced with `Elements`
 - `TLE` typealias'd to `Elements` (for backward compatibility)
 - (for example) `debugDescription()` is now a method on `Element`
@@ -276,5 +277,16 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 - `noradIndex` can't be negative so made `UInt`
 - some time functions moved to `TimeUtility.swift`
 - `TLE.n₀ʹ` removed from `public`
+
+`version/tag 1.1.1 .. (2022 Mar 02)`
+
+- JSON import much improved
+- JSON export implemented
+- `TLE` deprecated
+
+`version/tag 1.1.2 .. (2022 Mar 05)`
+
+- XML import much improved
+- Objection to `tleClass == "U"` removed [Starlinks are "C"]
 
 ---

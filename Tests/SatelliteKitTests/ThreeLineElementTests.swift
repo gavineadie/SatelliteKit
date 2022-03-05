@@ -12,9 +12,9 @@ class ThreeLineElementTests: XCTestCase {
     func testNullLine0() {
 
         do {
-            let tle = try TLE("",
-                              "1 00000  57001    98001.00000000  .00000000  00000-0  00000-0 0  0000",
-                              "2 00000   0.0000   0.0000 0000000   0.0000   0.0000 15.00000000 00000")
+            let tle = try Elements("",
+                                   "1 00000  57001    98001.00000000  .00000000  00000-0  00000-0 0  0000",
+                                   "2 00000   0.0000   0.0000 0000000   0.0000   0.0000 15.00000000 00000")
 
             print(tle.debugDescription())
 
@@ -40,9 +40,9 @@ class ThreeLineElementTests: XCTestCase {
     func testIndexedLine0() {
 
         do {
-            let tle = try TLE("0 ZERO OBJECT",
-                              "1 00000  57001    98001.00000000  .00000000  00000-0  00000-0 0  0000",
-                              "2 00000   0.0000   0.0000 0000000   0.0000   0.0000 15.00000000 00000")
+            let tle = try Elements("0 ZERO OBJECT",
+                                   "1 00000  57001    98001.00000000  .00000000  00000-0  00000-0 0  0000",
+                                   "2 00000   0.0000   0.0000 0000000   0.0000   0.0000 15.00000000 00000")
 
             print(tle.debugDescription())
 
@@ -66,9 +66,9 @@ class ThreeLineElementTests: XCTestCase {
     func testNoIndexTLE() {
 
         do {
-            let tle = try TLE("ZERO OBJECT",
-                              "1 00000  57001    98001.00000000  .00000000  00000-0  00000-0 0  0000",
-                              "2 00000   0.0000   0.0000 0000000   0.0000   0.0000 15.00000000 00000")
+            let tle = try Elements("ZERO OBJECT",
+                                   "1 00000  57001    98001.00000000  .00000000  00000-0  00000-0 0  0000",
+                                   "2 00000   0.0000   0.0000 0000000   0.0000   0.0000 15.00000000 00000")
 
             print(tle.debugDescription())
 
@@ -145,9 +145,9 @@ class ThreeLineElementTests: XCTestCase {
                                "2 44433 052.6278 127.6338 9908875 004.4926 008.9324 00.01340565    01"))
 
         do {
-            let tle = try TLE("Spektr-RG Booster",
-                              "1 44433U 19040B   19196.49919926  .00000000  00000-0  00000-0 2  5669",
-                              "2 44433 052.6278 127.6338 9908875 004.4926 008.9324 00.01340565    01")
+            let tle = try Elements("Spektr-RG Booster",
+                                   "1 44433U 19040B   19196.49919926  .00000000  00000-0  00000-0 2  5669",
+                                   "2 44433 052.6278 127.6338 9908875 004.4926 008.9324 00.01340565    01")
 
             print(tle.debugDescription())
         } catch {
@@ -190,7 +190,7 @@ class ThreeLineElementTests: XCTestCase {
         jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)
 
         do {
-            let tle = try jsonDecoder.decode(TLE.self, from: jsonData)
+            let tle = try jsonDecoder.decode(Elements.self, from: jsonData)
             print(tle.debugDescription())
         } catch {
             print(error)
@@ -262,7 +262,7 @@ class ThreeLineElementTests: XCTestCase {
         jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)
 
         do {
-            let tleArray = try jsonDecoder.decode([TLE].self, from: jsonData)
+            let tleArray = try jsonDecoder.decode([Elements].self, from: jsonData)
             print(tleArray[0].debugDescription())
             print(tleArray[1].debugDescription())
             print(tleArray[2].debugDescription())
@@ -408,9 +408,9 @@ class ThreeLineElementTests: XCTestCase {
             
         for subString in subStrings.dropLast() {
 
-            if let tle = TLE(xmlData: subString.data(using: .ascii)!) {
-                print(tle.debugDescription())
-            }
+            let tle = Elements(xmlData: subString.data(using: .ascii)!)
+            print(tle.debugDescription())
+            
 
         }
 
