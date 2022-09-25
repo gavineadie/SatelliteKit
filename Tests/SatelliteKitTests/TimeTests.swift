@@ -23,6 +23,16 @@ class TimeTests: XCTestCase {
         XCTAssertTrue(String(describing: Date(year: 2034, month: 12, day: 1)) == "2034-12-01 00:00:00 +0000")
     }
 
+    func testMHS() {
+        print(deg2hms(decimalDegrees: 45.0))
+        print(deg2hms(decimalDegrees: 45.01))
+        print(deg2hms(decimalDegrees: 45.001))
+        print(deg2hms(decimalDegrees: 45.0001))
+        print(deg2hms(decimalDegrees: 45.00001))
+        print(deg2hms(decimalDegrees: 45.000001))
+
+    }
+    
     func testSidereal() {
         print(String(format: "GMT MeanSiderealTime: %.2f°", zeroMeanSiderealTime(date: Date())))
         print(stringHMS(hms: deg2hms(decimalDegrees: zeroMeanSiderealTime(date: Date()))))
@@ -38,6 +48,10 @@ class TimeTests: XCTestCase {
         XCTAssertTrue(Date(julianDate: 2433281.5).julianDate == 2433281.5)
         XCTAssertTrue(Date(julianDate:      10.0).julianDate ==      10.0)
         XCTAssertTrue(Date(julianDate: 4321432.1).julianDate == 4321432.1)
+    }
+    
+    func testJD() {
+        print(julianDaysNow())
     }
 
     func testHMS() {

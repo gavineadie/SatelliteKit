@@ -203,10 +203,14 @@ public func stringHMS(hms: (Int, Int, Double)) -> String {
 
 // MARK: -
 
+/// `ep1950DaysNow` ...
+/// - Returns: the current number of days since Epoch 9050
 public func ep1950DaysNow() -> Double {
-    return julianDaysNow() - JD.epoch1950
+    julianDaysNow() - JD.epoch1950
 }
 
+/// `julianDay` calculate the JD of the time this method is executed
+/// - Returns: this moment's JD
 public func julianDaysNow() -> Double {
-    return JD.appleZero + Date().timeIntervalSinceReferenceDate * TimeConstants.sec2day
+    JD.appleZero + Date().timeIntervalSinceReferenceDate * TimeConstants.sec2day
 }
