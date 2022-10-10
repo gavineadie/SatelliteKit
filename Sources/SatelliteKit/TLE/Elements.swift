@@ -260,26 +260,82 @@ public extension Elements {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-
+        
         self.commonName = try container.decode(String.self, forKey: .commonName)
-        self.noradIndex = UInt(try container.decode(Int.self, forKey: .noradIndex))
+        
+        do {
+            self.noradIndex = UInt(try container.decode(Int.self, forKey: .noradIndex))     // UInt *OR* String
+        } catch {
+            self.noradIndex = UInt(String(try container.decode(String.self, forKey: .noradIndex)))!
+        }
+        
         self.launchName = try container.decode(String.self, forKey: .launchName)
         self.t₀ = try container.decode(Date.self, forKey: .t₀).daysSince1950
-        self.e₀ = try container.decode(Double.self, forKey: .e₀)
-        self.i₀ = try container.decode(Double.self, forKey: .i₀) * deg2rad
-        self.ω₀ = try container.decode(Double.self, forKey: .ω₀) * deg2rad
-        self.Ω₀ = try container.decode(Double.self, forKey: .Ω₀) * deg2rad
-        self.M₀ = try container.decode(Double.self, forKey: .M₀) * deg2rad
-        self.n₀ = try container.decode(Double.self, forKey: .n₀)
-        self.dragCoeff = try container.decode(Double.self, forKey: .dragCoeff)
-        self.ephemType = try container.decode(Int.self, forKey: .ephemType)
+        
+        do {
+            self.e₀ = try container.decode(Double.self, forKey: .e₀)
+        } catch {
+            self.e₀ = Double(String(try container.decode(String.self, forKey: .e₀)))!
+        }
+        
+        do {
+            self.i₀ = try container.decode(Double.self, forKey: .i₀) * deg2rad
+        } catch {
+            self.i₀ = Double(String(try container.decode(String.self, forKey: .i₀)))! * deg2rad
+        }
+        
+        do {
+            self.ω₀ = try container.decode(Double.self, forKey: .ω₀) * deg2rad
+        } catch {
+            self.ω₀ = Double(String(try container.decode(String.self, forKey: .ω₀)))! * deg2rad
+        }
+        
+        do {
+            self.Ω₀ = try container.decode(Double.self, forKey: .Ω₀) * deg2rad
+        } catch {
+            self.Ω₀ = Double(String(try container.decode(String.self, forKey: .Ω₀)))! * deg2rad
+        }
+        
+        do {
+            self.M₀ = try container.decode(Double.self, forKey: .M₀) * deg2rad
+        } catch {
+            self.M₀ = Double(String(try container.decode(String.self, forKey: .M₀)))! * deg2rad
+        }
+        
+        do {
+            self.n₀ = try container.decode(Double.self, forKey: .n₀)
+        } catch {
+            self.n₀ = Double(String(try container.decode(String.self, forKey: .n₀)))!
+        }
+        
+        do {
+            self.dragCoeff = try container.decode(Double.self, forKey: .dragCoeff)
+        } catch {
+            self.dragCoeff = Double(String(try container.decode(String.self, forKey: .dragCoeff)))!
+        }
+        
+        do {
+            self.ephemType = try container.decode(Int.self, forKey: .ephemType)
+        } catch {
+            self.ephemType = Int(String(try container.decode(String.self, forKey: .ephemType)))!
+        }
         self.tleClass = try container.decode(String.self, forKey: .tleClass)
-        self.tleNumber = try container.decode(Int.self, forKey: .tleNumber)
-        self.revNumber = try container.decode(Int.self, forKey: .revNumber)
+        
+        do {
+            self.tleNumber = try container.decode(Int.self, forKey: .tleNumber)
+        } catch {
+            self.tleNumber = Int(String(try container.decode(String.self, forKey: .tleNumber)))!
+        }
+        
+        do {
+            self.revNumber = try container.decode(Int.self, forKey: .revNumber)
+        } catch {
+            self.revNumber = Int(String(try container.decode(String.self, forKey: .revNumber)))!
+        }
         
         n₀ʹ = n₀                                                // capture pre-Kozai n₀
-
-        unKozai(try! container.decode(Double.self, forKey: .n₀) * (π/720.0))
+        
+        unKozai(self.n₀ * (π/720.0))
     }
     
     func encode(to encoder: Encoder) throws {
@@ -314,24 +370,29 @@ public extension Elements {
         
         let parser = ElementsParser()
         parser.parseXML(xmlData)
+        
+        var satelliteInfo = parser.satInfoArray[0]
+        print(satelliteInfo.count)
 
-        let satelliteInfo = parser.satInfoArray.first
-
-        self.init(commonName: satelliteInfo!["OBJECT_NAME"]!,
-                  noradIndex: UInt(satelliteInfo!["NORAD_CAT_ID"]!)!,
-                  launchName: satelliteInfo!["OBJECT_ID"]!,
-                  t₀: DateFormatter.iso8601Micros.date(from: satelliteInfo!["EPOCH"]!)!,
-                  e₀: Double(satelliteInfo!["ECCENTRICITY"]!)!,
-                  i₀: Double(satelliteInfo!["INCLINATION"]!)!,
-                  ω₀: Double(satelliteInfo!["ARG_OF_PERICENTER"]!)!,
-                  Ω₀: Double(satelliteInfo!["RA_OF_ASC_NODE"]!)!,
-                  M₀: Double(satelliteInfo!["MEAN_ANOMALY"]!)!,
-                  n₀: Double(satelliteInfo!["MEAN_MOTION"]!)!,
-                  ephemType: Int(satelliteInfo!["EPHEMERIS_TYPE"]!)!,
-                  tleClass: satelliteInfo!["CLASSIFICATION_TYPE"]!,
-                  tleNumber: Int(satelliteInfo!["ELEMENT_SET_NO"]!)!,
-                  revNumber: Int(satelliteInfo!["REV_AT_EPOCH"]!)!,
-                  dragCoeff: Double(satelliteInfo!["BSTAR"]!)!)
+        if satelliteInfo.count < 10 {
+            satelliteInfo = parser.satInfoArray[1]
+        }
+        
+        self.init(commonName: satelliteInfo["OBJECT_NAME"]!,
+                  noradIndex: UInt(satelliteInfo["NORAD_CAT_ID"]!)!,
+                  launchName: satelliteInfo["OBJECT_ID"] ?? "",
+                  t₀: DateFormatter.iso8601Micros.date(from: satelliteInfo["EPOCH"]!)!,
+                  e₀: Double(satelliteInfo["ECCENTRICITY"]!)!,
+                  i₀: Double(satelliteInfo["INCLINATION"]!)!,
+                  ω₀: Double(satelliteInfo["ARG_OF_PERICENTER"]!)!,
+                  Ω₀: Double(satelliteInfo["RA_OF_ASC_NODE"]!)!,
+                  M₀: Double(satelliteInfo["MEAN_ANOMALY"]!)!,
+                  n₀: Double(satelliteInfo["MEAN_MOTION"]!)!,
+                  ephemType: Int(satelliteInfo["EPHEMERIS_TYPE"]!)!,
+                  tleClass: satelliteInfo["CLASSIFICATION_TYPE"]!,
+                  tleNumber: Int(satelliteInfo["ELEMENT_SET_NO"]!)!,
+                  revNumber: Int(satelliteInfo["REV_AT_EPOCH"]!)!,
+                  dragCoeff: Double(satelliteInfo["BSTAR"]!)!)
 
         a₀ = 0.0
         n₀ʹ = 0.0

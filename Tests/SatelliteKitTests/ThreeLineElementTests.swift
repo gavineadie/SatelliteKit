@@ -9,6 +9,20 @@ import XCTest
 
 class ThreeLineElementTests: XCTestCase {
 
+    func testTwoLines() {
+        
+        do {
+            let tle = try Elements("",
+                                   "1 00005U 58002B   22281.98988747  .00000306  00000-0  37162-3 0  9996",
+                                   "2 00005  34.2463 149.5009 1846449 188.6184 167.7916 10.85017843296875")
+            
+            print(tle.debugDescription())
+            
+        } catch {
+            print(error)
+        }
+    }
+    
     func testNullLine0() {
 
         do {
@@ -165,257 +179,6 @@ class ThreeLineElementTests: XCTestCase {
 
     }
 
-    func testJsonTLE() {
-        let jsonData = """
-            {"OBJECT_NAME":"XINGYUN-2 01",
-            "OBJECT_ID":"2020-028A",
-            "EPOCH":"2020-06-03T21:51:26.358336",
-            "MEAN_MOTION":15.00667713,
-            "ECCENTRICITY":0.0011896,
-            "INCLINATION":97.5563,
-            "RA_OF_ASC_NODE":186.395,
-            "ARG_OF_PERICENTER":178.0873,
-            "MEAN_ANOMALY":235.0112,
-            "EPHEMERIS_TYPE":0,
-            "CLASSIFICATION_TYPE":"U",
-            "NORAD_CAT_ID":45602,
-            "ELEMENT_SET_NO":999,
-            "REV_AT_EPOCH":343,
-            "BSTAR":7.4303e-5,
-            "MEAN_MOTION_DOT":8.83e-6,
-            "MEAN_MOTION_DDOT":0}
-        """.data(using: .utf8)!
-
-        let jsonDecoder = JSONDecoder()
-        jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)
-
-        do {
-            let tle = try jsonDecoder.decode(Elements.self, from: jsonData)
-            print(tle.debugDescription())
-        } catch {
-            print(error)
-        }
-    }
-
-    func testJsonTLEArray() {
-        let jsonText = """
-            [{
-            "OBJECT_NAME": "ATLAS CENTAUR 2",
-            "OBJECT_ID": "1963-047A",
-            "EPOCH": "2020-06-05T19:21:58.044384",
-            "MEAN_MOTION": 14.0260002,
-            "ECCENTRICITY": 0.0585625,
-            "INCLINATION": 30.3559,
-            "RA_OF_ASC_NODE": 314.9437,
-            "ARG_OF_PERICENTER": 85.6228,
-            "MEAN_ANOMALY": 281.1015,
-            "EPHEMERIS_TYPE": 0,
-            "CLASSIFICATION_TYPE": "U",
-            "NORAD_CAT_ID": 694,
-            "ELEMENT_SET_NO": 999,
-            "REV_AT_EPOCH": 83546,
-            "BSTAR": 2.8454e-5,
-            "MEAN_MOTION_DOT": 3.01e-6,
-            "MEAN_MOTION_DDOT": 0
-            },{
-            "OBJECT_NAME": "THOR AGENA D R/B",
-            "OBJECT_ID": "1964-002A",
-            "EPOCH": "2020-06-05T17:39:55.010304",
-            "MEAN_MOTION": 14.32395649,
-            "ECCENTRICITY": 0.0032737,
-            "INCLINATION": 99.0129,
-            "RA_OF_ASC_NODE": 48.8284,
-            "ARG_OF_PERICENTER": 266.0175,
-            "MEAN_ANOMALY": 93.7265,
-            "EPHEMERIS_TYPE": 0,
-            "CLASSIFICATION_TYPE": "U",
-            "NORAD_CAT_ID": 733,
-            "ELEMENT_SET_NO": 999,
-            "REV_AT_EPOCH": 93714,
-            "BSTAR": 2.6247e-5,
-            "MEAN_MOTION_DOT": 2.3e-7,
-            "MEAN_MOTION_DDOT": 0
-            },{
-            "OBJECT_NAME": "SL-3 R/B",
-            "OBJECT_ID": "1964-053B",
-            "EPOCH": "2020-06-05T20:39:17.038368",
-            "MEAN_MOTION": 14.59393422,
-            "ECCENTRICITY": 0.0055713,
-            "INCLINATION": 65.0789,
-            "RA_OF_ASC_NODE": 2.8558,
-            "ARG_OF_PERICENTER": 32.0461,
-            "MEAN_ANOMALY": 328.4005,
-            "EPHEMERIS_TYPE": 0,
-            "CLASSIFICATION_TYPE": "U",
-            "NORAD_CAT_ID": 877,
-            "ELEMENT_SET_NO": 999,
-            "REV_AT_EPOCH": 95980,
-            "BSTAR": 7.6135e-6,
-            "MEAN_MOTION_DOT": -8.4e-7,
-            "MEAN_MOTION_DDOT": 0
-        }]
-        """
-            
-        let jsonData = jsonText.data(using: .utf8)!
-
-        let jsonDecoder = JSONDecoder()
-        jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)
-
-        do {
-            let tleArray = try jsonDecoder.decode([Elements].self, from: jsonData)
-            print(tleArray[0].debugDescription())
-            print(tleArray[1].debugDescription())
-            print(tleArray[2].debugDescription())
-        } catch {
-            print(error)
-        }
-    }
-
-    func testXmlTLEArray() {
-
-        var xmlText = """
-        <ndm xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
-               xsi:noNamespaceSchemaLocation="https://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd">
-            <omm>
-                <header>
-                    <CREATION_DATE/>
-                    <ORIGINATOR/>
-                </header>
-                <body>
-                    <segment>
-                        <metadata>
-                            <OBJECT_NAME>ATLAS CENTAUR 2</OBJECT_NAME>
-                            <OBJECT_ID>1963-047A</OBJECT_ID>
-                            <CENTER_NAME>EARTH</CENTER_NAME>
-                            <REF_FRAME>TEME</REF_FRAME>
-                            <TIME_SYSTEM>UTC</TIME_SYSTEM>
-                            <MEAN_ELEMENT_THEORY>SGP4</MEAN_ELEMENT_THEORY>
-                        </metadata>
-                        <data>
-                            <meanElements>
-                                <EPOCH>2020-06-06T10:44:23.559360</EPOCH>
-                                <MEAN_MOTION>14.02600247</MEAN_MOTION>
-                                <ECCENTRICITY>.0585615</ECCENTRICITY>
-                                <INCLINATION>30.3558</INCLINATION>
-                                <RA_OF_ASC_NODE>311.4167</RA_OF_ASC_NODE>
-                                <ARG_OF_PERICENTER>91.1851</ARG_OF_PERICENTER>
-                                <MEAN_ANOMALY>275.5862</MEAN_ANOMALY>
-                            </meanElements>
-                            <tleParameters>
-                                <EPHEMERIS_TYPE>0</EPHEMERIS_TYPE>
-                                <CLASSIFICATION_TYPE>U</CLASSIFICATION_TYPE>
-                                <NORAD_CAT_ID>694</NORAD_CAT_ID>
-                                <ELEMENT_SET_NO>999</ELEMENT_SET_NO>
-                                <REV_AT_EPOCH>83555</REV_AT_EPOCH>
-                                <BSTAR>.28591E-4</BSTAR>
-                                <MEAN_MOTION_DOT>3.03E-6</MEAN_MOTION_DOT>
-                                <MEAN_MOTION_DDOT>0</MEAN_MOTION_DDOT>
-                            </tleParameters>
-                        </data>
-                    </segment>
-                </body>
-            </omm>
-
-            <omm>
-                <header>
-                    <CREATION_DATE/>
-                    <ORIGINATOR/>
-                </header>
-                <body>
-                    <segment>
-                        <metadata>
-                            <OBJECT_NAME>THOR AGENA D R/B</OBJECT_NAME>
-                            <OBJECT_ID>1964-002A</OBJECT_ID>
-                            <CENTER_NAME>EARTH</CENTER_NAME>
-                            <REF_FRAME>TEME</REF_FRAME>
-                            <TIME_SYSTEM>UTC</TIME_SYSTEM>
-                            <MEAN_ELEMENT_THEORY>SGP4</MEAN_ELEMENT_THEORY>
-                        </metadata>
-                        <data>
-                            <meanElements>
-                                <EPOCH>2020-06-06T07:04:37.126560</EPOCH>
-                                <MEAN_MOTION>14.32395701</MEAN_MOTION>
-                                <ECCENTRICITY>.0032725</ECCENTRICITY>
-                                <INCLINATION>99.0129</INCLINATION>
-                                <RA_OF_ASC_NODE>49.4090</RA_OF_ASC_NODE>
-                                <ARG_OF_PERICENTER>264.3266</ARG_OF_PERICENTER>
-                                <MEAN_ANOMALY>95.4185</MEAN_ANOMALY>
-                            </meanElements>
-                            <tleParameters>
-                                <EPHEMERIS_TYPE>0</EPHEMERIS_TYPE>
-                                <CLASSIFICATION_TYPE>U</CLASSIFICATION_TYPE>
-                                <NORAD_CAT_ID>733</NORAD_CAT_ID>
-                                <ELEMENT_SET_NO>999</ELEMENT_SET_NO>
-                                <REV_AT_EPOCH>93722</REV_AT_EPOCH>
-                                <BSTAR>.25433E-4</BSTAR>
-                                <MEAN_MOTION_DOT>2.1E-7</MEAN_MOTION_DOT>
-                                <MEAN_MOTION_DDOT>0</MEAN_MOTION_DDOT>
-                            </tleParameters>
-                        </data>
-                    </segment>
-                </body>
-            </omm>
-
-            <omm>
-                <header>
-                    <CREATION_DATE/>
-                    <ORIGINATOR/>
-                </header>
-                <body>
-                    <segment>
-                        <metadata>
-                            <OBJECT_NAME>SL-3 R/B</OBJECT_NAME>
-                            <OBJECT_ID>1964-053B</OBJECT_ID>
-                            <CENTER_NAME>EARTH</CENTER_NAME>
-                            <REF_FRAME>TEME</REF_FRAME>
-                            <TIME_SYSTEM>UTC</TIME_SYSTEM>
-                            <MEAN_ELEMENT_THEORY>SGP4</MEAN_ELEMENT_THEORY>
-                        </metadata>
-                        <data>
-                            <meanElements>
-                                <EPOCH>2020-06-05T22:17:57.747840</EPOCH>
-                                <MEAN_MOTION>14.59393420</MEAN_MOTION>
-                                <ECCENTRICITY>.0055722</ECCENTRICITY>
-                                <INCLINATION>65.0789</INCLINATION>
-                                <RA_OF_ASC_NODE>2.6555</RA_OF_ASC_NODE>
-                                <ARG_OF_PERICENTER>32.0150</ARG_OF_PERICENTER>
-                                <MEAN_ANOMALY>328.4314</MEAN_ANOMALY>
-                            </meanElements>
-                            <tleParameters>
-                                <EPHEMERIS_TYPE>0</EPHEMERIS_TYPE>
-                                <CLASSIFICATION_TYPE>U</CLASSIFICATION_TYPE>
-                                <NORAD_CAT_ID>877</NORAD_CAT_ID>
-                                <ELEMENT_SET_NO>999</ELEMENT_SET_NO>
-                                <REV_AT_EPOCH>95981</REV_AT_EPOCH>
-                                <BSTAR>.75354E-5</BSTAR>
-                                <MEAN_MOTION_DOT>-8.4E-7</MEAN_MOTION_DOT>
-                                <MEAN_MOTION_DDOT>0</MEAN_MOTION_DDOT>
-                            </tleParameters>
-                        </data>
-                    </segment>
-                </body>
-            </omm>
-        </ndm>
-        """
-        
-        let ommRange = xmlText.range(of: "<omm>")      // find the first <omm>
-        let newRange = xmlText.startIndex ... xmlText.index(ommRange!.lowerBound, offsetBy: -4)
-        xmlText.removeSubrange(newRange)
-
-        xmlText = xmlText.replacingOccurrences(of: "   ", with: "")
-        xmlText = xmlText.replacingOccurrences(of: "</omm>", with: "</omm>###")
-        let subStrings = xmlText.components(separatedBy: "###")
-            
-        for subString in subStrings.dropLast() {
-
-            let tle = Elements(xmlData: subString.data(using: .ascii)!)
-            print(tle.debugDescription())
-            
-
-        }
-
-    }
-
     func testLongFile() {
 
         do {
@@ -475,6 +238,20 @@ class ThreeLineElementTests: XCTestCase {
 //
 //        self.measure {
 //            testLongFile()
+//        }
+//    }
+    
+// JWST is not in Earth orbit ..
+//
+//    func testJWST() {
+//        do {
+//
+//            let jwst = Satellite("0 JWST",
+//                                  "1 50463U 21130A   21362.00000000  .00000000  00000-0  00000-0 0  9999",
+//                                  "2 50463   4.6198  89.0659 9884983 192.3200  17.4027  0.01958082    27")
+//
+//            print(jwst.tle.debugDescription())
+//            let _ = jwst.geoPosition(minsAfterEpoch: 0)
 //        }
 //    }
 
