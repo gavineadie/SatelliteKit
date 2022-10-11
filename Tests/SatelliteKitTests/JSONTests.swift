@@ -180,9 +180,7 @@ class JSONElementTests: XCTestCase {
             jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)
 
             let tleArray = try jsonDecoder.decode([Elements].self, from: jsonData)
-            
-            print(tleArray.count)
-            
+
             print(tleArray[0].debugDescription())
             print(tleArray[1].debugDescription())
             print(tleArray[2].debugDescription())

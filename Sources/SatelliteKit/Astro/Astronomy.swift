@@ -9,24 +9,28 @@
 import Foundation
 
 public struct LatLonAlt {
-    
-/// latitude (degrees)
-    public var lat: Double
-/// longitude (degrees)
-    public var lon: Double
-/// altitude (kilometers)/
-    public var alt: Double
+    public init(lat: Double, lon: Double, alt: Double) {
+        self.lat = lat
+        self.lon = lon
+        self.alt = alt
+    }
+
+    public var lat: Double                                  // latitude (degrees)
+    public var lon: Double                                  // longitude (degrees)
+    public var alt: Double                                  // altitude
 
 }
 
 public struct AziEleDst {
-    
-/// azimuth (degrees)/
-    public var azim: Double
-/// elevation (degrees)
-    public var elev: Double
-/// distance/range (kilometers)
-    public var dist: Double
+    public init(azim: Double, elev: Double, dist: Double) {
+        self.azim = azim
+        self.elev = elev
+        self.dist = dist
+    }
+
+    public var azim: Double                                 // azimuth (degrees)
+    public var elev: Double                                 // elevation (degrees)
+    public var dist: Double                                 // distance/range
 
 }
 
@@ -38,7 +42,7 @@ public struct AziEleDst {
 ///  http://celestrak.com/columns/v02n02/ and http://aa.usno.navy.mil/faq/docs/GAST.php
 ///  http://www.jgiesen.de/SiderealTimeClock/index.html
 ///
-/// - Parameter julianDate: julianDate
+/// - Parameter julianDate: Julian Date
 /// - Returns: sidereal time in degrees ... (also "GHA Aries") ... the IAU 1982 GMST-UT1 model
 public func zeroMeanSiderealTime(julianDate: Double) -> Double {
     let     fractionalDay = fmod(julianDate + 0.5, 1.0)     // fractional part of JD + half a day
@@ -69,8 +73,10 @@ public func siteMeanSiderealTime(date: Date, _ siteLongitude: Double) -> Double 
 
 /// SolarCel
 ///
+/// References:
+/// http://aa.usno.navy.mil/faq/docs/SunApprox.php
+///
 /// - Parameter julianDays: julianDays
-/// References: http://aa.usno.navy.mil/faq/docs/SunApprox.php
 public func solarCel(julianDays: Double) -> Vector {
     let     daysSinceJD2000 = julianDays - JD.epoch2000
 
@@ -95,7 +101,7 @@ public func solarGeo(julianDays: Double) -> (Double, Double) {
 
 /// Low precision formulae for the moon, from:
  /// AN ALTERNATIVE LUNAR EPHEMERIS MODEL FOR ON-BOARD FLIGHT SOFTWARE USE by: David G. Simpson (NASA, GSFC)
- /// - Parameter julianDays: <#julianDays description#>
+ /// - Parameter julianDays: Julian Days
  /// - Returns: <#description#>
 public func lunarCel(julianDays: Double) -> Vector {
     let     centsSinceJD2000 = ( julianDays - JD.epoch2000 ) / 36525.0
@@ -127,8 +133,8 @@ public func lunarCel(julianDays: Double) -> Vector {
     return Vector(moonX1, moonY1, moonZ1)
 }
 
-/// <#Description#>
-/// - Parameter julianDays: <#julianDays description#>
+/// lunarGeo
+/// - Parameter julianDays: Julian Days
 /// - Returns: (Declination, Right_Ascension) are returned as decimal degrees.
 public func lunarGeo (julianDays: Double) -> (Double, Double) {
     let     lunarVector: Vector = lunarCel(julianDays: julianDays)
@@ -139,7 +145,7 @@ public func lunarGeo (julianDays: Double) -> (Double, Double) {
             atan2pi(lunarVector.y, lunarVector.x) * rad2deg)
 }
 
-///
+/// azel
 /// - Parameters:
 ///   - time: date
 ///   - site: (lat°, lon°)
@@ -163,9 +169,13 @@ public func azel(time: Date,
 
 /// eci to geo
 ///
-/// Reference: The 1992 Astronomical Almanac, page K12.
 /// Procedure eci2geo() will calculate the geodetic (lat, lon, alt) position of an object given the time and its ECI position.
-/// It is intended to be used to determine the satellite ground track. The calculations assume the earth to be oblate. If the time is negative, treat as zero.
+/// It is intended to be used to determine the satellite ground track. The calculations assume the earth to be oblate.
+/// If the time is negative, treat as zero.
+///
+/// Reference:
+/// The 1992 Astronomical Almanac, page K12.
+///
 /// - Parameters:
 ///   - julianDays: <#julianDays description#>
 ///   - celestial: <#celestial description#>
@@ -217,9 +227,9 @@ public func geo2eci(julianDays: Double, geodetic: LatLonAlt) -> Vector {
                   (geodetic.alt+s) * sinLatitude)
 }
 
-/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃ geo2eci .. (lat°, lon°, alt) -> (x, y, z,)                         OBLATE - NO SIDEREAL ROTATION ┃
-  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+/// geo2eci  [OBLATE - NO SIDEREAL ROTATION]
+/// - Parameter geodetic: (lat°, lon°, alt)
+/// - Returns: (x, y, z,)
 public func geo2eci(geodetic: LatLonAlt) -> Vector {
     let     latitudeRads = geodetic.lat * deg2rad
     let     sinLatitude = sin(latitudeRads)
@@ -259,7 +269,8 @@ public func geo2xyz(julianDays: Double, geodetic: LatLonAlt) -> Vector {
 }
 
 /// geo2xyz [SPHERICAL - NO SIDEREAL ROTATION]
-/// - Parameter geodetic: (lat°, lon°, alt)
+/// - Parameters
+///   - geodetic: (lat°, lon°, alt)
 /// - Returns: (x, y, z,)
 public func geo2xyz(geodetic: LatLonAlt) -> Vector {
     let     latitudeRads = geodetic.lat * deg2rad
@@ -317,7 +328,7 @@ public func topPosition(julianDays: Double, satCel: Vector, obsLLA: LatLonAlt) -
 
 /// utility function used in both eci2top and cet2top [obs→sat in obs topo frame]
  /// - Parameters:
- ///   - julianDays: <#julianDays description#>
+ ///   - julianDays: Julian Days
  ///   - satCel: <#satCel description#>
  ///   - obsLLA: <#obsLLA description#>
  /// - Returns: (x, y, z)
