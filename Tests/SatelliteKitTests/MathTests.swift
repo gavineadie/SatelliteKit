@@ -97,25 +97,25 @@ class MathTests: XCTestCase {
 //            print(radians.description)
 //        }
 
-        func testPerformanceLimit180() {
-
-            self.measure {
-                for angle in stride(from: -400.0, to: +400.0, by: 20.0) {
-                    _ = limit180(angle)
-                }
-            }
-
-        }
-
-        func testPerformanceLimit360() {
-
-            self.measure {
-                for angle in stride(from: -220.0, to: +580.0, by: 20.0) {
-                    _ = limit360(angle)
-                }
-            }
-
-        }
+//        func testPerformanceLimit180() {
+//
+//            self.measure {
+//                for angle in stride(from: -400.0, to: +400.0, by: 20.0) {
+//                    _ = limit180(angle)
+//                }
+//            }
+//
+//        }
+//
+//        func testPerformanceLimit360() {
+//
+//            self.measure {
+//                for angle in stride(from: -220.0, to: +580.0, by: 20.0) {
+//                    _ = limit360(angle)
+//                }
+//            }
+//
+//        }
 
     }
 

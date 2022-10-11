@@ -14,8 +14,8 @@ public struct Satellite {
 
     public let tle: Elements                            // make TLE accessible
     public let commonName: String                       // "COSMOS .."
-    public let noradIdent: String
-    public let t₀Days1950: Double                       // TLE t=0 (days since 1950)
+    public let noradIdent: String                       // "21332"
+    public let t₀Days1950: Double                       // days since 1950
 
     public var e: Double { return propagator.e }        //### these vary slowly over time ..
     public var i: Double { return propagator.i }        //###
@@ -101,8 +101,10 @@ public extension Satellite {
             return Vector((pv.position.x)/1000.0,
                           (pv.position.y)/1000.0,
                           (pv.position.z)/1000.0)
-        } catch let error as NSError {
-            fatalError("Satellite Position Error \(self.commonName) .. \(error.domain) (\(error.code))")
+        } catch SatKitError.SGP(let sgpError) {
+            fatalError("Position for '\(self.commonName)' .. \(sgpError)")
+        } catch {
+            fatalError("Something else: \(error)")
         }
     }
 
@@ -115,8 +117,10 @@ public extension Satellite {
             return Vector((pv.velocity.x)/1000.0,
                           (pv.velocity.y)/1000.0,
                           (pv.velocity.z)/1000.0)
-        } catch let error as NSError {
-            fatalError("Satellite Velocity Error \(self.commonName) .. \(error.domain) (\(error.code))")
+        } catch SatKitError.SGP(let sgpError) {
+            fatalError("Velocity for '\(self.commonName)' .. \(sgpError)")
+        } catch {
+            fatalError("Something else: \(error)")
         }
     }
 
@@ -186,4 +190,3 @@ public extension Satellite {
     }
 
 }
-

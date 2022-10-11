@@ -1,17 +1,51 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
-  ║ SatParser.swift                                                                           SatKit ║
-  ║ Created by Gavin Eadie on Feb19/22            Copyright © 2022 Gavin Eadie. All rights reserved. ║
+  ║ ElementsXML.swift                                                                         SatKit ║
+  ║ Created by Gavin Eadie on Oct10/22            Copyright © 2022 Gavin Eadie. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 import Foundation
 
-extension String {
-    var isBlank: Bool { return allSatisfy({ $0.isWhitespace })}
-}
+//MARK: - XML initializer
 
-extension Dictionary {
-    var isNotEmpty: Bool { !self.isEmpty }
+public extension Elements {
+
+/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+
+    init(xmlData: Data) {
+        
+        let parser = ElementsParser()
+        parser.parseXML(xmlData)
+        
+        var satelliteInfo = parser.satInfoArray[0]
+
+        if satelliteInfo.count < 10 {
+            satelliteInfo = parser.satInfoArray[1]
+        }
+        
+        self.init(commonName: satelliteInfo["OBJECT_NAME"]!,
+                  noradIndex: UInt(satelliteInfo["NORAD_CAT_ID"]!)!,
+                  launchName: satelliteInfo["OBJECT_ID"] ?? "",         // OBJECT_ID can be null
+                  t₀: DateFormatter.iso8601Micros.date(from: satelliteInfo["EPOCH"]!)!,
+                  e₀: Double(satelliteInfo["ECCENTRICITY"]!)!,
+                  i₀: Double(satelliteInfo["INCLINATION"]!)!,
+                  ω₀: Double(satelliteInfo["ARG_OF_PERICENTER"]!)!,
+                  Ω₀: Double(satelliteInfo["RA_OF_ASC_NODE"]!)!,
+                  M₀: Double(satelliteInfo["MEAN_ANOMALY"]!)!,
+                  n₀: Double(satelliteInfo["MEAN_MOTION"]!)!,
+                  ephemType: Int(satelliteInfo["EPHEMERIS_TYPE"]!)!,
+                  tleClass: satelliteInfo["CLASSIFICATION_TYPE"]!,
+                  tleNumber: Int(satelliteInfo["ELEMENT_SET_NO"]!)!,
+                  revNumber: Int(satelliteInfo["REV_AT_EPOCH"]!)!,
+                  dragCoeff: Double(satelliteInfo["BSTAR"]!)!)
+
+        a₀ = 0.0
+        n₀ʹ = 0.0
+
+        unKozai(n₀ * (π/720.0))
+
+    }
 }
 
 

@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ SGP4.swift                                                                                SatKit ║
-  ║ Created by Gavin Eadie on May24/17         Copyright © 2017-20 Gavin Eadie. All rights reserved. ║
+  ║ Created by Gavin Eadie on May24/17         Copyright © 2017-22 Gavin Eadie. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
@@ -101,7 +101,7 @@ class SGP4: Propagator {
         super.e = tle.e₀ - tempe
 
         if super.e >= 1.0 || super.e < -0.001 {
-            throw SatKitError.SGP("ERROR 1: eccentricity out of range 0...1")
+            throw SatKitError.SGP(sgpError: "1: eccentricity out of range 0...1")
         }
 
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮

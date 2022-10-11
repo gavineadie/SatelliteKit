@@ -5,6 +5,15 @@
 
 import Foundation
 
+extension String {
+    var isBlank: Bool { return allSatisfy({ $0.isWhitespace })}
+}
+
+extension Dictionary {
+    var isNotEmpty: Bool { !self.isEmpty }
+}
+
+
 public struct SatelliteKit {
 
     var staticVersion = "~~VersionBuild~~"          // v1.1.0 (321)

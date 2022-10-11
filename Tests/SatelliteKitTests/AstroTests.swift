@@ -42,13 +42,18 @@ class AstroTests: XCTestCase {
     func testECI_GEO() {
         let geo = eci2geo(julianDays: JD, celestial: Vector(10000.0, 10000.0, 0.0))
         let eci = geo2eci(julianDays: JD, geodetic: geo)
+        
+        XCTAssertEqual(10000.0, eci.x, accuracy: 0.000001)
+        XCTAssertEqual(10000.0, eci.y, accuracy: 0.000001)
+        XCTAssertEqual(0.0, eci.z, accuracy: 0.000001)
+
         print(eci)
     }
 
     func testECI_TOP() {
         let top = eci2top(julianDays: JD, satCel: Vector(10000.0, 10000.0, 0.0),
                                           obsLLA: LatLonAlt(lat: 0.0, lon: 0.0, alt: 0.0))
-//        let eci = top2eci(julianDays: JD, sar: geo)
+//        let eci = top2eci(julianDays: JD, sar: top)
         print(top)
     }
 
@@ -57,4 +62,12 @@ class AstroTests: XCTestCase {
         print(azEl)
     }
 
+    func llaTest() {
+        let _ = LatLonAlt(lat: 30.0, lon: -90.0, alt: 500.0)
+    }
+    
+    func aedTest() {
+        let _ = AziEleDst(azim: 90.0, elev: 45.0, dist: 2000.0)
+    }
+    
 }

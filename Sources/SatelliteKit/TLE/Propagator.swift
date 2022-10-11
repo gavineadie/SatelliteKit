@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ Propagator.swift                                                                          SatKit ║
-  ║ Created by Gavin Eadie on May24/17         Copyright © 2017-20 Gavin Eadie. All rights reserved. ║
+  ║ Created by Gavin Eadie on May24/17         Copyright © 2017-22 Gavin Eadie. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
@@ -248,7 +248,7 @@ public class Propagator {
         let ayn = self.e * sin(self.ω) + aynl
         let elsq = axn * axn + ayn * ayn
 
-        if elsq > 1.0 { throw SatKitError.SGP("ERROR 4: semi-latus rectum < 0.0") }
+        if elsq > 1.0 { throw SatKitError.SGP(sgpError: "4: semi-latus rectum < 0.0") }
 
         let capu = fmod2pi_π(xlt - self.Ω)           // normalize an angle between 0 and 2π
 
@@ -260,7 +260,7 @@ public class Propagator {
         let x1mth2 = 1.0 - cosθ²
         let x7thm1 = 7.0 * cosθ² - 1.0
 
-        if self.e > (1 - 1e-6) { throw SatKitError.SGP("ERROR 1: eccentricity too close to 1.0") }
+        if self.e > (1 - 1e-6) { throw SatKitError.SGP(sgpError: "1: eccentricity too close to 1.0") }
 
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆ Solve Kepler's Equation ..                                                                       ┆
@@ -319,7 +319,7 @@ public class Propagator {
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
         let rk = r * (1.0 - 1.5 * temp2 * betal * x3thm1) + 0.5 * temp1 * x1mth2 * cos2u
 
-        if rk < 1 { throw SatKitError.SGP("ERROR 6: decay condition .. radius < 1.0 ") }
+        if rk < 1 { throw SatKitError.SGP(sgpError: "ERROR 6: decay condition .. radius < 1.0 ") }
 
         let uk = u - 0.25 * temp2 * x7thm1 * sin2u
         let xnodek = self.Ω + 1.5 * temp2 * self.cosi₀ * sin2u
@@ -356,7 +356,7 @@ public class Propagator {
                          cv * (rdotk * uy + rfdotk * vy),
                          cv * (rdotk * uz + rfdotk * vz))
 
-        if (cv * (rdotk * ux + rfdotk * vx)).isNaN { throw SatKitError.SGP("nan") }
+        if (cv * (rdotk * ux + rfdotk * vx)).isNaN { throw SatKitError.SGP(sgpError: "nan") }
 
         return PVCoordinates(position: pos, velocity: vel)
 

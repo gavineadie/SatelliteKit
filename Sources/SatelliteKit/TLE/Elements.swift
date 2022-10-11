@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ Elements.swift                                                                            SatKit ║
-  ║ Created by Gavin Eadie on May24/17         Copyright © 2017-20 Gavin Eadie. All rights reserved. ║
+  ║ Created by Gavin Eadie on May24/17         Copyright © 2017-22 Gavin Eadie. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
@@ -14,8 +14,8 @@ import Foundation
 public typealias TLE = Elements
 
 enum SatKitError: Error {
-    case TLE(String)
-    case SGP(String)
+    case TLE(tleError: String)
+    case SGP(sgpError: String)
 }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -101,7 +101,7 @@ public extension Elements {
   ┆ ------------------------                                              < 24 char name             ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
 
-        commonName = line0.hasPrefix("0 ") ? String(line0.dropFirst().dropFirst()) : line0
+        commonName = line0.hasPrefix("0 ") ? String(line0.dropFirst(2)) : line0
 
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆ 1 NNNNNU NNNNNAAA NNNNN.NNNNNNNN ±.NNNNNNNN ±NNNNN-N ±NNNNN-N N NNNNN                            ┆
@@ -180,7 +180,7 @@ public extension Elements {
 
         stringlet = String(bytes: lineTwoBytes[2...6], encoding: .utf8)!
         guard self.noradIndex == alpha5ID(stringlet.trimmingCharacters(in: .whitespaces)) else {
-            throw SatKitError.TLE("Line1 and Line2 NORAD IDs don't match ..")
+            throw SatKitError.TLE(tleError: "Line1 and Line2 NORAD IDs don't match ..")
         }
 
         stringlet = String(bytes: lineTwoBytes[8...15], encoding: .utf8)!
@@ -207,208 +207,24 @@ public extension Elements {
         unKozai(self.n₀ʹ * (π/720.0))
 
         guard (self.ephemType == 0 || self.ephemType == 2 || self.ephemType == 3) else {
-            throw SatKitError.TLE("Line1 ephemerisType ≠ 0, 2 or 3 .. [\(self.ephemType)]")
+            throw SatKitError.TLE(tleError: "Line1 ephemerisType ≠ 0, 2 or 3 .. [\(self.ephemType)]")
         }
-    }
-}
-
-//MARK: - JSON initializer
-
-public extension Elements {
-
-/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  │ Decoding one, or more, Elements from JSON requires a little work before the init ..              │
-  │                                                                                                  │
-  │ First, we need to create a JSON decoder and teach it how to decode ISO times with milliseconds   │
-  │                                                                                                  │
-  │     let jsonDecoder = JSONDecoder()                                                              │
-  │     jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)                   │
-  │                                                                                                  │
-  │ Then, if JSON data in the form of a String, convert it to Data (catching any error)              │
-  │                                                                                                  │
-  │     guard let jsonData = jsonString.data(using: .utf8) else {                                    │
-  │         throw Error("JSON failure converting String to Data ..")                                 │
-  │     }                                                                                            │
-  │                                                                                                  │
-  │ Finally let the decoder do it's thing .. (again, catch errors if necessary)                      │
-  │                                                                                                  │
-  │     let elements = try jsonDecoder.decode(Elements.self, from: jsonData)                         │
-  │                                                                                                  │
-  │ or for an array of Elements                                                                      │
-  │                                                                                                  │
-  │     let ElementsArray = try jsonDecoder.decode([Elements].self, from: jsonData)                  │
-  │                                                                                                  │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-
-    private enum CodingKeys: String, CodingKey {
-        case commonName = "OBJECT_NAME"
-        case noradIndex = "NORAD_CAT_ID"
-        case launchName = "OBJECT_ID"
-        case t₀ = "EPOCH"
-        case e₀ = "ECCENTRICITY"
-        case i₀ = "INCLINATION"
-        case ω₀ = "ARG_OF_PERICENTER"
-        case Ω₀ = "RA_OF_ASC_NODE"
-        case M₀ = "MEAN_ANOMALY"
-        case n₀ = "MEAN_MOTION"
-        case dragCoeff = "BSTAR"
-        case ephemType = "EPHEMERIS_TYPE"
-        case tleClass = "CLASSIFICATION_TYPE"
-        case tleNumber = "ELEMENT_SET_NO"
-        case revNumber = "REV_AT_EPOCH"
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        
-        self.commonName = try container.decode(String.self, forKey: .commonName)
-        
-        do {
-            self.noradIndex = UInt(try container.decode(Int.self, forKey: .noradIndex))     // UInt *OR* String
-        } catch {
-            self.noradIndex = UInt(String(try container.decode(String.self, forKey: .noradIndex)))!
-        }
-        
-        self.launchName = try container.decode(String.self, forKey: .launchName)
-        self.t₀ = try container.decode(Date.self, forKey: .t₀).daysSince1950
-        
-        do {
-            self.e₀ = try container.decode(Double.self, forKey: .e₀)
-        } catch {
-            self.e₀ = Double(String(try container.decode(String.self, forKey: .e₀)))!
-        }
-        
-        do {
-            self.i₀ = try container.decode(Double.self, forKey: .i₀) * deg2rad
-        } catch {
-            self.i₀ = Double(String(try container.decode(String.self, forKey: .i₀)))! * deg2rad
-        }
-        
-        do {
-            self.ω₀ = try container.decode(Double.self, forKey: .ω₀) * deg2rad
-        } catch {
-            self.ω₀ = Double(String(try container.decode(String.self, forKey: .ω₀)))! * deg2rad
-        }
-        
-        do {
-            self.Ω₀ = try container.decode(Double.self, forKey: .Ω₀) * deg2rad
-        } catch {
-            self.Ω₀ = Double(String(try container.decode(String.self, forKey: .Ω₀)))! * deg2rad
-        }
-        
-        do {
-            self.M₀ = try container.decode(Double.self, forKey: .M₀) * deg2rad
-        } catch {
-            self.M₀ = Double(String(try container.decode(String.self, forKey: .M₀)))! * deg2rad
-        }
-        
-        do {
-            self.n₀ = try container.decode(Double.self, forKey: .n₀)
-        } catch {
-            self.n₀ = Double(String(try container.decode(String.self, forKey: .n₀)))!
-        }
-        
-        do {
-            self.dragCoeff = try container.decode(Double.self, forKey: .dragCoeff)
-        } catch {
-            self.dragCoeff = Double(String(try container.decode(String.self, forKey: .dragCoeff)))!
-        }
-        
-        do {
-            self.ephemType = try container.decode(Int.self, forKey: .ephemType)
-        } catch {
-            self.ephemType = Int(String(try container.decode(String.self, forKey: .ephemType)))!
-        }
-        self.tleClass = try container.decode(String.self, forKey: .tleClass)
-        
-        do {
-            self.tleNumber = try container.decode(Int.self, forKey: .tleNumber)
-        } catch {
-            self.tleNumber = Int(String(try container.decode(String.self, forKey: .tleNumber)))!
-        }
-        
-        do {
-            self.revNumber = try container.decode(Int.self, forKey: .revNumber)
-        } catch {
-            self.revNumber = Int(String(try container.decode(String.self, forKey: .revNumber)))!
-        }
-        
-        n₀ʹ = n₀                                                // capture pre-Kozai n₀
-        
-        unKozai(self.n₀ * (π/720.0))
-    }
-    
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        
-        try container.encode(commonName, forKey: .commonName)
-        try container.encode(noradIndex, forKey: .noradIndex)
-        try container.encode(launchName, forKey: .launchName)
-        try container.encode(Date(daysSince1950: t₀), forKey: .t₀)
-        try container.encode(e₀, forKey: .e₀)
-        try container.encode(i₀ * rad2deg, forKey: .i₀)
-        try container.encode(ω₀ * rad2deg, forKey: .ω₀)
-        try container.encode(Ω₀ * rad2deg, forKey: .Ω₀)
-        try container.encode(M₀ * rad2deg, forKey: .M₀)
-        try container.encode(dragCoeff, forKey: .dragCoeff)
-        try container.encode(ephemType, forKey: .ephemType)
-        try container.encode(tleClass, forKey: .tleClass)
-        try container.encode(tleNumber, forKey: .tleNumber)
-        try container.encode(revNumber, forKey: .revNumber)
-        try container.encode(self.n₀ʹ, forKey: .n₀)             // use the previously captured n₀ʹ
-    }
-}
-
-//MARK: - XML initializer
-
-public extension Elements {
-
-/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-
-    init(xmlData: Data) {
-        
-        let parser = ElementsParser()
-        parser.parseXML(xmlData)
-        
-        var satelliteInfo = parser.satInfoArray[0]
-        print(satelliteInfo.count)
-
-        if satelliteInfo.count < 10 {
-            satelliteInfo = parser.satInfoArray[1]
-        }
-        
-        self.init(commonName: satelliteInfo["OBJECT_NAME"]!,
-                  noradIndex: UInt(satelliteInfo["NORAD_CAT_ID"]!)!,
-                  launchName: satelliteInfo["OBJECT_ID"] ?? "",
-                  t₀: DateFormatter.iso8601Micros.date(from: satelliteInfo["EPOCH"]!)!,
-                  e₀: Double(satelliteInfo["ECCENTRICITY"]!)!,
-                  i₀: Double(satelliteInfo["INCLINATION"]!)!,
-                  ω₀: Double(satelliteInfo["ARG_OF_PERICENTER"]!)!,
-                  Ω₀: Double(satelliteInfo["RA_OF_ASC_NODE"]!)!,
-                  M₀: Double(satelliteInfo["MEAN_ANOMALY"]!)!,
-                  n₀: Double(satelliteInfo["MEAN_MOTION"]!)!,
-                  ephemType: Int(satelliteInfo["EPHEMERIS_TYPE"]!)!,
-                  tleClass: satelliteInfo["CLASSIFICATION_TYPE"]!,
-                  tleNumber: Int(satelliteInfo["ELEMENT_SET_NO"]!)!,
-                  revNumber: Int(satelliteInfo["REV_AT_EPOCH"]!)!,
-                  dragCoeff: Double(satelliteInfo["BSTAR"]!)!)
-
-        a₀ = 0.0
-        n₀ʹ = 0.0
-
-        unKozai(n₀ * (π/720.0))
-
     }
 }
 
 //MARK privates
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  ┆ Convenience function .. converts the YYDDD.DDDDDDDD TLE epoch time to days since 1950 reference. ┆
+  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+private func epochDays(year: Int, days: Double) -> Double {
+    Double(year-1950)*365.0 + Double((year-1949)/4) + days
+}
 
 extension Elements {
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆ recover (un'Kozai) original mean motion and semi-major axis from the input elements for SxP4.    ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
-    private mutating func unKozai(_ n₀ʹ: Double) {
+    internal mutating func unKozai(_ n₀ʹ: Double) {
 
         do {
             let θ = cos(self.i₀)                                    //         cos(i₀)  ..  θ
@@ -473,20 +289,13 @@ public extension Elements {
                           self.launchName.padding(toLength: 11, withPad: " ", startingAt: 0),
                           self.revNumber, self.tleNumber,
                           String(describing: Date(daysSince1950: self.t₀)), self.t₀,
-                          self.i₀ * rad2deg, self.ω₀ * rad2deg, self.n₀ / (π/720.0), self.Ω₀ * rad2deg,
-                          self.M₀ * rad2deg, self.e₀, self.dragCoeff)
+                          self.i₀ * rad2deg, self.ω₀ * rad2deg, self.n₀ / (π/720.0),
+                          self.Ω₀ * rad2deg, self.M₀ * rad2deg, self.e₀, self.dragCoeff)
         }
     }
 }
 
 //MARK: - static functions
-
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  ┆ Convenience function .. converts the YYDDD.DDDDDDDD TLE epoch time to days since 1950 reference. ┆
-  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
-fileprivate func epochDays(year: Int, days: Double) -> Double {
-    Double(year-1950)*365.0 + Double((year-1949)/4) + days
-}
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ Do the checksum check on a TLE line ("0"..."9" are 0...9; "-" is 1; last digit is checksum).     │
@@ -619,8 +428,8 @@ public func preProcessTLEs(_ elementsString: String) -> [(String, String, String
     return tuplesArray
 }
 
-func base10ID(_ noradID: String) -> Int {
-    guard let value = Int(noradID) else { return 0 }
+func base10ID(_ noradID: String) -> UInt {
+    guard let value = UInt(noradID) else { return 0 }
     return value
 }
 

@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ SDP4.swift                                                                                SatKit ║
-  ║ Created by Gavin Eadie on May26/17         Copyright © 2017-20 Gavin Eadie. All rights reserved. ║
+  ║ Created by Gavin Eadie on May26/17         Copyright © 2017-22 Gavin Eadie. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
@@ -49,7 +49,7 @@ class SDP4: Propagator {
 
         deepSecularEffects(minutesFromEphoch: minsAfterEpoch)
 
-        if n_new < 0 { throw SatKitError.SGP("ERROR 2: mean motion less than zero") }
+        if n_new < 0 { throw SatKitError.SGP(sgpError: "2: mean motion less than zero") }
 
         let tempa = 1.0 - super.c₁ * minsAfterEpoch
         a = pow(EarthConstants.kₑ / n_new, ⅔) * tempa * tempa
