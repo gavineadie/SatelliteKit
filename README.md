@@ -30,7 +30,7 @@ test output and the test output in the above published paper [1].
 ### Change Notes
 
 At the end of the README.
-Lastest change: Version/Tag 1.1.2 -- 2022 Mar 05
+Lastest change: Version/Tag 1.1.3 -- 2022 Oct 10
 
 ### Elements
 
@@ -288,5 +288,11 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 
 - XML import much improved
 - Objection to `tleClass == "U"` removed [Starlinks are "C"]
+
+`version/tag 1.1.3 .. (2022 Oct 10)`
+
+- XML import made more tolerant (eg: `OBJECT_ID` can be null)
+- JSON import made to deal with numeric values (like `INCLINATION`) being numbers (Celestrak) or strings (Space-Track)
+- add unit tests for above
 
 ---
