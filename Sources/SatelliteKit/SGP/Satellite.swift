@@ -35,7 +35,7 @@ public extension Satellite {
 
         self.tle = tle
 
-        self.commonName = propagator.tle.commonName
+        self.commonName = propagator.tle.commonName.isEmpty ? propagator.tle.launchName : propagator.tle.commonName
         self.noradIdent = String(propagator.tle.noradIndex)      // convert UInt to String
         self.t₀Days1950 = propagator.tle.t₀
     }
@@ -45,7 +45,7 @@ public extension Satellite {
 
         self.tle = elements
 
-        self.commonName = propagator.tle.commonName
+        self.commonName = propagator.tle.commonName.isEmpty ? propagator.tle.launchName : propagator.tle.commonName
         self.noradIdent = String(propagator.tle.noradIndex)      // convert UInt to String
         self.t₀Days1950 = propagator.tle.t₀
     }

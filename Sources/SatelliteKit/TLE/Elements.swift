@@ -61,7 +61,7 @@ public extension Elements {
          t₀: Date, e₀: Double, i₀: Double, ω₀: Double, Ω₀: Double, M₀: Double, n₀: Double,
          ephemType: Int, tleClass: String, tleNumber: Int, revNumber: Int, dragCoeff: Double) {
 
-        self.commonName = commonName
+        self.commonName = commonName.isEmpty ? launchName : commonName
         self.noradIndex = noradIndex
         self.launchName = launchName
         self.t₀ = t₀.daysSince1950
