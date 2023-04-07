@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ Astronomy.swift                                                                           SatKit ║
-  ║ Created by Gavin Eadie on Jul06/15.    Copyright 2015-22 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on Jul06/15.    Copyright 2015-23 Ramsay Consulting. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
@@ -9,34 +9,35 @@
 import Foundation
 
 public struct LatLonAlt {
-    public init(lat: Double, lon: Double, alt: Double) {
+    public var lat: Double                                  // latitude (degrees)
+    public var lon: Double                                  // longitude (degrees)
+    public var alt: Double                                  // altitude (Kms)
+
+    public init(_ lat: Double, _ lon: Double, _ alt: Double) {
         self.lat = lat
         self.lon = lon
         self.alt = alt
     }
 
-    public var lat: Double                                  // latitude (degrees)
-    public var lon: Double                                  // longitude (degrees)
-    public var alt: Double                                  // altitude
-
 }
 
 public struct AziEleDst {
-    public init(azim: Double, elev: Double, dist: Double) {
+    public var azim: Double                                 // azimuth (degrees)
+    public var elev: Double                                 // elevation (degrees)
+    public var dist: Double                                 // distance/range
+
+    public init(_ azim: Double, _ elev: Double, _ dist: Double) {
         self.azim = azim
         self.elev = elev
         self.dist = dist
     }
 
-    public var azim: Double                                 // azimuth (degrees)
-    public var elev: Double                                 // elevation (degrees)
-    public var dist: Double                                 // distance/range
-
 }
 
-/// Sidereal time is a system of timekeeping based on the rotation of the Earth with respect to the fixed stars in the sky.
-/// Specifically, it is the measure of the hour angle of the vernal equinox. When the measurements are made with respect
-/// to the meridian at Greenwich, the times are referred to as Greenwich mean sidereal time (GMST).
+/// Sidereal time is a system of timekeeping based on the rotation of the Earth with respect
+/// to the fixed stars in the sky.  Specifically, it is the measure of the hour angle of the
+/// vernal equinox.  When the measurements are made with respect to the meridian at Greenwich,
+/// the times are referred to as Greenwich mean sidereal time (GMST).
 ///
 /// References: The 1992 Astronomical Almanac,
 ///  http://celestrak.com/columns/v02n02/ and http://aa.usno.navy.mil/faq/docs/GAST.php
@@ -90,8 +91,9 @@ public func solarCel(julianDays: Double) -> Vector {
                   sin(solarEclpLong) * sin(eclipticInclin))
 }
 
-//  Declination (delta) and Right Ascension (alpha) are returned as decimal degrees.
-
+/// Declination (delta) and Right Ascension (alpha) are returned as decimal degrees.
+/// - Parameter julianDays: Julian days
+/// - Returns: Solar Declination and Right Ascension.
 public func solarGeo(julianDays: Double) -> (Double, Double) {
     let     solarVector: Vector = solarCel(julianDays: julianDays)
 
@@ -100,9 +102,9 @@ public func solarGeo(julianDays: Double) -> (Double, Double) {
 }
 
 /// Low precision formulae for the moon, from:
- /// AN ALTERNATIVE LUNAR EPHEMERIS MODEL FOR ON-BOARD FLIGHT SOFTWARE USE by: David G. Simpson (NASA, GSFC)
- /// - Parameter julianDays: Julian Days
- /// - Returns: <#description#>
+/// AN ALTERNATIVE LUNAR EPHEMERIS MODEL FOR ON-BOARD FLIGHT SOFTWARE USE by: David G. Simpson (NASA, GSFC)
+/// - Parameter julianDays: Julian Days
+/// - Returns: ECI Moon Vector
 public func lunarCel(julianDays: Double) -> Vector {
     let     centsSinceJD2000 = ( julianDays - JD.epoch2000 ) / 36525.0
 
@@ -196,11 +198,11 @@ public func eci2geo(julianDays: Double, celestial: Vector) -> LatLonAlt {
         newLatRads = atan2(celestial.z + correction * EarthConstants.e2 * sinLatitude, positionXY)
     } while (fabs(newLatRads - oldLatRads) > 0.0001)
 
-    return LatLonAlt(lat: newLatRads * rad2deg,
-                     lon: fmod(360.0 + atan2pi(celestial.y, celestial.x) *
-                        rad2deg - ((julianDays < 0.0) ? 0.0 :
-                            zeroMeanSiderealTime(julianDate: julianDays)), 360.0),
-                     alt: positionXY / cos(newLatRads) - correction)
+    return LatLonAlt(newLatRads * rad2deg,
+                     fmod(360.0 + atan2pi(celestial.y, celestial.x) *
+                          rad2deg - ((julianDays < 0.0) ? 0.0 :
+                                        zeroMeanSiderealTime(julianDate: julianDays)), 360.0),
+                     positionXY / cos(newLatRads) - correction)
 }
 
 /// geo2eci [OBLATE]
@@ -321,9 +323,9 @@ public func topPosition(julianDays: Double, satCel: Vector, obsLLA: LatLonAlt) -
 
     let d = magnitude(obsCel - satCel)
 
-    return AziEleDst(azim: atan2pi(top.y, -top.x) * rad2deg,
-                     elev: asin(top.z / d) * rad2deg,
-                     dist: d)
+    return AziEleDst(atan2pi(top.y, -top.x) * rad2deg,
+                     asin(top.z / d) * rad2deg,
+                     d)
 }
 
 /// utility function used in both eci2top and cet2top [obs→sat in obs topo frame]

@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ MathUtility.swift                                                                         SatKit ║
-  ║ Created by Gavin Eadie on Nov17/15 ... Copyright 2009-22 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on Nov17/15 ... Copyright 2009-23 Ramsay Consulting. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
@@ -8,19 +8,19 @@ import Foundation
 
 // swiftlint:disable identifier_name
 
-//NOTE interesting: https://gist.github.com/kelvin13/03d1fd5da024f058b6fd38fdbce665a4
+//NOTE: interesting: https://gist.github.com/kelvin13/03d1fd5da024f058b6fd38fdbce665a4
 
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║                                                                               C O N S T A N T S  ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
-public let π = 3.141_592_653_589_793_238_462_643_383_279_502_884_197_169_399_375_105_820_975
+public let π = Double.pi
 
 public let ⅓ = 1.0 / 3.0
 public let ⅔ = 2.0 / 3.0
 
-public let  deg2rad: Double = π/180.0
-public let  rad2deg: Double = 180.0/π
+public let  deg2rad = π/180.0
+public let  rad2deg = 180.0/π
 
 public let  hrs2deg: Double = 15.0                  // not used in library
 public let  deg2hrs: Double = 1.0/hrs2deg           // not used in library
@@ -45,11 +45,11 @@ public func almostEqual(_ a: Double, _ b: Double) -> Bool {
 
 extension Double {
     func roundTo3Places() -> Double {
-        return (self*1_000.0).rounded(.toNearestOrAwayFromZero) / 1_000.0
+        (self*1_000.0).rounded(.toNearestOrAwayFromZero) / 1_000.0
     }
 
     func roundTo6Places() -> Double {
-        return (self*1_000_000.0).rounded(.toNearestOrAwayFromZero) / 1_000_000.0
+        (self*1_000_000.0).rounded(.toNearestOrAwayFromZero) / 1_000_000.0
     }
 }
 
@@ -76,19 +76,19 @@ public struct Vector {
     }
 
     public static prefix func - (v: Vector) -> Vector {
-        return Vector(-v.x, -v.y, -v.z)
+        Vector(-v.x, -v.y, -v.z)
     }
 
     public static func + (lhs: Vector, rhs: Vector) -> Vector {
-        return Vector(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z)
+        Vector(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z)
     }
 
     public static func - (lhs: Vector, rhs: Vector) -> Vector {
-        return Vector(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z)
+        Vector(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z)
     }
 
     public func magnitude() -> Double {
-        return (self.x*self.x + self.y*self.y + self.z*self.z).squareRoot()
+        (self.x*self.x + self.y*self.y + self.z*self.z).squareRoot()
     }
 }
 
@@ -96,7 +96,7 @@ public struct Vector {
   ┃ magnitude                                                                           [3-D Vector] ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 public func magnitude(_ vector: Vector) -> Double {
-    return (vector.x*vector.x + vector.y*vector.y + vector.z*vector.z).squareRoot()
+    (vector.x*vector.x + vector.y*vector.y + vector.z*vector.z).squareRoot()
 }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -114,18 +114,18 @@ public func normalize(_ vector: Vector) -> Vector {
 infix operator •
 
 public func dotProduct(_ vector1: Vector, _ vector2: Vector) -> Double {
-    return (vector1.x*vector2.x + vector1.y*vector2.y + vector1.z*vector2.z)
+    (vector1.x*vector2.x + vector1.y*vector2.y + vector1.z*vector2.z)
 }
 
 func • (_ vector1: Vector, _ vector2: Vector) -> Double {
-    return (vector1.x*vector2.x + vector1.y*vector2.y + vector1.z*vector2.z)
+    (vector1.x*vector2.x + vector1.y*vector2.y + vector1.z*vector2.z)
 }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃ angle between (degrees)                                                                          ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 public func separation(_ vector1: Vector, _ vector2: Vector) -> Double {
-    return(acos((vector1 • vector2) / (magnitude(vector1)*magnitude(vector2))) * rad2deg)
+    (acos((vector1 • vector2) / (magnitude(vector1)*magnitude(vector2))) * rad2deg)
 }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -134,15 +134,15 @@ public func separation(_ vector1: Vector, _ vector2: Vector) -> Double {
 infix operator ⨯
 
 public func crossProduct(_ vector1: Vector, _ vector2: Vector) -> Vector {
-    return Vector(vector1.y*vector2.z - vector1.z*vector2.y,
-                  vector1.z*vector2.x - vector1.x*vector2.z,
-                  vector1.x*vector2.y - vector1.y*vector2.x)
+    Vector(vector1.y*vector2.z - vector1.z*vector2.y,
+           vector1.z*vector2.x - vector1.x*vector2.z,
+           vector1.x*vector2.y - vector1.y*vector2.x)
 }
 
 func ⨯ (_ vector1: Vector, _ vector2: Vector) -> Vector {
-    return Vector(vector1.y*vector2.z - vector1.z*vector2.y,
-                  vector1.z*vector2.x - vector1.x*vector2.z,
-                  vector1.x*vector2.y - vector1.y*vector2.x)
+    Vector(vector1.y*vector2.z - vector1.z*vector2.y,
+           vector1.z*vector2.x - vector1.x*vector2.z,
+           vector1.x*vector2.y - vector1.y*vector2.x)
 }
 
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -156,7 +156,7 @@ public func atan2pi(_ y: Double, _ x: Double) -> Double {
     var     result = 0.0
 
     if (x != 0.0) ||
-       (y != 0.0) { result = fmod2pi_π(atan2(y, x)) }
+        (y != 0.0) { result = fmod2pi_π(atan2(y, x)) }
 
     return result
 }
@@ -177,7 +177,7 @@ public func acos2pi(_ x: Double, _ y: Double) -> Double {
   ┃ fmod2pi_0(radians) -- limits 'radians' to -π..π                                                  ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 public func fmod2pi_0(_ angle: Double) -> Double {
-    return angle - (π*2) * floor((angle + π) / (π*2))
+    angle - (π*2) * floor((angle + π) / (π*2))
 }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓

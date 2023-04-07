@@ -1,7 +1,7 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ TimeTests.swift                                                                                  ║
   ║                                                                                                  ║
-  ║ Created by Gavin Eadie on Mar31/19     Copyright 2019-22 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on Mar31/19     Copyright 2019-23 Ramsay Consulting. All rights reserved. ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 /// swiftlint:disable comma
@@ -82,7 +82,7 @@ class TimeTests: XCTestCase {
     func testConstants() {
 
         print(TimeConstants.tleEpochReferenceDate)
-        print(Date(daysSince1950: 0.0))
+        print(Date(ds1950: 0.0))
 
     }
 

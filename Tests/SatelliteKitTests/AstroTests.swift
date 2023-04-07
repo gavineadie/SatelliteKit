@@ -1,7 +1,7 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ AstroTests.swift                                                                                 ║
   ║                                                                                                  ║
-  ║ Created by Gavin Eadie on Feb25/20        Copyright 2020 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on Feb25/20     Copyright 2020-23 Ramsay Consulting. All rights reserved. ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 // swiftlint:disable comma
@@ -21,18 +21,18 @@ class AstroTests: XCTestCase {
 
         let topVectorA = eci2top(julianDays: 2458905.0,
                                  satCel: Vector(10000.0, 10000.0, 0.0),
-                                 obsLLA: LatLonAlt(lat: 0.0, lon: 0.0, alt: 0.0))
+                                 obsLLA: LatLonAlt(0.0, 0.0, 0.0))
         print(topVectorA)
 
         let topVectorB = cel2top(julianDays: 2458905.0,
                                  satCel: Vector(10000.0, 10000.0, 0.0),
                                  obsCel: geo2xyz(julianDays: 2458905.0,
-                                                 geodetic: LatLonAlt(lat: 0.0, lon: 0.0, alt: 0.0)))
+                                                 geodetic: LatLonAlt(0.0, 0.0, 0.0)))
         print(topVectorB)
 
         let topVectorC = topPosition(julianDays: 2458905.0,
                                      satCel: Vector(10000.0, 10000.0, 0.0),
-                                     obsLLA: LatLonAlt(lat: 0.0, lon: 0.0, alt: 0.0))
+                                     obsLLA: LatLonAlt(0.0, 0.0, 0.0))
         print(topVectorC)
 
         XCTAssertTrue(true)
@@ -52,7 +52,7 @@ class AstroTests: XCTestCase {
 
     func testECI_TOP() {
         let top = eci2top(julianDays: JD, satCel: Vector(10000.0, 10000.0, 0.0),
-                                          obsLLA: LatLonAlt(lat: 0.0, lon: 0.0, alt: 0.0))
+                          obsLLA: LatLonAlt(0.0, 0.0, 0.0))
 //        let eci = top2eci(julianDays: JD, sar: top)
         print(top)
     }
@@ -63,11 +63,11 @@ class AstroTests: XCTestCase {
     }
 
     func llaTest() {
-        let _ = LatLonAlt(lat: 30.0, lon: -90.0, alt: 500.0)
+        let _ = LatLonAlt(30.0, -90.0, 500.0)
     }
     
     func aedTest() {
-        let _ = AziEleDst(azim: 90.0, elev: 45.0, dist: 2000.0)
+        let _ = AziEleDst(90.0, 45.0, 2000.0)
     }
     
 }

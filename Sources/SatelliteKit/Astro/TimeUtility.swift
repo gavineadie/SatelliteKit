@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ TimeUtility.swift                                                                         SatKit ║
-  ║ Created by Gavin Eadie on Jan07/17 ... Copyright 2017-22 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on Jan07/17 ... Copyright 2017-23 Ramsay Consulting. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
@@ -16,10 +16,10 @@ import Foundation
   ┃    - ∞                 J1900                1950                 J2000                  ...      ┃
   ┃   JD: 0           2415020.0                                 2451545.0                            ┃
   ┃                                                                                                  ┃
-  ┃                                      ---------|-----------------------|---                       ┃
-  ┃                                               |                     2001                         ┃
+  ┃                                      --------|||----------------------|---                       ┃
+  ┃                                              |||                    2001                         ┃
   ┃                                          NORAD: 0 -- JD: 2433281.5    |                          ┃
-  ┃                                                                  Apple: 0 -- JD: 2451910.5       ┃
+  ┃                                              |||                 Apple: 0 -- JD: 2451910.5       ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 public struct JD {
 
@@ -112,8 +112,8 @@ extension Date {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ Creates a Date from decimal days since the TLE epoch                                             │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public init(daysSince1950: Double) {
-        self = Date(timeInterval: daysSince1950 * TimeConstants.day2sec,    // seconds since 1950
+    public init(ds1950: Double) {
+        self = Date(timeInterval: ds1950 * TimeConstants.day2sec,    // seconds since 1950
                     since: TimeConstants.tleEpochReferenceDate)
     }
 
@@ -137,7 +137,7 @@ extension Date {
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ convert a Date to days since 1950 (TLE epoch-zero) ..                                            │
+  │ convert a Date to days since 1950 .. commonly "ds1950"                                           │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public var daysSince1950: Double { julianDate - JD.epoch1950 }
 

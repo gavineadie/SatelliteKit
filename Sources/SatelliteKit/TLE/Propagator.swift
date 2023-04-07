@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ Propagator.swift                                                                          SatKit ║
-  ║ Created by Gavin Eadie on May24/17         Copyright © 2017-22 Gavin Eadie. All rights reserved. ║
+  ║ Created by Gavin Eadie on May24/17         Copyright © 2017-23 Gavin Eadie. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
@@ -221,7 +221,7 @@ public class Propagator {
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public func getPVCoordinates(_ date: Date) throws -> PVCoordinates {
 
-        try sxpPropagate(minsAfterEpoch: date.timeIntervalSince(Date(daysSince1950: self.tle.t₀)) / 60.0)
+        try sxpPropagate(minsAfterEpoch: date.timeIntervalSince(Date(ds1950: self.tle.t₀)) / 60.0)
 
         return try computePVCoordinates()       // Compute PV with previous calculated parameters
 

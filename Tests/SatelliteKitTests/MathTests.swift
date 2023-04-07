@@ -1,7 +1,7 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ MathTests.swift                                                                                  ║
   ║                                                                                                  ║
-  ║ Created by Gavin Eadie on Dec07/18     Copyright 2018-22 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on Dec07/18     Copyright 2018-23 Ramsay Consulting. All rights reserved. ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 // swiftlint:disable comma

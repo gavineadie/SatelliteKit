@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ SGP4.swift                                                                                SatKit ║
-  ║ Created by Gavin Eadie on May24/17         Copyright © 2017-22 Gavin Eadie. All rights reserved. ║
+  ║ Created by Gavin Eadie on May24/17         Copyright © 2017-23 Gavin Eadie. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
@@ -62,7 +62,7 @@ class SGP4: Propagator {
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │  Propagation proper to each propagator (SGP or SDP).                                             │
+  │  Propagation proper to each propagator (SGP4 or SDP4).                                           │
   │                                      .. minsAfterEpochis the offset from initial epoch (minutes) │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     override func sxpPropagate(minsAfterEpoch: Double) throws {

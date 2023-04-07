@@ -1,15 +1,15 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ SatelliteKit.swift                                                                  SatelliteKit ║
-  ║ Created by Gavin Eadie on Aug05/17 ... Copyright 2016-22 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on Aug05/17 ... Copyright 2016-23 Ramsay Consulting. All rights reserved. ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 import Foundation
 
 extension String {
-    var isBlank: Bool { return allSatisfy({ $0.isWhitespace })}
+    var isWhitespace: Bool { return allSatisfy({ $0.isWhitespace })}
 }
 
-extension Dictionary {
+extension Collection {
     var isNotEmpty: Bool { !self.isEmpty }
 }
 
@@ -19,7 +19,7 @@ public struct SatelliteKit {
     var staticVersion = "~~VersionBuild~~"          // v1.1.0 (321)
     var staticLibDate = "~~AppBuildDate~~"          // Feb27/22
     var staticLibTime = "~~AppBuildTime~~"          // 20:15:10
-    var staticLibInfo = "~~CopyrightText~~"         // Copyright 2016-22 Ramsay Consulting
+    var staticLibInfo = "~~CopyrightText~~"         // Copyright 2016-23 Ramsay Consulting
 
     public static var version: String {
         guard let satelliteKitBundle = Bundle(identifier: "com.ramsaycons.SatelliteKit"),

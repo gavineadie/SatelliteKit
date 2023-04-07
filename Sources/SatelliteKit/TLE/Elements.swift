@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ Elements.swift                                                                            SatKit ║
-  ║ Created by Gavin Eadie on May24/17         Copyright © 2017-22 Gavin Eadie. All rights reserved. ║
+  ║ Created by Gavin Eadie on May24/17         Copyright © 2017-23 Gavin Eadie. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
@@ -32,13 +32,13 @@ public struct Elements: Codable {
     public let noradIndex: UInt                         // The satellite number [eg: 25544]
     public let launchName: String                       // International designation [eg: 1998-067A]
 
-    public let t₀: Double                               // the TLE t=0 time (days from 1950)
+    public let t₀: Double                               // the TLE t=0 epoch time (ds1950)
     public let e₀: Double                               // TLE .. eccentricity
-    public let i₀: Double                               // TLE .. inclination (rad).
-    public let ω₀: Double                               // Argument of perigee (rad).
-    public let Ω₀: Double                               // Right Ascension of the Ascending node (rad).
-    public let M₀: Double                               // Mean anomaly (rad).
-    public var n₀: Double = 0.0                         // Mean motion (rads/min)  << [un'Kozai'd]
+    public let i₀: Double                               // TLE .. inclination (radians).
+    public let ω₀: Double                               // Argument of perigee (radians).
+    public let Ω₀: Double                               // Right Ascension of Ascending node (radians).
+    public let M₀: Double                               // Mean anomaly (radians).
+    public var n₀: Double = 0.0                         // Mean motion (radians/min)  << [un'Kozai'd]
     public var a₀: Double = 0.0                         // semi-major axis (Eᵣ)    << [un'Kozai'd]
 
     public let ephemType: Int                           // Type of ephemeris.
@@ -47,7 +47,7 @@ public struct Elements: Codable {
     public let revNumber: Int                           // Revolution number at epoch.
 
     internal let dragCoeff: Double                      // Ballistic coefficient.
-    internal var n₀ʹ: Double = 0.0                      // Kozai version (keep for re-encoding
+    internal var n₀ʹ: Double = 0.0                      // Kozai'd version (keep for JSON encoding)
 
 }
 
@@ -90,20 +90,21 @@ public extension Elements {
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
     init(_ line0: String, _ line1: String, _ line2: String) throws {
 
-/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+/*╭╌╌╌╌ Line 0 ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆                                                                                                  ┆
   ┆ 0         1         2         3         4         5         6         7                          ┆
   ┆ 01234567890123456789012345678901234567890123456789012345678901234567890                          ┆
   ┆                                                                                                  ┆
   ┆                                                                                                  ┆
-  ┆ AAAAAAAAAAAAAAAAAAAAAAAA                                                                         ┆
-  ┆ ISS (ZARYA)                                                           optional leading "0 "      ┆
-  ┆ ------------------------                                              < 24 char name             ┆
+  ┆ 0 AAAAAAAAAAAAAAAAAAAAAAAA                                                                       ┆
+  ┆ 0 ISS (ZARYA)                                                           optional leading "0 "    ┆
+  ┆   ------------------------                                              < 24 char name           ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
 
         commonName = line0.hasPrefix("0 ") ? String(line0.dropFirst(2)) : line0
 
-/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+/*╭╌╌╌╌ Line 1 ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+  ┆                                                                                                  ┆
   ┆ 1 NNNNNU NNNNNAAA NNNNN.NNNNNNNN ±.NNNNNNNN ±NNNNN-N ±NNNNN-N N NNNNN                            ┆
   ┆ 1 25544U 98067A   08246.53160505  .00005208  00000-0  43781-4 0  1753                            ┆
   ┆ 1 25544U 98067A   08246.53160505  .00005208 .00000-0 .43781-4 0  1753   [zero index]             ┆
@@ -132,18 +133,20 @@ public extension Elements {
         self.tleClass = String(bytes: lineOneBytes[7...7], encoding: .utf8)!
 
         stringlet = String(bytes: lineOneBytes[9...10], encoding: .utf8)!
-        let launchYear = Int(stringlet) ?? 56                               // fails to year 2056
+        let launchYear = Int(stringlet) ?? 56                       // parse failure -> year 2056
 
         stringlet = String(bytes: lineOneBytes[11...16], encoding: .utf8)!
         let launchPart = stringlet.trimmingCharacters(in: .whitespaces)
 
-        self.launchName = "\(launchYear < 57 ? 2000 : 1900 + launchYear)-" + launchPart
+        self.launchName = "\(launchYear < 57 ? 2000 : 1900 + launchYear)-\(launchPart)"
 
         stringlet = String(bytes: lineOneBytes[18...19], encoding: .utf8)!
         let epochYear = Int(stringlet)!
 
         stringlet = String(bytes: lineOneBytes[20...31], encoding: .utf8)!
         self.t₀ = epochDays(year: (epochYear < 57 ? 2000 : 1900) + epochYear, days: Double(stringlet)!)
+
+        stringlet = String(bytes: lineOneBytes[33...51], encoding: .utf8)!      // unused by SGP4
 
         stringlet = (lineOneBytes[53] == 32 ||
                      lineOneBytes[53] == 43 ? "+" : "-") + "." +
@@ -158,7 +161,8 @@ public extension Elements {
         stringlet = String(bytes: lineOneBytes[64...67], encoding: .utf8)!
         self.tleNumber = Int(stringlet.trimmingCharacters(in: .whitespaces))!
 
-/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+/*╭╌╌╌╌ Line 2 ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+  ┆                                                                                                  ┆
   ┆ 2 NNNNN NNN.NNNN NNN.NNNN NNNNNNN NNN.NNNN NNN.NNNN NN.NNNNNNNNNNNNNN                            ┆
   ┆ 2 25544  51.6437 339.5511 0006673  73.4733  44.7326 15.71870125560705                            ┆
   ┆ 2 25544  51.6437 339.5511.0006673  73.4733  44.7326 15.71870125560705   [zero index]             ┆
@@ -251,10 +255,11 @@ public extension Elements {
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     func debugDescription() -> String {
 
-        if (-Date(daysSince1950: t₀).timeIntervalSinceNow * TimeConstants.sec2day < 1.0) {
-            return String(format: """
+        let ageFormat = -Date(ds1950: t₀).timeIntervalSinceNow * TimeConstants.sec2day < 1.0 ?
+                                                            "%4.1f hours" : "%5.2f days"
+        return String(format: """
 
-                ┌─[elements : %4.1f hours old]───────────────────────────────────────────
+                ┌─[elements : \(ageFormat)  old]──────────────────────────────────────────
                 │  %@    %05d = %@ rev#:%05d tle#:%04d
                 │     t₀:  %@    %+14.8f days after 1950
                 │
@@ -263,35 +268,14 @@ public extension Elements {
                 │                                        drag:  %+11.4e
                 └───────────────────────────────────────────────────────────────────────
                 """,
-                          -Date(daysSince1950: t₀).timeIntervalSinceNow * TimeConstants.sec2day * 24.0,
-                          self.commonName.padding(toLength: 24, withPad: " ", startingAt: 0),
-                          self.noradIndex,
-                          self.launchName.padding(toLength: 11, withPad: " ", startingAt: 0),
-                          self.revNumber, self.tleNumber,
-                          String(describing: Date(daysSince1950: self.t₀)), self.t₀,
-                          self.i₀ * rad2deg, self.ω₀ * rad2deg, self.n₀ / (π/720.0), self.Ω₀ * rad2deg,
-                          self.M₀ * rad2deg, self.e₀, self.dragCoeff)
-        } else {
-            return String(format: """
-
-                ┌─[elements : %5.2f days old]───────────────────────────────────────────
-                │  %@    %05d = %@ rev#:%05d tle#:%04d
-                │     t₀:  %@    %+14.8f days after 1950
-                │
-                │    inc: %8.4f°     aop: %8.4f°    mot:  %11.8f (rev/day)
-                │   raan: %8.4f°    anom: %8.4f°    ecc:   %9.7f
-                │                                        drag:  %+11.4e
-                └───────────────────────────────────────────────────────────────────────
-                """,
-                          -Date(daysSince1950: t₀).timeIntervalSinceNow * TimeConstants.sec2day,
-                          self.commonName.padding(toLength: 24, withPad: " ", startingAt: 0),
-                          self.noradIndex,
-                          self.launchName.padding(toLength: 11, withPad: " ", startingAt: 0),
-                          self.revNumber, self.tleNumber,
-                          String(describing: Date(daysSince1950: self.t₀)), self.t₀,
-                          self.i₀ * rad2deg, self.ω₀ * rad2deg, self.n₀ / (π/720.0),
-                          self.Ω₀ * rad2deg, self.M₀ * rad2deg, self.e₀, self.dragCoeff)
-        }
+                      -Date(ds1950: t₀).timeIntervalSinceNow * TimeConstants.sec2day * 24.0,
+                      self.commonName.padding(toLength: 24, withPad: " ", startingAt: 0),
+                      self.noradIndex,
+                      self.launchName.padding(toLength: 11, withPad: " ", startingAt: 0),
+                      self.revNumber, self.tleNumber,
+                      String(describing: Date(ds1950: self.t₀)), self.t₀,
+                      self.i₀ * rad2deg, self.ω₀ * rad2deg, self.n₀ / (π/720.0), self.Ω₀ * rad2deg,
+                      self.M₀ * rad2deg, self.e₀, self.dragCoeff)
     }
 }
 
@@ -460,6 +444,6 @@ func alpha5ID(_ noradID: String) -> UInt {              //      "B1234"      "5"
 	return 0
 }
 
-private func stringFrom(_ line: [UInt8], range: ClosedRange<Int>) -> String {
-    String(bytes: line[range], encoding: .utf8)!.trimmingCharacters(in: .whitespaces)
-}
+//private func stringFrom(_ line: [UInt8], range: ClosedRange<Int>) -> String {
+//    String(bytes: line[range], encoding: .utf8)!.trimmingCharacters(in: .whitespaces)
+//}

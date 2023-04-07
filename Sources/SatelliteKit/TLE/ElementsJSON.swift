@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ ElementsJSON.swift                                                                        SatKit ║
-  ║ Created by Gavin Eadie on Oct10/22            Copyright © 2022 Gavin Eadie. All rights reserved. ║
+  ║ Created by Gavin Eadie on Oct10/22         Copyright © 2022-23 Gavin Eadie. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
@@ -30,7 +30,7 @@ public extension Elements {
   │                                                                                                  │
   │ or for an array of Elements                                                                      │
   │                                                                                                  │
-  │     let ElementsArray = try jsonDecoder.decode([Elements].self, from: jsonData)                  │
+  │     let elementsArray = try jsonDecoder.decode([Elements].self, from: jsonData)                  │
   │                                                                                                  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
 
@@ -138,7 +138,7 @@ public extension Elements {
         try container.encode(commonName, forKey: .commonName)
         try container.encode(noradIndex, forKey: .noradIndex)
         try container.encode(launchName, forKey: .launchName)
-        try container.encode(Date(daysSince1950: t₀), forKey: .t₀)
+        try container.encode(Date(ds1950: t₀), forKey: .t₀)
         try container.encode(e₀, forKey: .e₀)
         try container.encode(i₀ * rad2deg, forKey: .i₀)
         try container.encode(ω₀ * rad2deg, forKey: .ω₀)
@@ -152,4 +152,3 @@ public extension Elements {
         try container.encode(self.n₀ʹ, forKey: .n₀)             // use the previously captured n₀ʹ
     }
 }
-

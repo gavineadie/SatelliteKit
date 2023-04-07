@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ ElementsXML.swift                                                                         SatKit ║
-  ║ Created by Gavin Eadie on Oct10/22            Copyright © 2022 Gavin Eadie. All rights reserved. ║
+  ║ Created by Gavin Eadie on Oct10/22         Copyright © 2022-23 Gavin Eadie. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
@@ -84,7 +84,7 @@ class ElementsParser : NSObject, XMLParserDelegate {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     func parser(_ parser: XMLParser, foundCharacters string: String) {
-        if !string.isBlank { satelliteInfo[eName] = string }
+        if !string.isWhitespace { satelliteInfo[eName] = string }
     }
     
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐

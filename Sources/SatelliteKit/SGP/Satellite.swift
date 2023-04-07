@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ Satellite.swift                                                                           SatKit ║
-  ║ Created by Gavin Eadie on Sep07/15 ... Copyright 2015-22 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on Sep07/15 ... Copyright 2015-23 Ramsay Consulting. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
@@ -174,8 +174,9 @@ public extension Satellite {
 
        let z = top.magnitude()
 
-       return AziEleDst(azim: atan2pi(top.y, -top.x) * rad2deg,
-                        elev: asin(top.z / z) * rad2deg, dist: z)
+       return AziEleDst(atan2pi(top.y, -top.x) * rad2deg,
+                        asin(top.z / z) * rad2deg,
+                        z)
    }
 
 }
