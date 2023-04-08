@@ -34,6 +34,9 @@ public struct AziEleDst {
 
 }
 
+/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃ sidereal time                                                                                    ┃
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 /// Sidereal time is a system of timekeeping based on the rotation of the Earth with respect
 /// to the fixed stars in the sky.  Specifically, it is the measure of the hour angle of the
 /// vernal equinox.  When the measurements are made with respect to the meridian at Greenwich,
@@ -72,12 +75,16 @@ public func siteMeanSiderealTime(date: Date, _ siteLongitude: Double) -> Double 
     return siteMeanSiderealTime(julianDate: date.julianDate, siteLongitude)
 }
 
+/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃ solar                                                                                            ┃
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 /// SolarCel
 ///
 /// References:
 /// http://aa.usno.navy.mil/faq/docs/SunApprox.php
 ///
 /// - Parameter julianDays: julianDays
+/// - Returns: Solar ECI Vector
 public func solarCel(julianDays: Double) -> Vector {
     let     daysSinceJD2000 = julianDays - JD.epoch2000
 
@@ -91,22 +98,31 @@ public func solarCel(julianDays: Double) -> Vector {
                   sin(solarEclpLong) * sin(eclipticInclin))
 }
 
+public func solarCel(ds1950: Double) -> Vector { solarCel(julianDays: ds1950 + JD.epoch1950) }
+
 /// Declination (delta) and Right Ascension (alpha) are returned as decimal degrees.
 /// - Parameter julianDays: Julian days
 /// - Returns: Solar Declination and Right Ascension.
-public func solarGeo(julianDays: Double) -> (Double, Double) {
+public func solarGeo(julianDays: Double) -> (delta: Double, alpha: Double) {
     let     solarVector: Vector = solarCel(julianDays: julianDays)
 
     return (asin(solarVector.z) * rad2deg,
             atan2pi(solarVector.y, solarVector.x) * rad2deg)
 }
 
+public func solarGeo(ds1950: Double) -> (delta: Double, alpha: Double) {
+    solarGeo(julianDays: ds1950 + JD.epoch1950)
+}
+
+/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃ lunar                                                                                            ┃
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 /// Low precision formulae for the moon, from:
 /// AN ALTERNATIVE LUNAR EPHEMERIS MODEL FOR ON-BOARD FLIGHT SOFTWARE USE by: David G. Simpson (NASA, GSFC)
 /// - Parameter julianDays: Julian Days
-/// - Returns: ECI Moon Vector
+/// - Returns: Lunar ECI Vector
 public func lunarCel(julianDays: Double) -> Vector {
-    let     centsSinceJD2000 = ( julianDays - JD.epoch2000 ) / 36525.0
+    let     centsSinceJD2000 = ( julianDays - JD.epoch2000 ) / TimeConstants.daysPerCentury
 
     let moonX1 = 383.0e3 * sin( 8399.685 * centsSinceJD2000 + 5.381) +
                   31.5e3 * sin(   70.990 * centsSinceJD2000 + 6.169) +
@@ -135,16 +151,24 @@ public func lunarCel(julianDays: Double) -> Vector {
     return Vector(moonX1, moonY1, moonZ1)
 }
 
+public func lunarCel(ds1950: Double) -> Vector {
+    lunarCel(julianDays: ds1950 + JD.epoch1950)
+}
+
 /// lunarGeo
 /// - Parameter julianDays: Julian Days
 /// - Returns: (Declination, Right_Ascension) are returned as decimal degrees.
-public func lunarGeo (julianDays: Double) -> (Double, Double) {
+public func lunarGeo (julianDays: Double) -> (delta: Double, alpha: Double) {
     let     lunarVector: Vector = lunarCel(julianDays: julianDays)
 
     return (asin(lunarVector.z / (lunarVector.x * lunarVector.x +
                                   lunarVector.y * lunarVector.y +
                                   lunarVector.z * lunarVector.z).squareRoot()) * rad2deg,
             atan2pi(lunarVector.y, lunarVector.x) * rad2deg)
+}
+
+public func lunarGeo(ds1950: Double) -> (delta: Double, alpha: Double) {
+    lunarGeo(julianDays: ds1950 + JD.epoch1950)
 }
 
 /// azel
@@ -179,8 +203,8 @@ public func azel(time: Date,
 /// The 1992 Astronomical Almanac, page K12.
 ///
 /// - Parameters:
-///   - julianDays: <#julianDays description#>
-///   - celestial: <#celestial description#>
+///   - julianDays: JD of desired lat/lon
+///   - celestial: ECI of object of interest
 /// - Returns: geodetic (latitude [degrees], longitude [degrees], altitude [Kms above geoid])
 public func eci2geo(julianDays: Double, celestial: Vector) -> LatLonAlt {
 
@@ -331,8 +355,8 @@ public func topPosition(julianDays: Double, satCel: Vector, obsLLA: LatLonAlt) -
 /// utility function used in both eci2top and cet2top [obs→sat in obs topo frame]
  /// - Parameters:
  ///   - julianDays: Julian Days
- ///   - satCel: <#satCel description#>
- ///   - obsLLA: <#obsLLA description#>
+ ///   - satCel: ECI of target object
+ ///   - obsLLA: observer lat/log/alt
  /// - Returns: (x, y, z)
 private func topoVector(julianDays: Double, satCel: Vector, obsLLA: LatLonAlt) -> Vector {
     let latitudeRads = obsLLA.lat * deg2rad

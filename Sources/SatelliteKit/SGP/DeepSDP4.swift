@@ -43,57 +43,30 @@ class DeepSDP4: SDP4 {
 
     private var ee2 = 0.0
     private var e3 = 0.0
-    private var xi2 = 0.0
-    private var xi3 = 0.0
-    private var xl2 = 0.0
-    private var xl3 = 0.0
-    private var xl4 = 0.0
-    private var xgh2 = 0.0
-    private var xgh3 = 0.0
-    private var xgh4 = 0.0
-    private var xh2 = 0.0
-    private var xh3 = 0.0
+    private var xi2 = 0.0, xi3 = 0.0
+    private var xl2 = 0.0, xl3 = 0.0, xl4 = 0.0
+    private var xgh2 = 0.0, xgh3 = 0.0, xgh4 = 0.0
+    private var xh2 = 0.0, xh3 = 0.0
 
-    private var d2201 = 0.0
-    private var d2211 = 0.0
-    private var d3210 = 0.0
-    private var d3222 = 0.0
-    private var d4410 = 0.0
-    private var d4422 = 0.0
-    private var d5220 = 0.0
-    private var d5232 = 0.0
-    private var d5421 = 0.0
-    private var d5433 = 0.0
+    private var d2201 = 0.0, d2211 = 0.0
+    private var d3210 = 0.0, d3222 = 0.0
+    private var d4410 = 0.0, d4422 = 0.0
+    private var d5220 = 0.0, d5232 = 0.0, d5421 = 0.0, d5433 = 0.0
     private var xlamo = 0.0
 
-    private var sse = 0.0
-    private var ssi = 0.0
-    private var ssl = 0.0
-    private var ssh = 0.0
-    private var ssg = 0.0
-    private var se2 = 0.0
-    private var si2 = 0.0
-    private var sl2 = 0.0
-    private var sgh2 = 0.0
-    private var sh2 = 0.0
-    private var se3 = 0.0
-    private var si3 = 0.0
-    private var sl3 = 0.0
-    private var sgh3 = 0.0
-    private var sh3 = 0.0
-    private var sl4 = 0.0
-    private var sgh4 = 0.0
+    private var sse = 0.0, se2 = 0.0, se3 = 0.0
+    private var ssi = 0.0, si2 = 0.0, si3 = 0.0
+    private var ssl = 0.0, sl2 = 0.0, sl3 = 0.0, sl4 = 0.0
+    private var ssh = 0.0, sh2 = 0.0, sh3 = 0.0
+    private var ssg = 0.0, sgh2 = 0.0, sgh3 = 0.0, sgh4 = 0.0
 
-    private var del1 = 0.0
-    private var del2 = 0.0
-    private var del3 = 0.0
+    private var del1 = 0.0, del2 = 0.0, del3 = 0.0
     private var xfact = 0.0
     private var xli = 0.0
     private var xni = 0.0
     private var atime = 0.0
 
-    private var derivs0 = 0.0
-    private var derivs1 = 0.0
+    private var derivs0 = 0.0, derivs1 = 0.0
 
     private var resonant = false                    // for resonant orbits.
     private var synchronous = false                 // for synchronous orbits.
@@ -314,13 +287,6 @@ class DeepSDP4: SDP4 {
 //              let e₀³ = super.tle.e₀ * super.e₀²
                 if super.tle.e₀ <= 0.65 {
 
-//                  g211 =    3.616  -   13.247  * super.tle.e₀ +   16.290  * super.e₀²
-//                  g310 =  -19.302  +  117.390  * super.tle.e₀ -  228.419  * super.e₀² +  156.591  * e₀³
-//                  g322 =  -18.9068 +  109.7927 * super.tle.e₀ -  214.6334 * super.e₀² +  146.5816 * e₀³
-//                  g410 =  -41.122  +  242.694  * super.tle.e₀ -  471.094  * super.e₀² +  313.953  * e₀³
-//                  g422 = -146.407  +  841.880  * super.tle.e₀ - 1629.014  * super.e₀² + 1083.435  * e₀³
-//                  g520 = -532.114  + 3017.977  * super.tle.e₀ - 5740.032  * super.e₀² + 3708.276  * e₀³
-
                     g211 = cubicPoly(tle.e₀, p⁰:    3.616,  p¹:  -13.247,  p²:   +16.290,  p³:    0.0)
                     g310 = cubicPoly(tle.e₀, p⁰:  -19.302,  p¹:  117.390,  p²:  -228.419,  p³:  156.591)
                     g322 = cubicPoly(tle.e₀, p⁰:  -18.9068, p¹:  109.7927, p²:  -214.6334, p³:  146.5816)
@@ -329,17 +295,6 @@ class DeepSDP4: SDP4 {
                     g520 = cubicPoly(tle.e₀, p⁰: -532.114,  p¹: 3017.977,  p²: -5740.032,  p³: 3708.276)
 
                 } else {
-
-//                  g211 =   -72.099 +   331.819 * super.tle.e₀ -   508.738 * super.e₀² +   266.724 * e₀³
-//                  g310 =  -346.844 +  1582.851 * super.tle.e₀ -  2415.925 * super.e₀² +  1246.113 * e₀³
-//                  g322 =  -342.585 +  1554.908 * super.tle.e₀ -  2366.899 * super.e₀² +  1215.972 * e₀³
-//                  g410 = -1052.797 +  4758.686 * super.tle.e₀ -  7193.992 * super.e₀² +  3651.957 * e₀³
-//                  g422 = -3581.69  + 16178.11  * super.tle.e₀ -  24462.77 * super.e₀² + 12422.52  * e₀³
-//                  if super.tle.e₀ <= 0.715 {
-//                      g520 =  1464.74 -  4664.75 * super.tle.e₀ +  3763.64 * super.e₀²
-//                  } else {
-//                      g520 = -5149.66 + 29936.92 * super.tle.e₀ - 54087.36 * super.e₀² + 31324.56 * e₀³
-//                  }
 
                     g211 = cubicPoly(tle.e₀, p⁰:   -72.099, p¹:  331.819, p²:  -508.738, p³:  266.724)
                     g310 = cubicPoly(tle.e₀, p⁰:  -346.844, p¹: 1582.851, p²: -2415.925, p³: 1246.113)
@@ -353,13 +308,6 @@ class DeepSDP4: SDP4 {
                 }
 
                 do {
-
-//                  let g521 = tle.e₀ < 0.7 ? -822.71072 + 4568.6173 * super.tle.e₀ - 8491.4146 * super.e₀² + 5337.524  * e₀³
-//                                          : -51752.104 + 218913.95 * super.tle.e₀ - 309468.16 * super.e₀² + 146349.42 * e₀³
-//                  let g532 = tle.e₀ < 0.7 ? -853.666   + 4690.25   * super.tle.e₀ - 8624.77   * super.e₀² + 5341.4    * e₀³
-//                                          : -40023.88  + 170470.89 * super.tle.e₀ - 242699.48 * super.e₀² + 115605.82 * e₀³
-//                  let g533 = tle.e₀ < 0.7 ? -919.2277  + 4988.61   * super.tle.e₀ - 9064.77   * super.e₀² + 5542.21   * e₀³
-//                                          : -37995.78  + 161616.52 * super.tle.e₀ - 229838.2  * super.e₀² + 109377.94 * e₀³
 
                     let g521 = tle.e₀ < 0.7 ? cubicPoly(tle.e₀, p⁰:   -822.71072, p¹:   4568.6173, p²:   -8491.4146, p³:   5337.524)
                                             : cubicPoly(tle.e₀, p⁰: -51752.104,   p¹: 218913.95,   p²: -309468.16,   p³: 146349.42)
