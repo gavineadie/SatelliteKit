@@ -80,9 +80,6 @@ public func siteMeanSiderealTime(date: Date, _ siteLongitude: Double) -> Double 
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 /// SolarCel
 ///
-/// References:
-/// http://aa.usno.navy.mil/faq/docs/SunApprox.php
-///
 /// - Parameter julianDays: julianDays
 /// - Returns: Solar ECI Vector
 public func solarCel(julianDays: Double) -> Vector {
