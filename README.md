@@ -30,7 +30,7 @@ test output and the test output in the above published paper [1].
 ### Change Notes
 
 At the end of the README.
-Lastest change: Version/Tag 1.1.3 -- 2022 Oct 10
+Lastest change: Version/Tag 1.1.5 -- 2023 Aug 26
 
 ### Elements
 
@@ -48,7 +48,7 @@ The public properties that are exposed from the `TLE` structure are:
 public let commonName: String                       // line zero name (if any)
 public let noradIndex: Int                          // The satellite number.
 public let launchName: String                       // International designation
-public let t₀: Double                               // the TLE t=0 time (days from 1950)
+public let t₀: Double                               // the TLE t₀=0 time (days from 1950)
 public let e₀: Double                               // TLE .. eccentricity
 public let i₀: Double                               // TLE .. inclination (rad).
 public let ω₀: Double                               // Argument of perigee (rad).
@@ -109,14 +109,13 @@ The `Elements` structure also implements `debugDescription` which will generate 
 
 Having obtained the `Elements` for a satellite, it is used to initialize a `Satellite` struct which will
 manage the propagation of the object's position and velocity as time is varied from the epochal
-t=0 of the element set.  Whether the object requires the "deep space" propagator, or not, is
+t₀=0 of the element set.  Whether the object requires the "deep space" propagator, or not, is
 determined within the `Satellite` initialization.
 
 The `Satellite` initializers are:
 
 ```swift
 public init(_: String, _: String, _: String)  	// three TLE lines ..
-public init(withTLE: TLE)                     	// an Elements struct ..
 public init(elements: Elements)             	// an Elements struct ..
 ```
 
@@ -128,7 +127,7 @@ The *properties* provide some naming information and a "grab bag" directory for 
 public let tle: Elements                    	// make TLE accessible
 public let commonName: String
 public let noradIdent: String
-public let t₀Days1950: Double       		        // TLE t=0 (days since 1950)
+public let t₀Days1950: Double       		        // TLE t₀=0 (days since 1950)
 public var extraInfo: [String: AnyObject]
 ```
 
@@ -317,5 +316,15 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 - XML import made more tolerant (eg: `OBJECT_ID` can be null)
 - JSON import made to deal with numeric values (like `INCLINATION`) being numbers (Celestrak) or strings (Space-Track)
 - add unit tests for above
+
+`version/tag 1.1.4 .. (2023 Jan 07)`
+
+- Copyright extended to 2023
+- accommodate Xcode 14
+
+`version/tag 1.1.5 .. (2023 Aug 26)`
+
+- minor edits to README (no functional changes)
+- accommodate Xcode 15
 
 ---

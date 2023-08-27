@@ -117,6 +117,11 @@ extension Date {
                     since: TimeConstants.tleEpochReferenceDate)
     }
 
+    public init(daysSince1950: Double) {
+        self = Date(timeInterval: daysSince1950 * TimeConstants.day2sec,    // seconds since 1950
+                    since: TimeConstants.tleEpochReferenceDate)
+    }
+
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │  Seconds from TLE Epoch to the reference date, 2001-Jan-01 00h00m00.0s (CFAbsoluteTime zero)     │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
