@@ -324,6 +324,10 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 
 `version/tag 1.1.5 .. (2023 Aug 26)`
 
+- tag `1.0.17` changed to WGS-84 constants which caused a divergence between
+  the Vallado results and the results of this library.  That change is reversed,
+  as it should be, because Vallado's algorithms are built expecting WGS-72 constants.
+  Now the results from this library and Vallado's agree, again, to a ridiculous extent !
 - minor edits to README (no functional changes)
 - accommodate Xcode 15
 

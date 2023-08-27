@@ -35,6 +35,7 @@ import Foundation
   ┃  @author Fabien Maussion (java translation)                                                      ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 
+#if false // WGS-84
 public struct EarthConstants {
 
      public static let Rₑ = 6378.137                    // Earth radius (Km) - WGS84
@@ -54,10 +55,37 @@ public struct EarthConstants {
     private static let J₃ = -2.53215306e-6
             static let J₃OVK₂ = -J₃ / K₂
 
-    private static let J₄ = -1.61098761e-6              
+    private static let J₄ = -1.61098761e-6
             static let K₄ = -0.375 * J₄
 
 }
+#endif
+
+#if true // WGS-72
+public struct EarthConstants {
+
+    public static let Rₑ = 6378.135                    // Earth radius (Km) - WGS72
+
+    public static let rotationₑ = 1.00273790934        // Earth sidereal rotations per UT day
+
+    private static let flatteningₑ = (1.0 / 298.26)
+    static let e2 = flatteningₑ * (2.0 - flatteningₑ)
+
+    private static let μₑ = 398600.8                    // gravitational constant (Km³/s²)
+    static let kₑ = 60.0 /
+    (EarthConstants.Rₑ*EarthConstants.Rₑ*EarthConstants.Rₑ / μₑ).squareRoot()
+
+    private static let J₂ = +1.082616e-3
+    static let K₂ =  0.5 * J₂
+
+    private static let J₃ = -2.53881e-6
+    static let J₃OVK₂ = -J₃ / K₂
+
+    private static let J₄ = -1.65597e-6
+    static let K₄ = -0.375 * J₄
+}
+
+#endif
 
 public class Propagator {
 
