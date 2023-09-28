@@ -30,7 +30,7 @@ test output and the test output in the above published paper [1].
 ### Change Notes
 
 At the end of the README.
-Lastest change: Version/Tag 1.1.5 -- 2023 Aug 26
+Lastest change: Version/Tag 1.1.6 -- 2023 Sep 27
 
 ### Elements
 
@@ -330,5 +330,9 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
   Now the results from this library and Vallado's agree, again, to a ridiculous extent !
 - minor edits to README (no functional changes)
 - accommodate Xcode 15
+
+`version/tag 1.1.6 .. (2023 Sep 27)`
+
+- add more, and more recent, platforms to the manifest
 
 ---

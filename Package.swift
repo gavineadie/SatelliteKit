@@ -1,11 +1,11 @@
-// swift-tools-version:5.5
+// swift-tools-version:5.9
 
 import PackageDescription
 
 let package = Package(
     name: "SatelliteKit",
     platforms: [
-        .macOS(.v12), .iOS(.v13), .tvOS(.v14), .watchOS(.v8)
+        .macOS(.v13), .iOS(.v16), .tvOS(.v16), .watchOS(.v9)
     ],
     products: [
         .library(
