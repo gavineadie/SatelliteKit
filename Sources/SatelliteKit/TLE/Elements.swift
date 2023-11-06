@@ -20,7 +20,6 @@ enum SatKitError: Error {
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃ The TLE struct .. Decodable for JSON usage ..                                                    ┃
-  ┃                                                                                                  ┃
   ┃                                                               MemoryLayout<TLE>.size = 200 bytes ┃
   ┃                                                                                                  ┃
   ┃ Information derived directly from the Two Line Elements ..                                       ┃
@@ -361,8 +360,8 @@ public func preProcessTLEs(_ elementsString: String) -> [(String, String, String
                                                           with: "").components(separatedBy: "\n")
 
     func trimWhitespace(string: String) -> String {
-        return string.trimmingCharacters(in: CharacterSet.whitespaces)
-                                                .replacingOccurrences(of: "\u{00A0}", with: " ")
+        return string.replacingOccurrences(of: "\u{00A0}", with: " ")
+                                          .trimmingCharacters(in: CharacterSet.whitespaces)
     }
 
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮

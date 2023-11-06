@@ -10,7 +10,7 @@ import Foundation
 
 public struct Satellite {
 
-    let propagator: Propagator
+    private let propagator: Propagator
 
     public let tle: Elements                            // make TLE accessible
     public let commonName: String                       // "COSMOS .."
@@ -30,10 +30,10 @@ public extension Satellite {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │  Initialize Satellite with TLE struct ..                                                         │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    init(withTLE tle: Elements) {
-        propagator = selectPropagator(tle: tle)
+    init(withTLE elements: Elements) {
+        self.propagator = selectPropagator(tle: elements)
 
-        self.tle = tle
+        self.tle = elements
 
         self.commonName = propagator.tle.commonName.isEmpty ? propagator.tle.launchName : propagator.tle.commonName
         self.noradIdent = String(propagator.tle.noradIndex)      // convert UInt to String
@@ -41,7 +41,7 @@ public extension Satellite {
     }
 
     init(elements: Elements) {
-        propagator = selectPropagator(tle: elements)
+        self.propagator = selectPropagator(tle: elements)
 
         self.tle = elements
 
@@ -65,13 +65,16 @@ public extension Satellite {
 }
 
 public extension Satellite {
-
+    
+    /// calculates the JD of  an offet (in minutes) from TLE epoch
+    /// - Parameter minsAfterEpoch: minutes since `Satellite` epoch
+    /// - Returns: the Julian date
     func julianDay(_ minsAfterEpoch: Double) -> Double {
-        (self.t₀Days1950 + JD.epoch1950) + minsAfterEpoch * TimeConstants.min2day
+        (t₀Days1950 + JD.epoch1950) + minsAfterEpoch * TimeConstants.min2day
     }
 
     func minsAfterEpoch(_ julianDays: Double) -> Double {
-        (julianDays - (self.t₀Days1950 + JD.epoch1950)) * TimeConstants.day2min
+        (julianDays - (t₀Days1950 + JD.epoch1950)) * TimeConstants.day2min
     }
 
     var daysAfterEpoch: Double {
@@ -79,11 +82,11 @@ public extension Satellite {
     }
 
     var hoursAfterEpoch: Double {
-        return (ep1950DaysNow() - t₀Days1950) * 24.0
+        return (ep1950DaysNow() - t₀Days1950) * TimeConstants.day2hrs
     }
 
     var minsAfterEpoch: Double {
-        return (ep1950DaysNow() - t₀Days1950) * 1440.0
+        return (ep1950DaysNow() - t₀Days1950) * TimeConstants.day2min
     }
 
 }

@@ -36,7 +36,7 @@ class ThreeLineElementTests: XCTestCase {
 
             XCTAssertEqual(tle.e₀, 0.0)                         // TLE .. eccentricity
             XCTAssertEqual(tle.M₀, 0.0)                         // Mean anomaly (rad).
-            XCTAssertEqual(tle.n₀, 0.0653602440158348,
+            XCTAssertEqual(tle.n₀, 0.06536024527421205,
                            accuracy: 1e-12)                     // Mean motion (rads/min)  << [un'Kozai'd]
 
             print("mean altitude    (Kms): \((tle.a₀ - 1.0) * EarthConstants.Rₑ)")
@@ -64,7 +64,7 @@ class ThreeLineElementTests: XCTestCase {
 
             XCTAssertEqual(tle.e₀, 0.0)                         // TLE .. eccentricity
             XCTAssertEqual(tle.M₀, 0.0)                         // Mean anomaly (rad).
-            XCTAssertEqual(tle.n₀, 0.0653602440158348,
+            XCTAssertEqual(tle.n₀, 0.06536024527421205,
                            accuracy: 1e-12)                     // Mean motion (rads/min)  << [un'Kozai'd]
 
             XCTAssertEqual(tle.i₀, 0.0)                         // TLE .. inclination (rad).
@@ -90,7 +90,7 @@ class ThreeLineElementTests: XCTestCase {
 
             XCTAssertEqual(tle.e₀, 0.0)                         // TLE .. eccentricity
             XCTAssertEqual(tle.M₀, 0.0)                         // Mean anomaly (rad).
-            XCTAssertEqual(tle.n₀, 0.0653602440158348,
+            XCTAssertEqual(tle.n₀, 0.06536024527421205,
                            accuracy: 1e-12)                     // Mean motion (rads/min)  << [un'Kozai'd]
 
             XCTAssertEqual(tle.i₀, 0.0)                         // TLE .. inclination (rad).

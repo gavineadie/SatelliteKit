@@ -8,8 +8,6 @@ import Foundation
 
 // swiftlint:disable identifier_name
 
-//NOTE: interesting: https://gist.github.com/kelvin13/03d1fd5da024f058b6fd38fdbce665a4
-
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║                                                                               C O N S T A N T S  ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
@@ -36,11 +34,17 @@ prefix func √ <T: FloatingPoint>(float: T) -> T {
 }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃ almostEqual (test for equality to one ULP) .. 10.0 ~~ 10.000000000000001                         ┃
+  ┃ almostEqual (test for equality to one ULP) .. 10.0 ≈ 10.000000000000001                          ┃
   ┃                      unit of least precision (ULP) is the spacing between floating-point numbers ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-public func almostEqual(_ a: Double, _ b: Double) -> Bool {
+infix operator ≈ : ComparisonPrecedence
+
+public func ≈(_ a: Double, _ b: Double) -> Bool {
     return a == b || a == b.nextUp || a == b.nextDown
+}
+
+public func almostEqual(_ a: Double, _ b: Double) -> Bool {
+    return a ≈ b
 }
 
 extension Double {
@@ -57,7 +61,7 @@ extension Double {
   ║ V E C T O R S                                                                                    ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
-public struct Vector {
+public struct Vector: Equatable {
 
     public var x: Double
     public var y: Double
@@ -87,6 +91,10 @@ public struct Vector {
         Vector(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z)
     }
 
+    public static func == (lhs: Vector, rhs: Vector) -> Bool {
+        lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z
+    }
+
     public func magnitude() -> Double {
         (self.x*self.x + self.y*self.y + self.z*self.z).squareRoot()
     }
@@ -113,19 +121,12 @@ public func normalize(_ vector: Vector) -> Vector {
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 infix operator •
 
-public func dotProduct(_ vector1: Vector, _ vector2: Vector) -> Double {
-    (vector1.x*vector2.x + vector1.y*vector2.y + vector1.z*vector2.z)
-}
-
 func • (_ vector1: Vector, _ vector2: Vector) -> Double {
     (vector1.x*vector2.x + vector1.y*vector2.y + vector1.z*vector2.z)
 }
 
-/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃ angle between (degrees)                                                                          ┃
-  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-public func separation(_ vector1: Vector, _ vector2: Vector) -> Double {
-    (acos((vector1 • vector2) / (magnitude(vector1)*magnitude(vector2))) * rad2deg)
+public func dotProduct(_ vector1: Vector, _ vector2: Vector) -> Double {
+    vector1 • vector2
 }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -133,16 +134,21 @@ public func separation(_ vector1: Vector, _ vector2: Vector) -> Double {
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 infix operator ⨯
 
-public func crossProduct(_ vector1: Vector, _ vector2: Vector) -> Vector {
+func ⨯ (_ vector1: Vector, _ vector2: Vector) -> Vector {
     Vector(vector1.y*vector2.z - vector1.z*vector2.y,
            vector1.z*vector2.x - vector1.x*vector2.z,
            vector1.x*vector2.y - vector1.y*vector2.x)
 }
 
-func ⨯ (_ vector1: Vector, _ vector2: Vector) -> Vector {
-    Vector(vector1.y*vector2.z - vector1.z*vector2.y,
-           vector1.z*vector2.x - vector1.x*vector2.z,
-           vector1.x*vector2.y - vector1.y*vector2.x)
+public func crossProduct(_ vector1: Vector, _ vector2: Vector) -> Vector {
+    vector1 ⨯ vector2
+}
+
+/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃ angle between (degrees)                                                                          ┃
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+public func separation(_ vector1: Vector, _ vector2: Vector) -> Double {
+    (acos((vector1 • vector2) / (magnitude(vector1)*magnitude(vector2))) * rad2deg)
 }
 
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗

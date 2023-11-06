@@ -30,7 +30,7 @@ test output and the test output in the above published paper [1].
 ### Change Notes
 
 At the end of the README.
-Lastest change: Version/Tag 1.1.6 -- 2023 Sep 27
+Lastest change: Version/Tag 1.1.7 -- 2023 Nov 06
 
 ### Elements
 
@@ -334,5 +334,10 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 `version/tag 1.1.6 .. (2023 Sep 27)`
 
 - add more, and more recent, platforms to the manifest
+
+`version/tag 1.1.7 .. (2023 Nov 06)`
+
+- `MathUtility` .. improve vector dot and cross products (and unit tests) ..
+- `ThreeLineElementTests` .. adjust unit tests results for reversion to WGS-72 ..
 
 ---

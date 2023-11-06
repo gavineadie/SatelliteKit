@@ -44,10 +44,55 @@ class MathTests: XCTestCase {
             XCTAssertTrue (almostEqual(10.0, 10.000000000000001), "10.0 ≈ 10.000000000000001")
             XCTAssertTrue (almostEqual(10.0,  9.999999999999999), "10.0 ≈  9.999999999999999")
 
-            XCTAssertFalse(almostEqual(10.0, 10.00000000000001),  "10.0 ≉ 10.00000000000001")
-            XCTAssertFalse(almostEqual(10.0,  9.99999999999999),  "10.0 ≉  9.99999999999999")
+            XCTAssertTrue (almostEqual(10.0, 10.000000000000002), "10.0 ≈ 10.000000000000002")
+            XCTAssertTrue (almostEqual(10.0,  9.999999999999998), "10.0 ≈  9.999999999999998")
 
-            XCTAssertFalse(almostEqual(1e-200, 1e-201), "1e-200 ≉ 1e-201")
+            XCTAssertFalse (almostEqual(10.0, 10.000000000000005), "10.0 ≈ 10.000000000000003")
+            XCTAssertFalse (almostEqual(10.0,  9.999999999999995), "10.0 ≈  9.999999999999997")
+
+            XCTAssertFalse (almostEqual(10.0, 10.00000000000001),  "10.0 ≉ 10.00000000000001")
+            XCTAssertFalse (almostEqual(10.0,  9.99999999999999),  "10.0 ≉  9.99999999999999")
+
+            XCTAssertFalse (almostEqual(1e-200, 1e-201), "1e-200 ≉ 1e-201")
+
+            XCTAssertTrue (10.0 ≈ 10.000000000000001, "10.0 ≈ 10.000000000000001")
+            XCTAssertTrue (10.0 ≈  9.999999999999999, "10.0 ≈  9.999999999999999")
+
+            XCTAssertFalse (10.0 ≈ 10.00000000000001,  "10.0 ≉ 10.00000000000001")
+            XCTAssertFalse (10.0 ≈  9.99999999999999,  "10.0 ≉  9.99999999999999")
+
+            XCTAssertFalse (1e-200 ≈ 1e-201, "1e-200 ≉ 1e-201")
+       }
+
+        func testDotProduct() {
+
+            var v1 = Vector()
+            var v2 = Vector()
+
+            XCTAssertEqual (v1 • v2, 0.0, "(0.0, 0.0, 0.0) • (0.0, 0.0, 0.0))")
+
+            v1 = Vector(1.0, 0.0, 0.0)
+            v2 = Vector(1.0, 0.0, 0.0)
+            XCTAssertEqual (v1 • v2, 1.0, "(1.0, 0.0, 0.0) • (1.0, 0.0, 0.0))")
+
+            v1 = Vector(1.0, 3.0, -5.0)
+            v2 = Vector(4.0, -2.0, -1.0)
+            XCTAssertEqual (v1 • v2, 3.0, "(1.0, 0.0, 0.0) • (0.0, 1.0, 0.0))")
+
+        }
+
+        func testCrossProduct() {
+
+            var v1 = Vector(1.0, 0.0, 0.0)
+            var v2 = Vector(0.0, 1.0, 0.0)
+
+            XCTAssertEqual (v1 ⨯ v2, Vector(0.0, 0.0, +1.0), "(1.0, 0.0, 0.0) ⨯ (0.0, 1.0, 0.0) == (0.0, 0.0, +1.0)")
+            XCTAssertEqual (v2 ⨯ v1, Vector(0.0, 0.0, -1.0), "(0.0, 1.0, 0.0) ⨯ (1.0, 0.0, 0.0) == (0.0, 0.0, -1.0)")
+
+            v1 = Vector(0.0, 0.0, 1.0)
+            v2 = Vector(0.0, 1.0, 0.0)
+
+            XCTAssertEqual (v2 ⨯ v1, Vector(1.0, 0.0, 0.0), "(0.0, 1.0, 0.0) ⨯ (0.0, 0.0, 1.0) == (0.0, 0.0, +1.0)")
 
         }
 

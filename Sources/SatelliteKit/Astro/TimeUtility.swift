@@ -55,6 +55,7 @@ public struct TimeConstants {
 }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ assorted 'DateFormetters' ..                                                                     │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
 extension DateFormatter {
 
@@ -147,6 +148,11 @@ extension Date {
     public var daysSince1950: Double { julianDate - JD.epoch1950 }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ convert a Date to days since 1900 ..                                                             │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    public var daysSince1900: Double { julianDate - JD.epoch1900 }
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public var UTC: String {
         DateFormatter.utc.string(from: self)
@@ -175,11 +181,6 @@ extension Date {
                                             timeIntervalSinceReferenceDate * TimeConstants.sec2day }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ convert a Date to days since 1900 ..                                                             │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public var daysSince1900: Double { julianDate - JD.epoch1900 }
-
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ stringify a Date to current locale ..                                                            │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public var localDescription: String {
@@ -188,7 +189,7 @@ extension Date {
 }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃  some angle functions hms <-> degrees ...                                                        ┃
+  ┃  some angle functions hms <-> degrees (tuple) ...                                                ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 public func deg2hms(decimalDegrees: Double) -> (Int, Int, Double) {
     let hour = decimalDegrees.truncatingRemainder(dividingBy: 360.0) * deg2hrs
@@ -208,14 +209,14 @@ public func stringHMS(hms: (Int, Int, Double)) -> String {
 
 // MARK: -
 
-/// `ep1950DaysNow` ...
-/// - Returns: the current number of days since Epoch 9050
-public func ep1950DaysNow() -> Double {
-    julianDaysNow() - JD.epoch1950
-}
-
 /// `julianDay` calculate the JD of the time this method is executed
 /// - Returns: this moment's JD
 public func julianDaysNow() -> Double {
     JD.appleZero + Date().timeIntervalSinceReferenceDate * TimeConstants.sec2day
+}
+
+/// `ep1950DaysNow` ...
+/// - Returns: the current number of days since Epoch 1950
+public func ep1950DaysNow() -> Double {
+    julianDaysNow() - JD.epoch1950
 }

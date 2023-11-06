@@ -154,7 +154,7 @@ public func lunarCel(ds1950: Double) -> Vector {
 
 /// lunarGeo
 /// - Parameter julianDays: Julian Days
-/// - Returns: (Declination, Right_Ascension) are returned as decimal degrees.
+/// - Returns: (Declination, Right Ascension) are returned as decimal degrees.
 public func lunarGeo (julianDays: Double) -> (delta: Double, alpha: Double) {
     let     lunarVector: Vector = lunarCel(julianDays: julianDays)
 
@@ -168,7 +168,7 @@ public func lunarGeo(ds1950: Double) -> (delta: Double, alpha: Double) {
     lunarGeo(julianDays: ds1950 + JD.epoch1950)
 }
 
-/// azel
+/// calculates `el-az`  from date, observer location and object coordinates
 /// - Parameters:
 ///   - time: date
 ///   - site: (lat°, lon°)
