@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "SatelliteKit",
     platforms: [
-        .macOS(.v13), .iOS(.v16), .tvOS(.v16), .watchOS(.v9)
+        .macOS(.v10_13), .iOS(.v12), .tvOS(.v12), .watchOS(.v4)
     ],
     products: [
         .library(
