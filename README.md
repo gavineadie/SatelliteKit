@@ -30,7 +30,7 @@ test output and the test output in the above published paper [1].
 ### Change Notes
 
 At the end of the README.
-Lastest change: Version/Tag 1.1.7 -- 2023 Nov 06
+Lastest change: Version/Tag 1.1.8 -- 2023 Nov 27
 
 ### Elements
 
@@ -339,5 +339,9 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 
 - `MathUtility` .. improve vector dot and cross products (and unit tests) ..
 - `ThreeLineElementTests` .. adjust unit tests results for reversion to WGS-72 ..
+
+`version/tag 1.1.8 .. (2023 Nov 27)`
+
+- add explicit minimum support for `macOS(.v13), .iOS(.v16), .tvOS(.v16), .watchOS(.v9)` ..
 
 ---
