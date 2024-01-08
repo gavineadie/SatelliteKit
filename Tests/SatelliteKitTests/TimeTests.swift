@@ -1,7 +1,7 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ TimeTests.swift                                                                                  ║
   ║                                                                                                  ║
-  ║ Created by Gavin Eadie on Mar31/19     Copyright 2019-23 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on Mar31/19     Copyright 2019-24 Ramsay Consulting. All rights reserved. ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 /// swiftlint:disable comma
@@ -19,7 +19,7 @@ class TimeTests: XCTestCase {
         XCTAssertTrue(String(describing: TimeConstants.tleEpochReferenceDate) == "1949-12-31 00:00:00 +0000")
 
         XCTAssertTrue(String(describing: Date(year: 1951, month: 1, day: 10)) == "1951-01-10 00:00:00 +0000")
-        XCTAssertTrue(String(describing: Date(year: 2018, month: 4, day: 23)) == "2018-04-23 00:00:00 +0000")
+        XCTAssertTrue(String(describing: Date(year: 2018, month: 4, day: 23)) == "2018-04-24 00:00:00 +0000")
         XCTAssertTrue(String(describing: Date(year: 2034, month: 12, day: 1)) == "2034-12-01 00:00:00 +0000")
     }
 

@@ -1,11 +1,11 @@
-// swift-tools-version:5.9
+// swift-tools-version:5.5
 
 import PackageDescription
 
 let package = Package(
     name: "SatelliteKit",
     platforms: [
-        .macOS(.v10_13), .iOS(.v12), .tvOS(.v12), .watchOS(.v4), .visionOS(.v1)
+        .macOS(.v11), .iOS(.v12), .tvOS(.v12), .watchOS(.v4) // , .visionOS(.v1)
     ],
     products: [
         .library(
@@ -15,8 +15,18 @@ let package = Package(
     targets: [
         .target(
             name: "SatelliteKit",
-            dependencies: [ ]
+            dependencies: [ ],
+            resources: [ .copy("Resourses/Pict.jpg") ],     // .embed
+            swiftSettings: [
+                .define("ENABLE_SOMETHING"/*, .when(configuration: .release)*/),
+            ]
+//            linkerSettings: [
+//                .unsafeFlags( ["-Xlinker", "-sectcreate",
+//                               "-Xlinker", "__TEXT",
+//                               "-Xlinker", "__info_plist",
+//                               "-Xlinker", "Resources/Info.plist"] )
+//            ]
         ),
-        .testTarget(name: "SatelliteKitTests", dependencies: ["SatelliteKit"]),
+        .testTarget(name: "SatelliteKitTests", dependencies: ["SatelliteKit"])
     ]
 )

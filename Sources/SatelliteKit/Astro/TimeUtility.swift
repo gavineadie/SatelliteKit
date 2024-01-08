@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ TimeUtility.swift                                                                         SatKit ║
-  ║ Created by Gavin Eadie on Jan07/17 ... Copyright 2017-23 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on Jan07/17 ... Copyright 2017-24 Ramsay Consulting. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
@@ -102,7 +102,7 @@ extension DateFormatter {
 
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ DateUtility.swift                                                                         SatKit ║
-  ║ Created by Gavin Eadie on May29/17         Copyright © 2017-20 Gavin Eadie. All rights reserved. ║
+  ║ Created by Gavin Eadie on May29/17         Copyright © 2017-24 Gavin Eadie. All rights reserved. ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓

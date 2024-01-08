@@ -30,7 +30,7 @@ test output and the test output in the above published paper [1].
 ### Change Notes
 
 At the end of the README.
-Lastest change: Version/Tag 1.1.8 -- 2023 Nov 27
+Lastest change: Version/Tag 1.2.0 -- 2024 Jan 08
 
 ### Elements
 
@@ -343,5 +343,9 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 `version/tag 1.1.8 .. (2023 Nov 27)`
 
 - add explicit minimum support for `macOS(.v13), .iOS(.v16), .tvOS(.v16), .watchOS(.v9)` ..
+
+`version/tag 1.2.0 .. (2024 Jan 08)`
+
+- copyright to 2024 ..
 
 ---
