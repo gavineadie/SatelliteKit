@@ -42,20 +42,26 @@ in that case, it is OK to pass a null `String` into the initializer.
 public init(_ line0: String, _ line1: String, _ line2: String) throws
 ```
 
-The public properties that are exposed from the `TLE` structure are:
+The public properties that are exposed from in the `Elements` structure are:
 
 ```swift
-public let commonName: String                       // line zero name (if any)
-public let noradIndex: Int                          // The satellite number.
-public let launchName: String                       // International designation
-public let t₀: Double                               // the TLE t₀=0 time (days from 1950)
-public let e₀: Double                               // TLE .. eccentricity
-public let i₀: Double                               // TLE .. inclination (rad).
-public let ω₀: Double                               // Argument of perigee (rad).
-public let Ω₀: Double                               // Right Ascension of the Ascending node (rad).
-public let M₀: Double                               // Mean anomaly (rad).
-public let n₀: Double                               // Mean motion (rads/min)  << [un'Kozai'd]
-public let a₀: Double                               // semi-major axis (Eᵣ)    << [un'Kozai'd]
+public let commonName: String                   // line zero name (if any) [eg: ISS (ZARYA)]
+public let noradIndex: UInt                     // The satellite number [eg: 25544]
+public let launchName: String                   // International designation [eg: 1998-067A]
+
+public let t₀: Double                           // the TLE t=0 epoch time (days since 1950)
+public let e₀: Double                           // TLE .. eccentricity
+public let i₀: Double                           // TLE .. inclination (radians).
+public let ω₀: Double                           // Argument of perigee (radians).
+public let Ω₀: Double                           // Right Ascension of Ascending node (radians).
+public let M₀: Double                           // Mean anomaly (radians).
+public var n₀: Double = 0.0                     // Mean motion (radians/min)  << [un'Kozai'd]
+public var a₀: Double = 0.0                     // semi-major axis (Eᵣ)       << [un'Kozai'd]
+
+public let ephemType: Int                       // Type of ephemeris.
+public let tleClass: String                     // Classification (U for unclassified).
+public let tleNumber: Int                       // Element number.
+public let revNumber: Int                       // Revolution number at epoch.
 ```
 
 Note that the operation to "un Kozai" the element data is performed inside the initialization because
@@ -82,13 +88,13 @@ More information on this move will be found at
 [A New Way to Obtain GP Data (aka TLEs)](https://celestrak.com/NORAD/documentation/gp-data-formats.php)
 
 `SatelliteKit` has been changed to allow the ingestion of GP data in a JSON form .. for example, given JSON
-data, this would decode an array of TLE structures (I'm not catching errors in the example, but you should):
+data, this would decode an array of `Elements` structures (I'm not catching errors in the example, but you should):
 
 ```swift
 let jsonDecoder = JSONDecoder()
 jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)
 
-let tleArray = try jsonDecoder.decode([TLE].self, from: jsonData)
+let tleArray = try jsonDecoder.decode([Elements].self, from: jsonData)
 print(Satellite(withTLE: tleArray[0]).debugDescription())
 print(Satellite(withTLE: tleArray[1]).debugDescription())
 print(Satellite(withTLE: tleArray[2]).debugDescription())
@@ -107,10 +113,10 @@ The `Elements` structure also implements `debugDescription` which will generate 
 
 ### Satellite
 
-Having obtained the `Elements` for a satellite, it is used to initialize a `Satellite` struct which will
-manage the propagation of the object's position and velocity as time is varied from the epochal
-t₀=0 of the element set.  Whether the object requires the "deep space" propagator, or not, is
-determined within the `Satellite` initialization.
+Having obtained the `Elements` for a satellite (a `struct` which holds only a description of the orbital
+elements), it is used to initialize a `Satellite` struct to manage the propagation of the object's 
+position and velocity as time is varied from the epochal t₀=0 of the element set.  
+Whether the object requires the "deep space" propagator, or not, is determined within the `Satellite` initialization.
 
 The `Satellite` initializers are:
 
@@ -125,14 +131,20 @@ The *properties* provide some naming information and a "grab bag" directory for 
 
 ```swift
 public let tle: Elements                    	// make TLE accessible
-public let commonName: String
-public let noradIdent: String
-public let t₀Days1950: Double       		        // TLE t₀=0 (days since 1950)
-public var extraInfo: [String: AnyObject]
+public let commonName: String                   // "COSMOS .."
+public let noradIdent: String                   // "21332"
+public let t₀Days1950: Double                   // days since 1950
+
+public var e: Double { return propagator.e }    //### these vary slowly over time ..
+public var i: Double { return propagator.i }    //###
+public var ω: Double { return propagator.ω }    //###
+public var Ω: Double { return propagator.Ω }    //###
+
+public var extraInfo = [String: AnyObject]()    // the "grab bag" dictionary ..
 ```
 
 The *functions* accept a time argument, either minutes after the satellite's TLE epoch, or Julian Days,
-and provide postion (Kilometers) and velocity (Kms/sec) state vectors as output.
+and provide celestial postion (Kilometers) and velocity (Kms/sec) state vectors as output.
 
 ```swift
 public func position(minsAfterEpoch: Double) -> Vector
@@ -163,8 +175,8 @@ do {
 
 ### Dealing with TLE files
 
-The most commonly available form of TLE data is a file containing multiple concatenated TLEs.  The `String`
-content of such a file may be processed (records that are empty or start with "#" are dropped then
+The most commonly publically available form of TLE data is a file containing multiple concatenated TLEs.  
+The `String` content of such a file may be processed (records that are empty or start with "#" are dropped then
 leading and trailing whitespace is stripped and non-breaking spaces are converted to regular spaces)
 and checked for quality (line length is 69 characters and the checksum is good) within SatelliteKit with the function:
 
@@ -172,7 +184,7 @@ and checked for quality (line length is 69 characters and the checksum is good) 
 public func preProcessTLEs(_: String) -> [(String, String, String)]
 ```
 
-`preProcessTLEs` consumes a `String` of, presumably, TLE records, and returns an array of
+`preProcessTLEs` consumes a `String` of TLE records and returns an array of
 `(String, String, String)` tuples, one per satellite.  The tuple items are the, mildly verified, zeroth, first
 and second of one satellite's TLE lines. If the TLEs are the two-line variety, the first member of the
 tuple is an empty `String`.
@@ -194,7 +206,7 @@ that is not performed in `preProcessTLEs`.
 
 ### Inclusion
 
-`SatelliteKit` can be added to your project using the Swift Package Manager (SwiftPM) by adding
+`SatelliteKit` can be added to your project using the Swift Package Manager (SPM) by adding
 the dependency:
 
 ```swift
@@ -206,8 +218,8 @@ and using `import SatelliteKit` in code that needs it.
 ### Platforms
 
 `SatelliteKit` has been used for applications on iOS devices (iPhone, iPad and TV),
-and Macintosh computers (GUI and command line).  It has not yet been
-exposed to the Unix Swift enviroment.
+and Macintosh computers (SwiftUI, AppKit and command line).  It has been exposed to the 
+Windows and Unix Swift enviroment briefly, but not tested rigorously.
 
 ### Author
 
@@ -224,7 +236,7 @@ Translation from C++ and Java, testing and distribution by [Gavin Eadie](mailto:
 
 `version/tag 1.0.9 .. (2019 Oct 03)`
 
-- move `debugDescription()` from the `TLE` structure to the `Satellite` structure
+- move `debugDescription()` from the `Elements` structure to the `Satellite` structure
 
 - remove public access to `dragCoeff` (it's never used)
 
@@ -238,7 +250,7 @@ Translation from C++ and Java, testing and distribution by [Gavin Eadie](mailto:
 
 `version/tag 1.0.21 .. (2020 Mar 09)`
 
-- include the age of the TLE set in its `debugDescription(..)`.
+- include the age (time since t₀ epoch) of the `Elements` set in its `debugDescription(..)`.
 
 `version/tag 1.0.22 .. (2020 Apr 25)`
 
@@ -251,14 +263,14 @@ accommodate NORAD catalog IDs that are more than 5 digits ..
 
 `version/tag 1.0.24 .. (2020 Jun 04)`
 
-- provide an (**EXPERIMENTAL**) TLE initializer that consumes a JSON version of the new NORAD GP Element Set.
+- provide an (**EXPERIMENTAL**) `Elements` initializer that consumes a JSON version of the new NORAD GP Element Set.
 - the TLE property `launchName` has been expanded from, for example: `98067A` to `1998-067A` .. since this property
 is mostly decorative, with no semantic value, this is not treated as an API change
 
 `version/tag 1.0.25 .. (2020 Jun 07)`
 
-- clean up the JSON version of the TLE initializer.
-- start work on an (**EXPERIMENTAL**) XML version of the TLE initializer.
+- clean up the JSON version of the `Elements` initializer.
+- start work on an (**EXPERIMENTAL**) XML version of the `Elements` initializer.
 
 `version/tag 1.0.26 .. (2020 Jun 30)`
 
@@ -266,7 +278,7 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 
 `version/tag 1.0.27 .. (2021 Jan 30)`
 
-- make the TLE struct accessible from the Satellite struct.
+- make the `Elements` struct accessible from the Satellite struct.
 
 `version/tag 1.0.27 .. (2021 Mar 05)`
 
@@ -284,7 +296,7 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 
 `version/tag 1.0.31 .. (2022 Feb 19)`
 
-- TLE initialization: factored out unKozai()
+- `Elements` initialization: factored out unKozai()
 - moved XML parsing to own file
 - revised the XML unit test
 
@@ -294,17 +306,17 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 
 - `TLE` struct replaced with `Elements`
 - `TLE` typealias'd to `Elements` (for backward compatibility)
-- (for example) `debugDescription()` is now a method on `Element`
+- (for example) `debugDescription()` is now a method on `Elements`
 - `TLEPropagator` class replaced with `Propagator` .. (private anyway)
 - `noradIndex` can't be negative so made `UInt`
 - some time functions moved to `TimeUtility.swift`
-- `TLE.n₀ʹ` removed from `public`
+- `Elements.n₀ʹ` removed from `public`
 
 `version/tag 1.1.1 .. (2022 Mar 02)`
 
 - JSON import much improved
 - JSON export implemented
-- `TLE` deprecated
+- `TLE` struct deprecated
 
 `version/tag 1.1.2 .. (2022 Mar 05)`
 

@@ -494,27 +494,27 @@ class XmlTests: XCTestCase {
 
     }
     
-    func testXMLMassiveArray() async {
-
-        do {
-            var xmlText = try String(contentsOf: URL(fileURLWithPath:
-                    "/Users/gavin/Development/Orbits/SatelliteKit/xml.xml"))
-
-            let ommRange = xmlText.range(of: "<omm ",options: .caseInsensitive)      // find the first <omm>
-            let newRange = xmlText.startIndex ... xmlText.index(ommRange!.lowerBound, offsetBy: -1)
-            xmlText.removeSubrange(newRange)
-
-            xmlText = xmlText.replacingOccurrences(of: "   ", with: "")
-            xmlText = xmlText.replacingOccurrences(of: "</omm>", with: "</omm>###")
-            let subStrings = xmlText.components(separatedBy: "###")
-                
-            for subString in subStrings.dropLast() {
-                let _ = Elements(xmlData: subString.data(using: .ascii)!)
-            }
-
-        } catch {
-            print(error)
-        }
-
-    }
+//    func testXMLMassiveArray() async {
+//
+//        do {
+//            var xmlText = try String(contentsOf: URL(fileURLWithPath:
+//                    "/Users/gavin/Development/Orbits/SatelliteKit/xml.xml"))
+//
+//            let ommRange = xmlText.range(of: "<omm ",options: .caseInsensitive)      // find the first <omm>
+//            let newRange = xmlText.startIndex ... xmlText.index(ommRange!.lowerBound, offsetBy: -1)
+//            xmlText.removeSubrange(newRange)
+//
+//            xmlText = xmlText.replacingOccurrences(of: "   ", with: "")
+//            xmlText = xmlText.replacingOccurrences(of: "</omm>", with: "</omm>###")
+//            let subStrings = xmlText.components(separatedBy: "###")
+//                
+//            for subString in subStrings.dropLast() {
+//                let _ = Elements(xmlData: subString.data(using: .ascii)!)
+//            }
+//
+//        } catch {
+//            print(error)
+//        }
+//
+//    }
 }

@@ -19,11 +19,14 @@ class TimeTests: XCTestCase {
         XCTAssertTrue(String(describing: TimeConstants.tleEpochReferenceDate) == "1949-12-31 00:00:00 +0000")
 
         XCTAssertTrue(String(describing: Date(year: 1951, month: 1, day: 10)) == "1951-01-10 00:00:00 +0000")
-        XCTAssertTrue(String(describing: Date(year: 2018, month: 4, day: 23)) == "2018-04-24 00:00:00 +0000")
+        XCTAssertTrue(String(describing: Date(year: 2018, month: 4, day: 23)) == "2018-04-23 00:00:00 +0000")
         XCTAssertTrue(String(describing: Date(year: 2034, month: 12, day: 1)) == "2034-12-01 00:00:00 +0000")
     }
 
     func testMHS() {
+        XCTAssertEqual(deg2hms(decimalDegrees: 45.0).0, 3)
+        XCTAssertEqual(deg2hms(decimalDegrees: 45.00001).2, 0.002)
+
         print(deg2hms(decimalDegrees: 45.0))
         print(deg2hms(decimalDegrees: 45.01))
         print(deg2hms(decimalDegrees: 45.001))
@@ -48,6 +51,7 @@ class TimeTests: XCTestCase {
         XCTAssertTrue(Date(julianDate: 2433281.5).julianDate == 2433281.5)
         XCTAssertTrue(Date(julianDate:      10.0).julianDate ==      10.0)
         XCTAssertTrue(Date(julianDate: 4321432.1).julianDate == 4321432.1)
+        XCTAssertEqual(Date(julianDate: -4321432.1).julianDate, -4321432.1)
     }
     
     func testJD() {
@@ -61,7 +65,7 @@ class TimeTests: XCTestCase {
         print(deg2hms(decimalDegrees: 360.0))
         print(deg2hms(decimalDegrees: 720.0))
 
-        print(stringHMS(hms: deg2hms(decimalDegrees: 123.456)))
+        XCTAssertEqual(stringHMS(hms: deg2hms(decimalDegrees: 123.456)), "08ʰ13ᵐ49.440")
     }
 
     func testDeg2hms() {

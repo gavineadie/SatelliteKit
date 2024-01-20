@@ -16,16 +16,9 @@ let package = Package(
         .target(
             name: "SatelliteKit",
             dependencies: [ ],
-            resources: [ .copy("Resourses/Pict.jpg") ],     // .embed
             swiftSettings: [
                 .define("ENABLE_SOMETHING"/*, .when(configuration: .release)*/),
             ]
-//            linkerSettings: [
-//                .unsafeFlags( ["-Xlinker", "-sectcreate",
-//                               "-Xlinker", "__TEXT",
-//                               "-Xlinker", "__info_plist",
-//                               "-Xlinker", "Resources/Info.plist"] )
-//            ]
         ),
         .testTarget(name: "SatelliteKitTests", dependencies: ["SatelliteKit"])
     ]

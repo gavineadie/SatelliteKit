@@ -11,6 +11,12 @@ import XCTest
 
 class SwiftTests: XCTestCase {
 
+    func testVersion() {
+
+        print(SatelliteKit.version)
+
+    }
+
     func testProp1() {
 
         do {

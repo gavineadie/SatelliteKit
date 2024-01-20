@@ -22,20 +22,18 @@ class AstroTests: XCTestCase {
         let topVectorA = eci2top(julianDays: 2458905.0,
                                  satCel: Vector(10000.0, 10000.0, 0.0),
                                  obsLLA: LatLonAlt(0.0, 0.0, 0.0))
-        print(topVectorA)
 
         let topVectorB = cel2top(julianDays: 2458905.0,
                                  satCel: Vector(10000.0, 10000.0, 0.0),
                                  obsCel: geo2xyz(julianDays: 2458905.0,
                                                  geodetic: LatLonAlt(0.0, 0.0, 0.0)))
-        print(topVectorB)
+
+        XCTAssertEqual(topVectorA, topVectorB)
 
         let topVectorC = topPosition(julianDays: 2458905.0,
                                      satCel: Vector(10000.0, 10000.0, 0.0),
                                      obsLLA: LatLonAlt(0.0, 0.0, 0.0))
         print(topVectorC)
-
-        XCTAssertTrue(true)
 
     }
 
@@ -80,7 +78,12 @@ class AstroTests: XCTestCase {
     }
 
     func testSolar() {
-        let baseJD = Date.now.julianDate
+        var baseJD: Double
+        if #available(macOS 12, *) {
+            baseJD = Date.now.julianDate
+        } else {
+            baseJD = Date().julianDate
+        }
         for hour in 0...24 {
             let hourJD = baseJD + Double(hour)/24.0
             let v = solarCel(julianDays: hourJD)
