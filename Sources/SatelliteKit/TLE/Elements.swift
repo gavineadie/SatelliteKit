@@ -254,8 +254,9 @@ public extension Elements {
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     func debugDescription() -> String {
 
-        let ageFormat = -Date(ds1950: t₀).timeIntervalSinceNow * TimeConstants.sec2day < 1.0 ?
-                                                            "%4.1f hours" : "%5.2f days"
+        let printableDate = -Date(ds1950: t₀).timeIntervalSinceNow * TimeConstants.sec2day  // days
+        let ageFormat = printableDate < 1.0 ? "%4.1f hours" : "%5.2f days"
+
         return String(format: """
 
                 ┌─[elements : \(ageFormat)  old]──────────────────────────────────────────
@@ -267,7 +268,7 @@ public extension Elements {
                 │                                        drag:  %+11.4e
                 └───────────────────────────────────────────────────────────────────────
                 """,
-                      -Date(ds1950: t₀).timeIntervalSinceNow * TimeConstants.sec2day * 24.0,
+                      printableDate < 1.0 ? printableDate * 24.0 : printableDate,
                       self.commonName.padding(toLength: 24, withPad: " ", startingAt: 0),
                       self.noradIndex,
                       self.launchName.padding(toLength: 11, withPad: " ", startingAt: 0),

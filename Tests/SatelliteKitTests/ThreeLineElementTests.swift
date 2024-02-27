@@ -103,6 +103,27 @@ class ThreeLineElementTests: XCTestCase {
 
     }
 
+    func testCurrentTLE() {
+
+        do {
+            let tle1 = try Elements("ISS (ZARYA)",
+                                    "1 25544U 98067A   24058.53519608  .00023511  00000+0  42705-3 0  9998",
+                                    "2 25544  51.6422 143.7454 0005758 300.3007 142.0288 15.49424907441399")
+
+            print(tle1.debugDescription())
+
+            let tle2 = try Elements("ISS (ZARYA)",
+                                    "1 25544U 98067A   24056.53519608  .00023511  00000+0  42705-3 0  9998",
+                                    "2 25544  51.6422 143.7454 0005758 300.3007 142.0288 15.49424907441399")
+
+            print(tle2.debugDescription())
+
+        } catch {
+            print(error)
+        }
+
+    }
+
     func testSuccessFormatTLE() {
 
         XCTAssertTrue(formatOK("1 25544U 98067A   17108.89682041  .00002831  00000-0  50020-4 0  9990",
