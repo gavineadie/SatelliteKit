@@ -40,8 +40,7 @@ public extension Elements {
                   revNumber: Int(satelliteInfo["REV_AT_EPOCH"]!)!,
                   dragCoeff: Double(satelliteInfo["BSTAR"]!)!)
 
-        a₀ = 0.0
-        n₀ʹ = 0.0
+//      n₀ʹ = 0.0
 
         unKozai(n₀ * (π/720.0))
 

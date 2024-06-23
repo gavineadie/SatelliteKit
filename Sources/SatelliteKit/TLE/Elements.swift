@@ -89,7 +89,7 @@ public extension Elements {
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
     init(_ line0: String, _ line1: String, _ line2: String) throws {
 
-/*╭╌╌╌╌ Line 0 ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆                                                                                                  ┆
   ┆ 0         1         2         3         4         5         6         7                          ┆
   ┆ 01234567890123456789012345678901234567890123456789012345678901234567890                          ┆
@@ -102,7 +102,7 @@ public extension Elements {
 
         commonName = line0.hasPrefix("0 ") ? String(line0.dropFirst(2)) : line0
 
-/*╭╌╌╌╌ Line 1 ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆                                                                                                  ┆
   ┆ 1 NNNNNU NNNNNAAA NNNNN.NNNNNNNN ±.NNNNNNNN ±NNNNN-N ±NNNNN-N N NNNNN                            ┆
   ┆ 1 25544U 98067A   08246.53160505  .00005208  00000-0  43781-4 0  1753                            ┆
@@ -160,7 +160,7 @@ public extension Elements {
         stringlet = String(bytes: lineOneBytes[64...67], encoding: .utf8)!
         self.tleNumber = Int(stringlet.trimmingCharacters(in: .whitespaces))!
 
-/*╭╌╌╌╌ Line 2 ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ┆                                                                                                  ┆
   ┆ 2 NNNNN NNN.NNNN NNN.NNNN NNNNNNN NNN.NNNN NNN.NNNN NN.NNNNNNNNNNNNNN                            ┆
   ┆ 2 25544  51.6437 339.5511 0006673  73.4733  44.7326 15.71870125560705                            ┆
@@ -217,8 +217,8 @@ public extension Elements {
 
 //MARK privates
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  ┆ Convenience function .. converts the YYDDD.DDDDDDDD TLE epoch time to days since 1950 reference. ┆
-  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+  │ Convenience function .. converts the YYDDD.DDDDDDDD TLE epoch time to days since 1950 reference. │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
 private func epochDays(year: Int, days: Double) -> Double {
     Double(year-1950)*365.0 + Double((year-1949)/4) + days
 }
@@ -240,8 +240,8 @@ extension Elements {
             let a₁ = a₀ʹ * (1.0 - δ₁ * (⅓ + δ₁ * (1.0 + 134.0 / 81.0 * δ₁)))
             let δ₀ = temp / (a₁ * a₁)
 
-            self.n₀ = n₀ʹ / (1.0 + δ₀)                               //             n₀
-            self.a₀ = a₁  / (1.0 - δ₀)                               //             a₀
+            self.n₀ = n₀ʹ / (1.0 + δ₀)                              //             n₀
+            self.a₀ = a₁  / (1.0 - δ₀)                              //             a₀
         }
     }
 }
@@ -444,6 +444,206 @@ func alpha5ID(_ noradID: String) -> UInt {              //      "B1234"      "5"
 	return 0
 }
 
-//private func stringFrom(_ line: [UInt8], range: ClosedRange<Int>) -> String {
-//    String(bytes: line[range], encoding: .utf8)!.trimmingCharacters(in: .whitespaces)
-//}
+/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃ .. include the RegexBuilder equivalent here for possible future use (needs macOS 13 or iOS 16)   ┃
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+
+import RegexBuilder
+
+@available(macOS 13.0, *)
+let lineOneRegEx = Regex {
+    "1 "
+    Repeat(count: 5) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    ("A"..."Z")
+    " "
+    Repeat(count: 5) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    Repeat(count: 3) {
+        CharacterClass(
+            .anyOf(" "),
+            ("A"..."Z")
+        )
+    }
+    " "
+    Repeat(count: 5) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    One(.anyOf("."))
+    Repeat(count: 8) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    " "
+    ChoiceOf {
+        Regex {
+            One(.anyOf(" 0+-"))
+            One(.anyOf("."))
+            Repeat(count: 8) {
+                CharacterClass(
+                    .anyOf(" "),
+                    ("0"..."9")
+                )
+            }
+        }
+        Regex {
+            " "
+            One(.anyOf(" +-"))
+            One(.anyOf("."))
+            Repeat(count: 7) {
+                CharacterClass(
+                    .anyOf(" "),
+                    ("0"..."9")
+                )
+            }
+        }
+    }
+    " "
+    One(.anyOf(" +-"))
+    Repeat(count: 5) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    One(.anyOf("+-"))
+    CharacterClass(
+        .anyOf(" "),
+        ("0"..."9")
+    )
+    " "
+    One(.anyOf(" +-"))
+    Repeat(count: 5) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    One(.anyOf("+-"))
+    CharacterClass(
+        .anyOf(" "),
+        ("0"..."9")
+    )
+    " "
+    CharacterClass(
+        .anyOf(" "),
+        ("0"..."9")
+    )
+    " "
+    Repeat(count: 4) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    CharacterClass(
+        .anyOf(" "),
+        ("0"..."9")
+    )
+}
+
+@available(macOS 13.0, *)
+let lineTwoRegEx = Regex {
+    "2 "
+    Repeat(count: 5) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    " "
+    Repeat(count: 3) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    One(.anyOf("."))
+    Repeat(count: 4) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    " "
+    Repeat(count: 3) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    One(.anyOf("."))
+    Repeat(count: 4) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    " "
+    Repeat(count: 7) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    " "
+    Repeat(count: 3) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    One(.anyOf("."))
+    Repeat(count: 4) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    " "
+    Repeat(count: 3) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    One(.anyOf("."))
+    Repeat(count: 4) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    " "
+    Repeat(count: 2) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    One(.anyOf("."))
+    Repeat(count: 13) {
+        CharacterClass(
+            .anyOf(" "),
+            ("0"..."9")
+        )
+    }
+    CharacterClass(
+        .anyOf(" "),
+        ("0"..."9")
+    )
+}
+

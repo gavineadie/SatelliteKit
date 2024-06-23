@@ -30,7 +30,7 @@ class DeepSDP4: SDP4 {
     private let C1SS     =  2.9864797E-6
     private let C1L      =  4.7968065E-7
 
-    private let SECULAR_INTEGRATION_STEP  = 720.0       // Integration step (seconds)
+    private let SECULAR_INTEGRATION_STEP  = 720.0       // Integration step (seconds) - ½ day
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │  i n t e r m e d i a t e   v a l u e s                                                           │
@@ -68,9 +68,9 @@ class DeepSDP4: SDP4 {
 
     private var derivs0 = 0.0, derivs1 = 0.0
 
-    private var resonant = false                    // for resonant orbits.
-    private var synchronous = false                 // for synchronous orbits.
-    private var isDundeeCompliant = true            // for compliance with Dundee modifications.
+    private var resonant = false                        // for resonant orbits.
+    private var synchronous = false                     // for synchronous orbits.
+    private var isDundeeCompliant = true                // for compliance with Dundee modifications.
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │  Computes luni - solar terms from initial coordinates and epoch.                                 │
@@ -90,7 +90,7 @@ class DeepSDP4: SDP4 {
         xnq = super.tle.n₀
 //      omegaq = super.tle.ω₀
 
-        let days₁₉₀₀ = super.tle.t₀ + (JD.epoch1950 - JD.epoch1900)    // Compute days since 1900
+        let days₁₉₀₀ = super.tle.t₀ + (JD.epoch1950 - JD.epoch1900)     // Compute days since 1900
 
         let lunar_asc_node = 4.5236020 - 9.2422029e-4 * days₁₉₀₀
         let stem = sin(lunar_asc_node)

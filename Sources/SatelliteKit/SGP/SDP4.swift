@@ -11,15 +11,15 @@ import Foundation
 
 class SDP4: Propagator {
 
-    var ω_new = 0.0                                 ///** New arg of perigee argument. */
-    var n_new = 0.0                                 ///** New mean motion. */
-    var e_new = 0.0                                 ///** New eccentricity. */
-    var i_new = 0.0                                 ///** New inclination. */
-    var xll = 0.0                                   ///** Parameter for xl computation. */
+    var ω_new = 0.0                                     // New arg of perigee argument.
+    var n_new = 0.0                                     // New mean motion.
+    var e_new = 0.0                                     // New eccentricity.
+    var i_new = 0.0                                     // New inclination.
+    var xll = 0.0                                       // Parameter for xl computation.
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │  Initialization proper to each propagator (SGP or SDP).                                          │
-  │  .. exception OrekitException when UTC time steps can't be read                                  │
+  │  .. exception OrekitException when UTC time steps can't be read                         [Orekit] │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     override func sxpInitialize() throws {
 

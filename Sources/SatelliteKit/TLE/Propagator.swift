@@ -35,33 +35,6 @@ import Foundation
   ┃  @author Fabien Maussion (java translation)                                                      ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 
-#if false // WGS-84
-public struct EarthConstants {
-
-     public static let Rₑ = 6378.137                    // Earth radius (Km) - WGS84
-
-     public static let rotationₑ = 1.00273790934        // Earth sidereal rotations per UT day
-
-    private static let flatteningₑ = (1.0 / 298.25722)
-            static let e2 = flatteningₑ * (2.0 - flatteningₑ)
-
-    private static let μₑ = 398600.5                    // gravitational constant (Km³/s²)
-            static let kₑ = 60.0 /
-                            (EarthConstants.Rₑ*EarthConstants.Rₑ*EarthConstants.Rₑ / μₑ).squareRoot()
-
-    private static let J₂ = +1.08262998905e-3
-            static let K₂ =  0.5 * J₂
-
-    private static let J₃ = -2.53215306e-6
-            static let J₃OVK₂ = -J₃ / K₂
-
-    private static let J₄ = -1.61098761e-6
-            static let K₄ = -0.375 * J₄
-
-}
-#endif
-
-#if true // WGS-72
 public struct EarthConstants {
 
     public static let Rₑ = 6378.135                    // Earth radius (Km) - WGS72
@@ -72,8 +45,7 @@ public struct EarthConstants {
     static let e2 = flatteningₑ * (2.0 - flatteningₑ)
 
     private static let μₑ = 398600.8                    // gravitational constant (Km³/s²)
-    static let kₑ = 60.0 /
-    (EarthConstants.Rₑ*EarthConstants.Rₑ*EarthConstants.Rₑ / μₑ).squareRoot()
+    static let kₑ = 60.0 / (EarthConstants.Rₑ*EarthConstants.Rₑ*EarthConstants.Rₑ / μₑ).squareRoot()
 
     private static let J₂ = +1.082616e-3
     static let K₂ =  0.5 * J₂
@@ -84,8 +56,6 @@ public struct EarthConstants {
     private static let J₄ = -1.65597e-6
     static let K₄ = -0.375 * J₄
 }
-
-#endif
 
 public class Propagator {
 
@@ -141,7 +111,7 @@ public class Propagator {
         self.e = 0.0                        // ECCENT
         self.i = 0.0                        // INCLIN
         self.ω = 0.0                        // ARGPER
-        self.Ω = 0.0                        // RAOFAN
+        self.Ω = 0.0                        // RAANOD
         self.a = 0.0                        // SEMIMA
 
         self.xl = 0.0                       // L from SPTRCK #3
@@ -150,9 +120,9 @@ public class Propagator {
   ┆ For perigee below 156Km, the values of s and (q₀-s)⁴ are changed                                 ┆
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
         switch self.perigee {
-        case ..<98.0:       self.s = 20.0
-        case 98.0...156.0:  self.s = self.perigee - 78.0
-        default:            self.s = 78.0
+            case ..<98.0:       self.s = 20.0
+            case 98.0...156.0:  self.s = self.perigee - 78.0
+            default:            self.s = 78.0
         }
         let q₀_s = (120.0 - self.s) / EarthConstants.Rₑ
         self.s = self.s / EarthConstants.Rₑ + 1.0
@@ -186,7 +156,8 @@ public class Propagator {
         let x3thm1 = 3.0 * self.θ² - 1.0                    //      3×cos²(i₀) - 1
         self.c₂ = self.coef1 * self.tle.n₀ *                //            (q₀-s)⁴ξ⁴η₀ʺ(1-η²) ** 7/2 *
                         (self.tle.a₀ * (1.0 + 1.5 * self.η² + self.eeta * (4.0 + self.η²)) +
-                         0.75 * EarthConstants.K₂ * self.ξ / ψ² * x3thm1 * (8.0 + 3.0 * self.η² * (8.0 + self.η²)))
+                         0.75 * EarthConstants.K₂ * self.ξ / ψ² * x3thm1 * 
+                                       (8.0 + 3.0 * self.η² * (8.0 + self.η²)))
         self.c₁ = self.tle.dragCoeff * self.c₂
 
         let x1mth2 = 1.0 - self.θ²
@@ -347,7 +318,7 @@ public class Propagator {
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
         let rk = r * (1.0 - 1.5 * temp2 * betal * x3thm1) + 0.5 * temp1 * x1mth2 * cos2u
 
-        if rk < 1 { throw SatKitError.SGP(sgpError: "ERROR 6: decay condition .. radius < 1.0 ") }
+        if rk < 1 { throw SatKitError.SGP(sgpError: "ERROR 6: decay condition .. radius < Rₑ") }
 
         let uk = u - 0.25 * temp2 * x7thm1 * sin2u
         let xnodek = self.Ω + 1.5 * temp2 * self.cosi₀ * sin2u

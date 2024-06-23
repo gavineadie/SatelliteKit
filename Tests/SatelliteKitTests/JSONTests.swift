@@ -1,9 +1,8 @@
-//
-//  File.swift
-//  
-//
-//  Created by Gavin Eadie on 9/25/22.
-//
+/*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+  ║ JSONTests.swift                                                                                  ║
+  ║                                                                                                  ║
+  ║ Created by Gavin Eadie on Sep25/22     Copyright 2020-24 Ramsay Consulting. All rights reserved. ║
+  ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 import XCTest
 @testable import SatelliteKit

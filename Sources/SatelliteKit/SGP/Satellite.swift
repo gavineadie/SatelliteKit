@@ -35,7 +35,8 @@ public extension Satellite {
 
         self.tle = elements
 
-        self.commonName = propagator.tle.commonName.isEmpty ? propagator.tle.launchName : propagator.tle.commonName
+        self.commonName = propagator.tle.commonName.isEmpty ? propagator.tle.launchName : 
+                                                               propagator.tle.commonName
         self.noradIdent = String(propagator.tle.noradIndex)      // convert UInt to String
         self.t₀Days1950 = propagator.tle.t₀
     }
@@ -45,7 +46,8 @@ public extension Satellite {
 
         self.tle = elements
 
-        self.commonName = propagator.tle.commonName.isEmpty ? propagator.tle.launchName : propagator.tle.commonName
+        self.commonName = propagator.tle.commonName.isEmpty ? propagator.tle.launchName : 
+                                                               propagator.tle.commonName
         self.noradIdent = String(propagator.tle.noradIndex)      // convert UInt to String
         self.t₀Days1950 = propagator.tle.t₀
     }
@@ -58,10 +60,9 @@ public extension Satellite {
             let elements = try Elements(line0, line1, line2)
             self.init(withTLE: elements)
         } catch {
-            fatalError("Satellite.init failure ..")
+            fatalError("Satellite(L0, L1, L2)) failure ..")
         }
     }
-
 }
 
 public extension Satellite {
@@ -98,7 +99,7 @@ public extension Satellite {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial position (Kilometers) at minutes after TLE epoch      │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    func position(minsAfterEpoch: Double) -> Vector {
+    func position(minsAfterEpoch: Double) -> Vector {               //FIXME: throws ?
         do {
             let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
             return Vector((pv.position.x)/1000.0,
@@ -114,7 +115,7 @@ public extension Satellite {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial velocity (Kms/second) at minutes after TLE epoch      │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    func velocity(minsAfterEpoch: Double) -> Vector {
+    func velocity(minsAfterEpoch: Double) -> Vector {               //FIXME: throws ?
         do {
             let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
             return Vector((pv.velocity.x)/1000.0,
@@ -130,14 +131,14 @@ public extension Satellite {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial position (Kilometers) at Julian Date                  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    func position(julianDays: Double) -> Vector {
+    func position(julianDays: Double) -> Vector {                   //FIXME: throws ?
         position(minsAfterEpoch: minsAfterEpoch(julianDays))
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial velocity (Kms/second) at Julian Date                  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    func velocity(julianDays: Double) -> Vector {
+    func velocity(julianDays: Double) -> Vector {                   //FIXME: throws ?
         velocity(minsAfterEpoch: minsAfterEpoch(julianDays))
     }
 

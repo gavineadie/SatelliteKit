@@ -127,7 +127,7 @@ public extension Elements {
             self.revNumber = Int(String(try container.decode(String.self, forKey: .revNumber)))!
         }
         
-        n₀ʹ = n₀                                                // capture pre-Kozai n₀
+        n₀ʹ = n₀                                                // capture pre-Kozai n₀ for export
         
         unKozai(self.n₀ * (π/720.0))
     }

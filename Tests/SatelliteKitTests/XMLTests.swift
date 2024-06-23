@@ -1,9 +1,8 @@
-//
-//  XML Tests.swift
-//  
-//
-//  Created by Gavin Eadie on 10/9/22.
-//
+/*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+  ║ XMLTests.swift                                                                                   ║
+  ║                                                                                                  ║
+  ║ Created by Gavin Eadie on Nov09/22 ... Copyright 2017-24 Ramsay Consulting. All rights reserved. ║
+  ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 import XCTest
 @testable import SatelliteKit

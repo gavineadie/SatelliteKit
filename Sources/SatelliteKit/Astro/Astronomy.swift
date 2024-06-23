@@ -8,32 +8,6 @@
 
 import Foundation
 
-public struct LatLonAlt {
-    public var lat: Double                                  // latitude (degrees)
-    public var lon: Double                                  // longitude (degrees)
-    public var alt: Double                                  // altitude (Kms)
-
-    public init(_ lat: Double, _ lon: Double, _ alt: Double) {
-        self.lat = lat
-        self.lon = lon
-        self.alt = alt
-    }
-
-}
-
-public struct AziEleDst {
-    public var azim: Double                                 // azimuth (degrees)
-    public var elev: Double                                 // elevation (degrees)
-    public var dist: Double                                 // distance/range
-
-    public init(_ azim: Double, _ elev: Double, _ dist: Double) {
-        self.azim = azim
-        self.elev = elev
-        self.dist = dist
-    }
-
-}
-
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃ sidereal time                                                                                    ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
@@ -75,13 +49,36 @@ public func siteMeanSiderealTime(date: Date, _ siteLongitude: Double) -> Double 
     return siteMeanSiderealTime(julianDate: date.julianDate, siteLongitude)
 }
 
+/*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+  ║ coordinate frames                                                                                ║
+  ║                                                                                                  ║
+  ║ The International Celestial Reference System (ICRS) is a higher-accuracy replacement for the old ║
+  ║ J2000 reference system:                                                                          ║
+  ║                                                                                                  ║
+  ║     x-axis — Aims at the ascending node of the ecliptic on the mean celestial equator.           ║
+  ║              Ancient astronomers called this “the first point of Ares”.                          ║
+  ║     y-axis — Aims at the point 90° east of the Vernal Equinox along the celestial equator.       ║
+  ║     z-axis — Aims at the North Celestial Pole.                                                   ║
+  ║                                                                                                  ║
+  ║                                 The spherical Right Ascension and Declination are based on this. ║
+  ║                                                                                                  ║
+  ║ ECI (Earth Centered Inertial): coordinates fixed in the Celestial Reference frame.               ║
+  ║ CEL:                                                                                             ║
+  ║                                                                                                  ║
+  ║ GEO: (bad name) Right Ascension and Declination angles                                           ║
+  ║                                                                                                  ║
+  ║ TOP: Earth surface latitude and longitude                                                        ║
+  ║                                                                                                  ║
+  ║ xxx: azimuth, elevation and range from Observer's latitude and longitude                         ║
+  ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
+
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃ solar                                                                                            ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-/// SolarCel
+/// The Sun's position in ECI (Earth Centered Inertial - ICRS) frame.
 ///
 /// - Parameter julianDays: julianDays
-/// - Returns: Solar ECI Vector
+/// - Returns: Solar ECI unit Vector (mag = 1)
 public func solarCel(julianDays: Double) -> Vector {
     let     daysSinceJD2000 = julianDays - JD.epoch2000
 
@@ -114,7 +111,7 @@ public func solarGeo(ds1950: Double) -> (delta: Double, alpha: Double) {
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃ lunar                                                                                            ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-/// Low precision formulae for the moon, from:
+/// Low precision formulae for the Moon's ECI (Earth Centered Inertial - ICRS) frame, from:
 /// AN ALTERNATIVE LUNAR EPHEMERIS MODEL FOR ON-BOARD FLIGHT SOFTWARE USE by: David G. Simpson (NASA, GSFC)
 /// - Parameter julianDays: Julian Days
 /// - Returns: Lunar ECI Vector
@@ -168,7 +165,7 @@ public func lunarGeo(ds1950: Double) -> (delta: Double, alpha: Double) {
     lunarGeo(julianDays: ds1950 + JD.epoch1950)
 }
 
-/// calculates `el-az`  from date, observer location and object coordinates
+/// calculates `el-az`  from date, observer location (lat/log), and object coordinates (RA/Dec)
 /// - Parameters:
 ///   - time: date
 ///   - site: (lat°, lon°)
@@ -186,197 +183,6 @@ public func azel(time: Date,
     let elev = asin(sin(lat) * sin(dec) + cos(lat) * cos(dec) * cos(hourAngle))
     let azim = atan2pi(sin(hourAngle), sin(lat) * cos(hourAngle) - cos(lat) * tan(dec))
 
-    return (fmod(elev * rad2deg, 360.0),
+    return (fmod(elev * rad2deg,         360.0),
             fmod(azim * rad2deg + 540.0, 360.0))
-}
-
-/// eci to geo
-///
-/// Procedure eci2geo() will calculate the geodetic (lat, lon, alt) position of an object given the time and its ECI position.
-/// It is intended to be used to determine the satellite ground track. The calculations assume the earth to be oblate.
-/// If the time is negative, treat as zero.
-///
-/// Reference:
-/// The 1992 Astronomical Almanac, page K12.
-///
-/// - Parameters:
-///   - julianDays: JD of desired lat/lon
-///   - celestial: ECI of object of interest
-/// - Returns: geodetic (latitude [degrees], longitude [degrees], altitude [Kms above geoid])
-public func eci2geo(julianDays: Double, celestial: Vector) -> LatLonAlt {
-
-    let     positionXY = (celestial.x*celestial.x + celestial.y*celestial.y).squareRoot()
-    var     newLatRads = atan2(celestial.z, positionXY)
-
-    var     oldLatRads: Double
-    var     correction: Double
-
-    repeat {
-        let sinLatitude = sin(newLatRads)
-        correction = EarthConstants.Rₑ /
-                            (1.0 - EarthConstants.e2 * sinLatitude*sinLatitude).squareRoot()
-        oldLatRads = newLatRads
-        newLatRads = atan2(celestial.z + correction * EarthConstants.e2 * sinLatitude, positionXY)
-    } while (fabs(newLatRads - oldLatRads) > 0.0001)
-
-    return LatLonAlt(newLatRads * rad2deg,
-                     fmod(360.0 + atan2pi(celestial.y, celestial.x) *
-                          rad2deg - ((julianDays < 0.0) ? 0.0 :
-                                        zeroMeanSiderealTime(julianDate: julianDays)), 360.0),
-                     positionXY / cos(newLatRads) - correction)
-}
-
-/// geo2eci [OBLATE]
-/// - Parameters:
-///   - julianDays: JD
-///   - geodetic: (lat°, lon°, alt)
-/// - Returns: (x, y, z,)
-public func geo2eci(julianDays: Double, geodetic: LatLonAlt) -> Vector {
-    let     latitudeRads = geodetic.lat * deg2rad
-    let     sinLatitude = sin(latitudeRads)
-    let     cosLatitude = cos(latitudeRads)
-
-    let     siderealRads = siteMeanSiderealTime(julianDate: julianDays, geodetic.lon) * deg2rad
-    let     sinSidereal = sin(siderealRads)
-    let     cosSidereal = cos(siderealRads)
-
-    let     correction = EarthConstants.Rₑ /
-                            (1.0 + EarthConstants.e2 * sinLatitude*sinLatitude).squareRoot()
-    let     s = (1 - EarthConstants.e2) * correction
-    let     achcp = (correction + geodetic.alt) * cosLatitude
-
-    return Vector(achcp * cosSidereal,
-                  achcp * sinSidereal,
-                  (geodetic.alt+s) * sinLatitude)
-}
-
-/// geo2eci  [OBLATE - NO SIDEREAL ROTATION]
-/// - Parameter geodetic: (lat°, lon°, alt)
-/// - Returns: (x, y, z,)
-public func geo2eci(geodetic: LatLonAlt) -> Vector {
-    let     latitudeRads = geodetic.lat * deg2rad
-    let     sinLatitude = sin(latitudeRads)
-    let     cosLatitude = cos(latitudeRads)
-
-    let     siderealRads = geodetic.lon * deg2rad
-    let     sinSidereal = sin(siderealRads)
-    let     cosSidereal = cos(siderealRads)
-
-    let     correction = EarthConstants.Rₑ /
-                            (1.0 + EarthConstants.e2 * sinLatitude*sinLatitude).squareRoot()
-    let     s = (1 - EarthConstants.e2) * correction
-    let     achcp = (correction + geodetic.alt) * cosLatitude
-
-    return Vector(achcp * cosSidereal,
-                  achcp * sinSidereal,
-                  (geodetic.alt+s) * sinLatitude)
-}
-
-/// geo2xyz [SPHERICAL]
-/// - Parameters:
-///   - julianDays: JD
-///   - geodetic: (lat°, lon°, alt)
-/// - Returns: (x, y, z,)
-public func geo2xyz(julianDays: Double, geodetic: LatLonAlt) -> Vector {
-    let     latitudeRads = geodetic.lat * deg2rad
-    let     sinLatitude = sin(latitudeRads)
-    let     cosLatitude = cos(latitudeRads)
-
-    let     siderealRads = siteMeanSiderealTime(julianDate: julianDays, geodetic.lon) * deg2rad
-    let     sinSidereal = sin(siderealRads)
-    let     cosSidereal = cos(siderealRads)
-
-    return Vector((geodetic.alt+EarthConstants.Rₑ) * cosLatitude * cosSidereal,
-                  (geodetic.alt+EarthConstants.Rₑ) * cosLatitude * sinSidereal,
-                  (geodetic.alt+EarthConstants.Rₑ) * sinLatitude)
-}
-
-/// geo2xyz [SPHERICAL - NO SIDEREAL ROTATION]
-/// - Parameters
-///   - geodetic: (lat°, lon°, alt)
-/// - Returns: (x, y, z,)
-public func geo2xyz(geodetic: LatLonAlt) -> Vector {
-    let     latitudeRads = geodetic.lat * deg2rad
-    let     sinLatitude = sin(latitudeRads)
-    let     cosLatitude = cos(latitudeRads)
-
-    let     siderealRads = geodetic.lon * deg2rad
-    let     sinSidereal = sin(siderealRads)
-    let     cosSidereal = cos(siderealRads)
-
-    return Vector((geodetic.alt+EarthConstants.Rₑ) * cosLatitude * cosSidereal,
-                  (geodetic.alt+EarthConstants.Rₑ) * cosLatitude * sinSidereal,
-                  (geodetic.alt+EarthConstants.Rₑ) * sinLatitude)
-}
-
-/// eci2top [obs→sat in obs topo frame]
-/// - Parameters:
-///   - julianDays: JD
-///   - satCel: sat(x, y, z)
-///   - obsLLA: obs(lat°, lon°, alt)
-/// - Returns: (x, y, z)
-public func eci2top(julianDays: Double, satCel: Vector, obsLLA: LatLonAlt) -> Vector {
-   topoVector(julianDays: julianDays, satCel: satCel, obsLLA: obsLLA)
-}
-
-/// cel2top [vector obs→sat in obs topo frame]
-/// - Parameters:
-///   - julianDays: JD
-///   - satCel: sat(x, y, z)
-///   - obsCel: obs(x, y, z)
-/// - Returns: (x, y, z)
-public func cel2top(julianDays: Double, satCel: Vector, obsCel: Vector) -> Vector {
-    topoVector(julianDays: julianDays, satCel: satCel,
-                                       obsLLA: eci2geo(julianDays: julianDays, celestial: obsCel))
-}
-
-/// eci2top
-/// - Parameters:
-///   - julianDays: JD
-///   - satCel: sat(x, y, z)
-///   - obsLLA: obs(lat°, lon°, alt)
-/// - Returns: (azi°, ele°, dst)
-public func topPosition(julianDays: Double, satCel: Vector, obsLLA: LatLonAlt) -> AziEleDst {
-
-    let obsCel = geo2eci(julianDays: julianDays, geodetic: obsLLA)    // ECI
-
-    let top = cel2top(julianDays: julianDays, satCel: satCel, obsCel: obsCel)
-
-    let d = magnitude(obsCel - satCel)
-
-    return AziEleDst(atan2pi(top.y, -top.x) * rad2deg,
-                     asin(top.z / d) * rad2deg,
-                     d)
-}
-
-/// utility function used in both eci2top and cet2top [obs→sat in obs topo frame]
- /// - Parameters:
- ///   - julianDays: Julian Days
- ///   - satCel: ECI of target object
- ///   - obsLLA: observer lat/log/alt
- /// - Returns: (x, y, z)
-private func topoVector(julianDays: Double, satCel: Vector, obsLLA: LatLonAlt) -> Vector {
-    let latitudeRads = obsLLA.lat * deg2rad
-    let sinLatitude = sin(latitudeRads)
-    let cosLatitude = cos(latitudeRads)
-
-    let siderealRads = siteMeanSiderealTime(julianDate: julianDays, obsLLA.lon) * deg2rad
-    let sinSidereal = sin(siderealRads)
-    let cosSidereal = cos(siderealRads)
-
-    let obsCel = geo2eci(julianDays: julianDays, geodetic: obsLLA)    // ECI
-    let obs2sat = satCel - obsCel
-
-    return Vector(obs2sat.x*(+sinLatitude * cosSidereal) +
-                  obs2sat.y*(+sinLatitude * sinSidereal) +
-                  obs2sat.z*(-cosLatitude),
-
-                  obs2sat.x*(-sinSidereal) +
-                  obs2sat.y*(+cosSidereal) +
-                  obs2sat.z*0.0,
-
-                  obs2sat.x*(+cosLatitude * cosSidereal) +
-                  obs2sat.y*(+cosLatitude * sinSidereal) +
-                  obs2sat.z*(+sinLatitude)
-    )
 }

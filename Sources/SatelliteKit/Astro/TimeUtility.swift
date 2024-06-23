@@ -23,12 +23,12 @@ import Foundation
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 public struct JD {
 
-           static let modJDZero = 2400000.5             // Modified JD (MJD) zero
-           static let epoch1900 = 2415020.0             // 1900 Jan 0.5
-    public static let epoch1950 = 2433281.5             // 1949-Dec-31 00h00m00.0s
-           static let epochUnix = 2440587.5             // 1970-Jan-01 00h00m00.0s
-    public static let epoch2000 = 2451545.0             // 2000 Jan 1.5
-    public static let appleZero = 2451910.5             // 2001-Jan-01 00h00m00.0s (CFAbsoluteTime zero)
+           static let modJDZero: TimeInterval = 2400000.5   // Modified JD (MJD) zero
+           static let epoch1900: TimeInterval = 2415020.0   // 1900 Jan 0.5
+    public static let epoch1950: TimeInterval = 2433281.5   // 1949-Dec-31 00h00m00.0s
+           static let epochUnix: TimeInterval = 2440587.5   // 1970-Jan-01 00h00m00.0s
+    public static let epoch2000: TimeInterval = 2451545.0   // 2000 Jan 1.5
+    public static let appleZero: TimeInterval = 2451910.5   // 2001-Jan-01 00h00m00.0s (CFAbsoluteTime zero)
 
 }
 
@@ -111,10 +111,10 @@ extension DateFormatter {
 extension Date {
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ Creates a Date from decimal days since the TLE epoch                                             │
+  │ Creates a Date from decimal days since 1950 (the TLE epoch)                                      │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public init(ds1950: Double) {
-        self = Date(timeInterval: ds1950 * TimeConstants.day2sec,    // seconds since 1950
+        self = Date(timeInterval: ds1950 * TimeConstants.day2sec,           // seconds since 1950
                     since: TimeConstants.tleEpochReferenceDate)
     }
 
@@ -154,9 +154,7 @@ extension Date {
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    public var UTC: String {
-        DateFormatter.utc.string(from: self)
-    }
+    public var UTC: String { DateFormatter.utc.string(from: self) }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ create a Date from year, month and day ..                                                        │
@@ -212,7 +210,11 @@ public func stringHMS(hms: (Int, Int, Double)) -> String {
 /// `julianDay` calculate the JD of the time this method is executed
 /// - Returns: this moment's JD
 public func julianDaysNow() -> Double {
-    JD.appleZero + Date().timeIntervalSinceReferenceDate * TimeConstants.sec2day
+    if #available(macOS 12, *) {
+        JD.appleZero + Date.now.timeIntervalSinceReferenceDate * TimeConstants.sec2day
+    } else {
+        JD.appleZero + Date().timeIntervalSinceReferenceDate * TimeConstants.sec2day
+    }
 }
 
 /// `ep1950DaysNow` ...

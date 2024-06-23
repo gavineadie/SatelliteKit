@@ -29,7 +29,7 @@ public let  deg2hrs: Double = 1.0/hrs2deg           // not used in library
 
 prefix operator √
 
-prefix func √ <T: FloatingPoint>(float: T) -> T {
+prefix func √ <T: BinaryFloatingPoint>(float: T) -> T {
     float.squareRoot()
 }
 
@@ -39,11 +39,11 @@ prefix func √ <T: FloatingPoint>(float: T) -> T {
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 infix operator ≈ : ComparisonPrecedence
 
-public func ≈(_ a: Double, _ b: Double) -> Bool {
+public func ≈ <T: BinaryFloatingPoint>(_ a: T, _ b: T) -> Bool {
     return a == b || a == b.nextUp || a == b.nextDown
 }
 
-public func almostEqual(_ a: Double, _ b: Double) -> Bool {
+public func almostEqual<T: BinaryFloatingPoint>(_ a: T, _ b: T) -> Bool {
     return a ≈ b
 }
 
