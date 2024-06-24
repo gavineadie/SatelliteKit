@@ -92,6 +92,14 @@ public extension Satellite {
 
 }
 
+/*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+  ║ non-THROWING (original) inertial position and velocity .. TODO: fatalError                       ║
+  ║                                                                                                  ║
+  ║     position, velocity                                                                           ║
+  ║                         → getPVCoordinates (throws)                                              ║
+  ║                                                                                                  ║
+  ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
+
 public extension Satellite {
 
 // MARK: - inertial position and velocity
@@ -99,7 +107,7 @@ public extension Satellite {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial position (Kilometers) at minutes after TLE epoch      │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    func position(minsAfterEpoch: Double) -> Vector {               //FIXME: throws ?
+    func position(minsAfterEpoch: Double) -> Vector {
         do {
             let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
             return Vector((pv.position.x)/1000.0,
@@ -113,9 +121,16 @@ public extension Satellite {
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ return satellite's earth centered inertial position (Kilometers) at Julian Date                  │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    func position(julianDays: Double) -> Vector {
+        position(minsAfterEpoch: minsAfterEpoch(julianDays))
+    }
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial velocity (Kms/second) at minutes after TLE epoch      │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    func velocity(minsAfterEpoch: Double) -> Vector {               //FIXME: throws ?
+    func velocity(minsAfterEpoch: Double) -> Vector {
         do {
             let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
             return Vector((pv.velocity.x)/1000.0,
@@ -129,16 +144,9 @@ public extension Satellite {
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ return satellite's earth centered inertial position (Kilometers) at Julian Date                  │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    func position(julianDays: Double) -> Vector {                   //FIXME: throws ?
-        position(minsAfterEpoch: minsAfterEpoch(julianDays))
-    }
-
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial velocity (Kms/second) at Julian Date                  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    func velocity(julianDays: Double) -> Vector {                   //FIXME: throws ?
+    func velocity(julianDays: Double) -> Vector {
         velocity(minsAfterEpoch: minsAfterEpoch(julianDays))
     }
 
@@ -152,11 +160,11 @@ public extension Satellite {
   ┃  derive latitude, longitude and altitude at given time ..                                        ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
     func geoPosition(minsAfterEpoch: Double) -> LatLonAlt {
-        return geoPosition(julianDays: julianDay(minsAfterEpoch))
+        geoPosition(julianDays: julianDay(minsAfterEpoch))
     }
 
     func geoPosition(julianDays: Double) -> LatLonAlt {
-        return eci2geo(julianDays: julianDays, celestial: position(julianDays: julianDays))
+        eci2geo(julianDays: julianDays, celestial: position(julianDays: julianDays))
     }
 
 // MARK: - azimuth, elevation and range
@@ -164,24 +172,24 @@ public extension Satellite {
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃  return topological position (satellite's azimuth, elevation and range) at given time ..         ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-   func topPosition(minsAfterEpoch: Double, obsLatLonAlt: LatLonAlt) -> AziEleDst {
-       topPosition(julianDays: minsAfterEpoch * TimeConstants.min2day +
-                                               (self.t₀Days1950 + JD.epoch1950), observer: obsLatLonAlt)
-   }
+    func topPosition(julianDays: Double, observer: LatLonAlt) throws -> AziEleDst {
+        
+        let satCel = position(julianDays: julianDays)                       // ECI
+        let obsCel = geo2eci(julianDays: julianDays, geodetic: observer)    // ECI
+        
+        let top = cel2top(julianDays: julianDays, satCel: satCel, obsCel: obsCel)
+        
+        let z = top.magnitude()
+        
+        return AziEleDst(atan2pi(top.y, -top.x) * rad2deg,
+                         asin(top.z / z) * rad2deg,
+                         z)
+    }
 
-   func topPosition(julianDays: Double, observer: LatLonAlt) -> AziEleDst {
-
-       let satCel = self.position(julianDays: julianDays)                  // ECI
-       let obsCel = geo2eci(julianDays: julianDays, geodetic: observer)    // ECI
-
-       let top = cel2top(julianDays: julianDays, satCel: satCel, obsCel: obsCel)
-
-       let z = top.magnitude()
-
-       return AziEleDst(atan2pi(top.y, -top.x) * rad2deg,
-                        asin(top.z / z) * rad2deg,
-                        z)
-   }
+    func topPosition(minsAfterEpoch: Double, obsLatLonAlt: LatLonAlt) throws -> AziEleDst {
+        try topPosition(julianDays: minsAfterEpoch * TimeConstants.min2day +
+                        (self.t₀Days1950 + JD.epoch1950), observer: obsLatLonAlt)
+    }
 
 }
 
@@ -192,6 +200,74 @@ public extension Satellite {
     @available(*, deprecated, message: "PrettyPrint the elements from the Elements struct")
     func debugDescription() -> String {
         return tle.debugDescription()
+    }
+
+}
+
+/*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+  ║ THROWING inertial position and velocity ..                                                       ║
+  ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
+
+public extension Satellite {
+
+// MARK: - THROWING inertial position and velocity
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ return satellite's earth centered inertial position (Kilometers) at minutes after TLE epoch      │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    func position_throwz(minsAfterEpoch: Double) throws -> Vector {
+        let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
+        return Vector((pv.position.x)/1000.0,
+                      (pv.position.y)/1000.0,
+                      (pv.position.z)/1000.0)
+    }
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ return satellite's earth centered inertial position (Kilometers) at Julian Date                  │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    func position_throwz(julianDays: Double) throws -> Vector {
+        try position_throwz(minsAfterEpoch: minsAfterEpoch(julianDays))
+    }
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ return satellite's earth centered inertial velocity (Kms/second) at minutes after TLE epoch      │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    func velocity_throwz(minsAfterEpoch: Double) throws -> Vector {
+        let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
+        return Vector((pv.velocity.x)/1000.0,
+                      (pv.velocity.y)/1000.0,
+                      (pv.velocity.z)/1000.0)
+    }
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ return satellite's earth centered inertial velocity (Kms/second) at Julian Date                  │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    func velocity_throwz(julianDays: Double) throws -> Vector {
+        velocity(minsAfterEpoch: minsAfterEpoch(julianDays))
+    }
+
+// MARK: - THROWING azimuth, elevation and range
+
+/*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃  return topological position (satellite's azimuth, elevation and range) at given time ..         ┃
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+    func topPosition_throwz(julianDays: Double, observer: LatLonAlt) throws -> AziEleDst {
+
+        let satCel = try position_throwz(julianDays: julianDays)            // ECI
+        let obsCel = geo2eci(julianDays: julianDays, geodetic: observer)    // ECI
+        
+        let top = cel2top(julianDays: julianDays, satCel: satCel, obsCel: obsCel)
+        
+        let z = top.magnitude()
+        
+        return AziEleDst(atan2pi(top.y, -top.x) * rad2deg,
+                         asin(top.z / z) * rad2deg,
+                         z)
+    }
+
+    func topPosition_throwz(minsAfterEpoch: Double, obsLatLonAlt: LatLonAlt) throws -> AziEleDst {
+        try topPosition_throwz(julianDays: minsAfterEpoch * TimeConstants.min2day +
+                        (self.t₀Days1950 + JD.epoch1950), observer: obsLatLonAlt)
     }
 
 }

@@ -32,6 +32,46 @@ test output and the test output in the above published paper [1].
 At the end of the README.
 Lastest change: Version/Tag 1.2.0 -- 2024 Jan 08
 
+### Upcoming Changes
+
+The core of `SatelliteKit` operates to generate a 6-D vector of the orbiting object's
+position (x, y, z) and velocity (ẋ, ẏ, ż) at the given time.  That 6-D vector is the 
+`struct PVCoordinates` and it is derived in the (public) `getPVCoordinates` function 
+which calls the (private) `computePVCoordinates` function. When a propagation anomaly 
+is detected within `computePVCoordinates` an error is thrown and `getPVCoordinates` 
+throws it into the public API. 
+
+The programmer can catch errors from `getPVCoordinates` and take appropriate action,
+however, the two functions `Satellite.position` and `Satellite.velocity` (which make
+direct calls to `getPVCoordinates`) are more commonly used to obtain an object's 
+position and velocity and they **do not** process the errors gracefully -- instead
+they cause an immediate failure and exit from the running program.
+
+Some of the possible errors are not outlandish (for examples, a satellite in a low 
+orbit may decay, elements may be loaded that contain errors, or elements way past 
+their sell-by date may be unpropagatable).
+
+Obviously, this is a **bad** experience for the user and needs to be corrected and
+so `Satellite.position` and `Satellite.velocity` will be changed to catch and re-throw
+propagation errors, giving the programmer the ability to dodge a failure and/or display
+an error alert to the user.
+
+In the Sample Usage below, the line 
+```swift
+    let posInKms = sat.position(minsAfterEpoch: 10.0)
+```
+would be recoded as
+```swift
+    do {
+        let posInKms = try sat.position(minsAfterEpoch: 10.0)
+    } catch {
+    	// code to process the error ..
+    }
+```
+
+
+
+
 ### Elements
 
 The `Elements` structure is initialized from the three lines of elements in a traditional TLE set.

@@ -169,24 +169,24 @@ class JSONElementTests: XCTestCase {
         }
     }
     
-    func testJsonMassiveArray() async {
-        
-        do {
-            let jsonData = try Data(contentsOf: URL(fileURLWithPath:
-                    "/Users/gavin/Development/Orbits/SatelliteKit/json.json"))
-            
-            let jsonDecoder = JSONDecoder()
-            jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)
-
-            let tleArray = try jsonDecoder.decode([Elements].self, from: jsonData)
-
-            print(tleArray[0].debugDescription())
-            print(tleArray[1].debugDescription())
-            print(tleArray[2].debugDescription())
-        } catch {
-            print(error)
-        }
-
-    }
+//    func testJsonMassiveArray() async {
+//        
+//        do {
+//            let jsonData = try Data(contentsOf: URL(fileURLWithPath:
+//                    "/Users/gavin/Development/Orbits/SatelliteKit/json.json"))
+//            
+//            let jsonDecoder = JSONDecoder()
+//            jsonDecoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Micros)
+//
+//            let tleArray = try jsonDecoder.decode([Elements].self, from: jsonData)
+//
+//            print(tleArray[0].debugDescription())
+//            print(tleArray[1].debugDescription())
+//            print(tleArray[2].debugDescription())
+//        } catch {
+//            print(error)
+//        }
+//
+//    }
 
 }

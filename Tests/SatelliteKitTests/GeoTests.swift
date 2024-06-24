@@ -65,11 +65,5 @@ final class GeoTests: XCTestCase {
     func aedTest() {
         let _ = AziEleDst(90.0, 45.0, 2000.0)
     }
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
-    }
 
 }

@@ -318,7 +318,7 @@ public class Propagator {
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
         let rk = r * (1.0 - 1.5 * temp2 * betal * x3thm1) + 0.5 * temp1 * x1mth2 * cos2u
 
-        if rk < 1 { throw SatKitError.SGP(sgpError: "ERROR 6: decay condition .. radius < Rₑ") }
+        if rk < 1 { throw SatKitError.SGP(sgpError: "6: decay condition .. radius < Rₑ") }
 
         let uk = u - 0.25 * temp2 * x7thm1 * sin2u
         let xnodek = self.Ω + 1.5 * temp2 * self.cosi₀ * sin2u

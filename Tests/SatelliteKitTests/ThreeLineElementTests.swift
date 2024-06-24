@@ -200,16 +200,16 @@ class ThreeLineElementTests: XCTestCase {
 
     }
 
-    func testLongFile() {
-
-        do {
-            let contents = try String(contentsOfFile: "/Users/gavin/Development/sat_code/all_tle.txt")
-            _ = preProcessTLEs(contents)
-        } catch {
-            print(error)
-        }
-
-    }
+//    func testLongFile() {
+//
+//        do {
+//            let contents = try String(contentsOfFile: "/Users/gavin/Development/sat_code/all_tle.txt")
+//            _ = preProcessTLEs(contents)
+//        } catch {
+//            print(error)
+//        }
+//
+//    }
 
     func testBase34() {
         XCTAssert(base10ID(     "") == 0)
@@ -254,40 +254,5 @@ class ThreeLineElementTests: XCTestCase {
         XCTAssert(base10ID("10000") == 10000, "got \(base10ID("10000"))")
         XCTAssert(base10ID("99999") == 99999, "got \(base10ID("99999"))")
     }
-
-//    func testIssue2() {
-//        do {
-//
-//            let sl30 = Satellite("0 STARLINK-30",
-//                                 "1 44244U 19029K   20287.12291165  .47180237  12426-4  22139-2 0  9995",
-//                                 "2 44244  52.9708 332.0356 0003711 120.7278 242.0157 16.43170483 77756")
-//            print(sl30.tle.debugDescription())
-//
-//            for time in stride(from: 600.0, to: 660.0, by: 5.0) {
-//                print(sl30.geoPosition(minsAfterEpoch: time))
-//            }
-//        }
-//
-//    }
-//    func testPerformanceExample() {         // May06/19 = iOS sim average: 2.267
-//
-//        self.measure {
-//            testLongFile()
-//        }
-//    }
-    
-// JWST is not in Earth orbit ..
-//
-//    func testJWST() {
-//        do {
-//
-//            let jwst = Satellite("0 JWST",
-//                                  "1 50463U 21130A   21362.00000000  .00000000  00000-0  00000-0 0  9999",
-//                                  "2 50463   4.6198  89.0659 9884983 192.3200  17.4027  0.01958082    27")
-//
-//            print(jwst.tle.debugDescription())
-//            let _ = jwst.geoPosition(minsAfterEpoch: 0)
-//        }
-//    }
 
 }
