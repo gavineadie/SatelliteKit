@@ -179,6 +179,13 @@ extension Date {
                                             timeIntervalSinceReferenceDate * TimeConstants.sec2day }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ create a Date from a Modified Julian date ..                                                     │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    public init(mjd: Double) {
+        self = Date(timeIntervalSinceReferenceDate: (mjd + JD.modJDZero - JD.appleZero) * TimeConstants.day2sec)
+    }
+
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ stringify a Date to current locale ..                                                            │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
     public var localDescription: String {

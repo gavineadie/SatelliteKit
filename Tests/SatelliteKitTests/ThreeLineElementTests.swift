@@ -200,16 +200,16 @@ class ThreeLineElementTests: XCTestCase {
 
     }
 
-//    func testLongFile() {
-//
-//        do {
-//            let contents = try String(contentsOfFile: "/Users/gavin/Development/sat_code/all_tle.txt")
-//            _ = preProcessTLEs(contents)
-//        } catch {
-//            print(error)
-//        }
-//
-//    }
+    func testLongFile() {
+
+        do {
+            let contents = try String(contentsOfFile: "/Users/gavin/Library/Application Support/com.ramsaycons.tle/active.txt")
+            _ = preProcessTLEs(contents)
+        } catch {
+            print(error)
+        }
+
+    }
 
     func testBase34() {
         XCTAssert(base10ID(     "") == 0)

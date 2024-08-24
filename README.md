@@ -30,7 +30,7 @@ test output and the test output in the above published paper [1].
 ### Change Notes
 
 At the end of the README.
-Lastest change: Version/Tag 1.2.0 -- 2024 Jan 08
+Lastest change: Version/Tag 1.2.2 -- 2024 Aug 24
 
 ### Upcoming Changes
 
@@ -399,5 +399,13 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 `version/tag 1.2.0 .. (2024 Jan 08)`
 
 - copyright to 2024 ..
+
+`version/tag 1.2.1 .. (2024 Feb 27)`
+
+- correct day display in elements.prettyprint ..
+
+`version/tag 1.2.2 .. (2024 Aug 24)`
+
+- account for a blank character in the BTERM exponent ..
 
 ---

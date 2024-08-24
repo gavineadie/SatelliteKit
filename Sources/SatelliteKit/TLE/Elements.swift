@@ -147,11 +147,12 @@ public extension Elements {
 
         stringlet = String(bytes: lineOneBytes[33...51], encoding: .utf8)!      // unused by SGP4
 
-        stringlet = (lineOneBytes[53] == 32 ||
-                     lineOneBytes[53] == 43 ? "+" : "-") + "." +
+        stringlet = String((lineOneBytes[53] == 32 ||
+                            lineOneBytes[53] == 43 ? "+" : "-") + ".") +
                     String(bytes: lineOneBytes[54...54], encoding: .utf8)! +
                     String(bytes: lineOneBytes[55...58], encoding: .utf8)! + "e" +
-                    String(bytes: lineOneBytes[59...60], encoding: .utf8)!
+                    String((lineOneBytes[59] == 32 ||
+                            lineOneBytes[59] == 43 ? "+" : "-")) + String(lineOneBytes[60])
         self.dragCoeff = Double(stringlet)!
 
         stringlet = String(bytes: lineOneBytes[62...62], encoding: .utf8)!

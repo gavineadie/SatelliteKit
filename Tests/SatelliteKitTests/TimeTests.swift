@@ -58,6 +58,10 @@ class TimeTests: XCTestCase {
         print(julianDaysNow())
     }
 
+    func testMJD() {
+        print(Date(mjd: 42338.9113))                // 1974-10-18 21:52:16 +0000
+    }
+
     func testHMS() {
         print(deg2hms(decimalDegrees:  45.0))
         print(deg2hms(decimalDegrees:   0.0))
