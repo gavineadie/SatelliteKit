@@ -217,7 +217,7 @@ public func stringHMS(hms: (Int, Int, Double)) -> String {
 /// `julianDay` calculate the JD of the time this method is executed
 /// - Returns: this moment's JD
 public func julianDaysNow() -> Double {
-    if #available(macOS 12, *) {
+    if #available(macOS 12, iOS 15, *) {
         JD.appleZero + Date.now.timeIntervalSinceReferenceDate * TimeConstants.sec2day
     } else {
         JD.appleZero + Date().timeIntervalSinceReferenceDate * TimeConstants.sec2day

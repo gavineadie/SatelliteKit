@@ -30,7 +30,7 @@ test output and the test output in the above published paper [1].
 ### Change Notes
 
 At the end of the README.
-Lastest change: Version/Tag 1.2.2 -- 2024 Aug 24
+Lastest change: Version/Tag 1.2.3 -- (2024 Sep 11)
 
 ### Upcoming Changes
 
@@ -68,9 +68,14 @@ would be recoded as
     	// code to process the error ..
     }
 ```
-
-
-
+however, currently this should be coded as
+```swift
+    do {
+        let posInKms = try sat.position_throwz(minsAfterEpoch: 10.0)
+    } catch {
+    	// code to process the error ..
+    }
+```
 
 ### Elements
 
@@ -407,5 +412,11 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 `version/tag 1.2.2 .. (2024 Aug 24)`
 
 - account for a blank character in the BTERM exponent ..
+
+`version/tag 1.2.3 .. (2024 Sep 11)`
+
+- throwing versions of Satellite position/velocity functions added -- for example `position_throwz(minsAfterEpoch..)`
+- Package support for .macOS(.v11), .iOS(.v12), .tvOS(.v12), .watchOS(.v4), .visionOS(.v1)
+- macOS 13 and iOS 15/16 required for non-default uses ..
 
 ---
