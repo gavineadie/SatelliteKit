@@ -30,9 +30,9 @@ test output and the test output in the above published paper [1].
 ### Change Notes
 
 At the end of the README.
-Lastest change: Version/Tag 1.2.3 -- (2024 Sep 11)
+Lastest change: Version/Tag 1.2.4 -- (2024 Sep 12)
 
-### Upcoming Changes
+### Important Changes • 2024 Sep 12
 
 The core of `SatelliteKit` operates to generate a 6-D vector of the orbiting object's
 position (x, y, z) and velocity (ẋ, ẏ, ż) at the given time.  That 6-D vector is the 
@@ -51,24 +51,20 @@ Some of the possible errors are not outlandish (for examples, a satellite in a l
 orbit may decay, elements may be loaded that contain errors, or elements way past 
 their sell-by date may be unpropagatable).
 
-Obviously, this is a **bad** experience for the user and needs to be corrected and
-so `Satellite.position` and `Satellite.velocity` will be changed to catch and re-throw
-propagation errors, giving the programmer the ability to dodge a failure and/or display
-an error alert to the user.
+Obviously, this is a **bad** experience for the user and needs to be corrected.  Since
+merely making `Satellite.position` and `Satellite.velocity` throw errors would break 
+existing code, new versions (same basic purpose, but with different names) have been added 
+to catch and re-throw the propagation errors, giving the programmer the ability to dodge a
+failure and/or display an error alert to the user.  The non-throwing versions have also
+been marked as deprecated so the compiler can issue an advisory message.
 
 In the Sample Usage below, the line 
+
 ```swift
     let posInKms = sat.position(minsAfterEpoch: 10.0)
 ```
-would be recoded as
-```swift
-    do {
-        let posInKms = try sat.position(minsAfterEpoch: 10.0)
-    } catch {
-    	// code to process the error ..
-    }
-```
-however, currently this should be coded as
+should be recoded as
+
 ```swift
     do {
         let posInKms = try sat.position_throwz(minsAfterEpoch: 10.0)
@@ -76,6 +72,9 @@ however, currently this should be coded as
     	// code to process the error ..
     }
 ```
+
+(This workaround will be temporary -- the next MAJOR release of `SatelliteKit` will remove
+the non-throwing functions.) 
 
 ### Elements
 
@@ -418,5 +417,17 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
 - throwing versions of Satellite position/velocity functions added -- for example `position_throwz(minsAfterEpoch..)`
 - Package support for .macOS(.v11), .iOS(.v12), .tvOS(.v12), .watchOS(.v4), .visionOS(.v1)
 - macOS 13 and iOS 15/16 required for non-default uses ..
+
+`version/tag 1.2.4 .. (2024 Sep 12)`
+
+- converting the non-throwing versions of Satellite position/velocity functions to throwing functions
+  would break source compatibility if the same function names were maintained, hence the use of `_throwz`
+  versions.  The next MAJOR release of `SatelliteKit` will make those breaking changes.
+  
+  `@available(*, deprecated ..)` tags have been added to the non-throwing versions.  They are not
+  actually deprecated but this allows the compiler to issue a message informing of the throwing versions.
+  
+  Since the non-throwing versions are used internally by `SatelliteKit`, there have been `private`
+  duplicates of those added for internal libaray use only.
 
 ---
