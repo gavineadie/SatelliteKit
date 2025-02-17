@@ -30,7 +30,13 @@ test output and the test output in the above published paper [1].
 ### Change Notes
 
 At the end of the README.
-Lastest change: Version/Tag 1.2.4 -- (2024 Sep 12)
+Lastest change: Version/Tag 2.0.0 -- (2025 Feb 16)
+
+### Important Changes • 2025 Feb 16
+
+__The temporary changes to accommodate throwing in the `position` and `velocity` functions has 
+been reversed which is a source-incompatible change.  Any use of `position_throwz()` can be 
+replaced with `position()` though the `throwz` versions remain available.__
 
 ### Important Changes • 2024 Sep 12
 
@@ -429,5 +435,21 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
   
   Since the non-throwing versions are used internally by `SatelliteKit`, there have been `private`
   duplicates of those added for internal libaray use only.
+
+`version/Tag 2.0.0 -- (2025 Feb 16)`
+
+- SatelliteKit version 2 is, nominally, a major upgrade though, in fact, not much has changed, and
+  nothing computationally.  It is
+  compatible with Swift 6 and required couple of minor source code changes in its clients.
+  
+  * The use of the `..._throwz()` functions can be replaced with non-throwz versions.
+  
+  * The function:
+  
+    `topPosition(minsAfterEpoch: Double, obsLatLonAlt: LatLonAlt)`
+  
+    is now:
+  
+    `topPosition(minsAfterEpoch: Double, observer: LatLonAlt)`
 
 ---

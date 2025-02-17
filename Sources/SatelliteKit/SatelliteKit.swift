@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ SatelliteKit.swift                                                                  SatelliteKit ║
-  ║ Created by Gavin Eadie on Aug05/17 ... Copyright 2016-24 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on Aug05/17 ... Copyright 2016-25 Ramsay Consulting. All rights reserved. ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 import Foundation
@@ -19,7 +19,7 @@ public struct SatelliteKit {
     var staticVersion = "~~VersionBuild~~"          // v1.1.0 (321)
     var staticLibDate = "~~AppBuildDate~~"          // Feb27/22
     var staticLibTime = "~~AppBuildTime~~"          // 20:15:10
-    var staticLibInfo = "~~CopyrightText~~"         // Copyright 2016-24 Ramsay Consulting
+    var staticLibInfo = "~~CopyrightText~~"         // Copyright 2016-25 Ramsay Consulting
 
     public static var version: String {
         guard let satelliteKitBundle = Bundle(identifier: "com.ramsaycons.SatelliteKit"),

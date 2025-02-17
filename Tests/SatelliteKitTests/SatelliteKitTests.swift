@@ -8,7 +8,7 @@ final class SatelliteKitTests: XCTestCase {
 
     }
 
-    static var allTests = [
-        ("testExample", testExample),
-    ]
+//    static var allTests = [
+//        ("testExample", testExample),
+//    ]
 }

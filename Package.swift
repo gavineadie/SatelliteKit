@@ -1,11 +1,11 @@
-// swift-tools-version: 5.10
+// swift-tools-version: 6.0
 
 import PackageDescription
 
 let package = Package(
     name: "SatelliteKit",
     platforms: [
-        .macOS(.v11), .iOS(.v12), .tvOS(.v12), .watchOS(.v4), .visionOS(.v1)
+        .macOS(.v11), .iOS(.v12), .tvOS(.v12), .watchOS(.v10), .visionOS(.v1)
     ],
     products: [
         .library(
@@ -15,10 +15,7 @@ let package = Package(
     targets: [
         .target(
             name: "SatelliteKit",
-            dependencies: [ ],
-            swiftSettings: [
-                .define("ENABLE_SOMETHING"/*, .when(configuration: .release)*/),
-            ]
+            dependencies: [ ]
         ),
         .testTarget(name: "SatelliteKitTests", dependencies: ["SatelliteKit"])
     ]

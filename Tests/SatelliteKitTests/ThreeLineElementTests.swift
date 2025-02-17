@@ -1,7 +1,7 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ ThreeLineElementTests.swift                                                                      ║
   ║                                                                                                  ║
-  ║ Created by Gavin Eadie on May05/19     Copyright 2019-24 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on May05/19     Copyright 2019-25 Ramsay Consulting. All rights reserved. ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
 import XCTest

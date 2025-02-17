@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ Satellite.swift                                                                           SatKit ║
-  ║ Created by Gavin Eadie on Sep07/15 ... Copyright 2015-24 Ramsay Consulting. All rights reserved. ║
+  ║ Created by Gavin Eadie on Sep07/15 ... Copyright 2015-25 Ramsay Consulting. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
@@ -92,14 +92,6 @@ public extension Satellite {
 
 }
 
-/*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
-  ║ non-THROWING (original) inertial position and velocity .. TODO: fatalError                       ║
-  ║                                                                                                  ║
-  ║     position, velocity                                                                           ║
-  ║                         → getPVCoordinates (throws)                                              ║
-  ║                                                                                                  ║
-  ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
-
 public extension Satellite {
 
 // MARK: - inertial position and velocity
@@ -107,76 +99,35 @@ public extension Satellite {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial position (Kilometers) at minutes after TLE epoch      │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    @available(*, deprecated, message: "a throwing version of this function is available 'position_throwz'")
-    func position(minsAfterEpoch: Double) -> Vector {
-        do {
-            let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
-            return Vector((pv.position.x)/1000.0,
-                          (pv.position.y)/1000.0,
-                          (pv.position.z)/1000.0)
-        } catch SatKitError.SGP(let sgpError) {
-            fatalError("Position for '\(self.commonName)' .. \(sgpError)")
-        } catch {
-            fatalError("Something else: \(error)")
-        }
-    }
-
-/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
-  ┆ return satellite's earth centered inertial position (Kilometers) at minutes after TLE epoch      ┆
-  ┆ NOTE: private non-throwing version for SatelliteKit use only                                     ┆
-  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
-    private func position_nothrow(minsAfterEpoch: Double) -> Vector {
-        do {
-            let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
-            return Vector((pv.position.x)/1000.0,
-                          (pv.position.y)/1000.0,
-                          (pv.position.z)/1000.0)
-        } catch SatKitError.SGP(let sgpError) {
-            fatalError("Position for '\(self.commonName)' .. \(sgpError)")
-        } catch {
-            fatalError("Something else: \(error)")
-        }
+    func position(minsAfterEpoch: Double) throws -> Vector {
+        let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
+        return Vector((pv.position.x)/1000.0,
+                      (pv.position.y)/1000.0,
+                      (pv.position.z)/1000.0)
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial position (Kilometers) at Julian Date                  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    @available(*, deprecated, message: "a throwing version of this function is available 'position_throwz'")
-    func position(julianDays: Double) -> Vector {
-        position(minsAfterEpoch: minsAfterEpoch(julianDays))
-    }
-
-/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
-  ┆ return satellite's earth centered inertial position (Kilometers) at Julian Date                  ┆
-  ┆ NOTE: private non-throwing version for SatelliteKit use only                                     ┆
-  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
-    private func position_nothrow(julianDays: Double) -> Vector {
-        position_nothrow(minsAfterEpoch: minsAfterEpoch(julianDays))
+    func position(julianDays: Double) throws -> Vector {
+        try position(minsAfterEpoch: minsAfterEpoch(julianDays))
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial velocity (Kms/second) at minutes after TLE epoch      │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    @available(*, deprecated, message: "a throwing version of this function is available 'velocity_throwz'")
-    func velocity(minsAfterEpoch: Double) -> Vector {
-        do {
-            let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
-            return Vector((pv.velocity.x)/1000.0,
-                          (pv.velocity.y)/1000.0,
-                          (pv.velocity.z)/1000.0)
-        } catch SatKitError.SGP(let sgpError) {
-            fatalError("Velocity for '\(self.commonName)' .. \(sgpError)")
-        } catch {
-            fatalError("Something else: \(error)")
-        }
+    func velocity(minsAfterEpoch: Double) throws -> Vector {
+        let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
+        return Vector((pv.velocity.x)/1000.0,
+                      (pv.velocity.y)/1000.0,
+                      (pv.velocity.z)/1000.0)
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial velocity (Kms/second) at Julian Date                  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    @available(*, deprecated, message: "a throwing version of this function is available 'velocity_throwz'")
-    func velocity(julianDays: Double) -> Vector {
-        velocity(minsAfterEpoch: minsAfterEpoch(julianDays))
+    func velocity(julianDays: Double) throws -> Vector {
+        try velocity(minsAfterEpoch: minsAfterEpoch(julianDays))
     }
 
 }
@@ -188,36 +139,37 @@ public extension Satellite {
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃  derive latitude, longitude and altitude at given time ..                                        ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-    func geoPosition(minsAfterEpoch: Double) -> LatLonAlt {
-        geoPosition(julianDays: julianDay(minsAfterEpoch))
+    func geoPosition(minsAfterEpoch: Double) throws -> LatLonAlt {
+        try geoPosition(julianDays: julianDay(minsAfterEpoch))
     }
 
-    func geoPosition(julianDays: Double) -> LatLonAlt {
-        eci2geo(julianDays: julianDays, celestial: position_nothrow(julianDays: julianDays))
+    func geoPosition(julianDays: Double) throws -> LatLonAlt {
+        eci2geo(julianDays: julianDays, celestial: try position(julianDays: julianDays))
     }
 
 // MARK: - azimuth, elevation and range
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃  return topological position (satellite's azimuth, elevation and range) at given time ..         ┃
+  ┃                                             .. throws because it depends on satellite position   ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
     func topPosition(julianDays: Double, observer: LatLonAlt) throws -> AziEleDst {
-        
-        let satCel = try position_throwz(julianDays: julianDays)            // ECI
+
+        let satCel = try position(julianDays: julianDays)                   // ECI
         let obsCel = geo2eci(julianDays: julianDays, geodetic: observer)    // ECI
-        
+
         let top = cel2top(julianDays: julianDays, satCel: satCel, obsCel: obsCel)
-        
+
         let z = top.magnitude()
-        
+
         return AziEleDst(atan2pi(top.y, -top.x) * rad2deg,
                          asin(top.z / z) * rad2deg,
                          z)
     }
 
-    func topPosition(minsAfterEpoch: Double, obsLatLonAlt: LatLonAlt) throws -> AziEleDst {
+    func topPosition(minsAfterEpoch: Double, observer: LatLonAlt) throws -> AziEleDst {
         try topPosition(julianDays: minsAfterEpoch * TimeConstants.min2day +
-                        (self.t₀Days1950 + JD.epoch1950), observer: obsLatLonAlt)
+                        (self.t₀Days1950 + JD.epoch1950), observer: observer)
     }
 
 }
@@ -244,35 +196,33 @@ public extension Satellite {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial position (Kilometers) at minutes after TLE epoch      │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    @available(*, deprecated, message: "SatelliteKit v2's 'position' functions now throws")
     func position_throwz(minsAfterEpoch: Double) throws -> Vector {
-        let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
-        return Vector((pv.position.x)/1000.0,
-                      (pv.position.y)/1000.0,
-                      (pv.position.z)/1000.0)
+        try position(minsAfterEpoch: minsAfterEpoch)
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial position (Kilometers) at Julian Date                  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    @available(*, deprecated, message: "SatelliteKit v2's 'position' functions now throws")
     func position_throwz(julianDays: Double) throws -> Vector {
-        try position_throwz(minsAfterEpoch: minsAfterEpoch(julianDays))
+        try position(julianDays: julianDays)
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial velocity (Kms/second) at minutes after TLE epoch      │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    @available(*, deprecated, message: "SatelliteKit v2's 'velocity' functions now throws")
     func velocity_throwz(minsAfterEpoch: Double) throws -> Vector {
-        let pv = try propagator.getPVCoordinates(minsAfterEpoch: minsAfterEpoch)
-        return Vector((pv.velocity.x)/1000.0,
-                      (pv.velocity.y)/1000.0,
-                      (pv.velocity.z)/1000.0)
+        try velocity(minsAfterEpoch: minsAfterEpoch)
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ return satellite's earth centered inertial velocity (Kms/second) at Julian Date                  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+    @available(*, deprecated, message: "SatelliteKit v2's 'velocity' functions now throws")
     func velocity_throwz(julianDays: Double) throws -> Vector {
-        try velocity_throwz(minsAfterEpoch: minsAfterEpoch(julianDays))
+        try velocity(julianDays: julianDays)
     }
 
 // MARK: - THROWING latitude, longitude and altitude
@@ -280,12 +230,14 @@ public extension Satellite {
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃  derive latitude, longitude and altitude at given time ..                                        ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+    @available(*, deprecated, message: "SatelliteKit v2's 'geoPosition' functions now throws")
     func geoPosition_throwz(minsAfterEpoch: Double) throws -> LatLonAlt {
-        try geoPosition_throwz(julianDays: julianDay(minsAfterEpoch))
+        try geoPosition(julianDays: julianDay(minsAfterEpoch))
     }
 
+    @available(*, deprecated, message: "SatelliteKit v2's 'geoPosition' functions now throws")
     func geoPosition_throwz(julianDays: Double) throws -> LatLonAlt {
-        try eci2geo(julianDays: julianDays, celestial: position_throwz(julianDays: julianDays))
+        try eci2geo(julianDays: julianDays, celestial: position(julianDays: julianDays))
     }
 
 // MARK: - THROWING azimuth, elevation and range
@@ -293,23 +245,14 @@ public extension Satellite {
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃  return topological position (satellite's azimuth, elevation and range) at given time ..         ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
+    @available(*, deprecated, message: "SatelliteKit v2's 'topPosition' functions now throws")
     func topPosition_throwz(julianDays: Double, observer: LatLonAlt) throws -> AziEleDst {
-
-        let satCel = try position_throwz(julianDays: julianDays)            // ECI
-        let obsCel = geo2eci(julianDays: julianDays, geodetic: observer)    // ECI
-        
-        let top = cel2top(julianDays: julianDays, satCel: satCel, obsCel: obsCel)
-        
-        let z = top.magnitude()
-        
-        return AziEleDst(atan2pi(top.y, -top.x) * rad2deg,
-                         asin(top.z / z) * rad2deg,
-                         z)
+        try topPosition(julianDays: julianDays, observer: observer)
     }
 
-    func topPosition_throwz(minsAfterEpoch: Double, obsLatLonAlt: LatLonAlt) throws -> AziEleDst {
-        try topPosition_throwz(julianDays: minsAfterEpoch * TimeConstants.min2day +
-                        (self.t₀Days1950 + JD.epoch1950), observer: obsLatLonAlt)
+    @available(*, deprecated, message: "SatelliteKit v2's 'topPosition' functions now throws")
+    func topPosition_throwz(minsAfterEpoch: Double, observer: LatLonAlt) throws -> AziEleDst {
+        try topPosition(minsAfterEpoch: minsAfterEpoch, observer: observer)
     }
 
 }

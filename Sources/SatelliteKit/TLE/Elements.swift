@@ -1,6 +1,6 @@
 /*╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
   ║ Elements.swift                                                                            SatKit ║
-  ║ Created by Gavin Eadie on May24/17         Copyright © 2017-24 Gavin Eadie. All rights reserved. ║
+  ║ Created by Gavin Eadie on May24/17         Copyright © 2017-25 Gavin Eadie. All rights reserved. ║
   ║──────────────────────────────────────────────────────────────────────────────────────────────────║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
@@ -452,7 +452,7 @@ func alpha5ID(_ noradID: String) -> UInt {              //      "B1234"      "5"
 import RegexBuilder
 
 @available(macOS 13.0, iOS 16, *)
-let lineOneRegEx = Regex {
+nonisolated(unsafe) let lineOneRegEx = Regex {
     "1 "
     Repeat(count: 5) {
         CharacterClass(
@@ -557,7 +557,7 @@ let lineOneRegEx = Regex {
 }
 
 @available(macOS 13.0, iOS 16, *)
-let lineTwoRegEx = Regex {
+nonisolated(unsafe) let lineTwoRegEx = Regex {
     "2 "
     Repeat(count: 5) {
         CharacterClass(
