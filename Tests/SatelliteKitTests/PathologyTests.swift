@@ -12,10 +12,6 @@ import XCTest
 
 class PathologyTests: XCTestCase {
 
-    override func setUp() {    }
-
-    override func tearDown() {    }
-
     class Pathology: XCTestCase {
 
         // # check error code 4 (0.0 ... 150.0 ... 5.00)

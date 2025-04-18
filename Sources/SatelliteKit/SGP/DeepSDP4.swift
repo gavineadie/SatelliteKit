@@ -51,7 +51,8 @@ class DeepSDP4: SDP4 {
     private var d2201 = 0.0, d2211 = 0.0
     private var d3210 = 0.0, d3222 = 0.0
     private var d4410 = 0.0, d4422 = 0.0
-    private var d5220 = 0.0, d5232 = 0.0, d5421 = 0.0, d5433 = 0.0
+    private var d5220 = 0.0, d5232 = 0.0
+    private var d5421 = 0.0, d5433 = 0.0
     private var xlamo = 0.0
 
     private var sse = 0.0, se2 = 0.0, se3 = 0.0
@@ -70,7 +71,7 @@ class DeepSDP4: SDP4 {
 
     private var resonant = false                        // for resonant orbits.
     private var synchronous = false                     // for synchronous orbits.
-    private var isDundeeCompliant = true                // for compliance with Dundee modifications.
+    private var isDundeeCompliant = false                // for compliance with Dundee modifications.
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │  Computes luni - solar terms from initial coordinates and epoch.                                 │

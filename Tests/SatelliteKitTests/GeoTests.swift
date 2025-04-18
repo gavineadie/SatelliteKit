@@ -11,10 +11,6 @@ final class GeoTests: XCTestCase {
 
     let JD = 2_458_965.464_745_4
 
-    override func setUpWithError() throws {   }
-
-    override func tearDownWithError() throws {   }
-
     func testAstro() {
 
         let topVectorA = eci2top(julianDays: 2458905.0,

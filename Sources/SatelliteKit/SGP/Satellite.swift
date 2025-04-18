@@ -67,7 +67,7 @@ public extension Satellite {
 
 public extension Satellite {
     
-    /// calculates the JD of  an offet (in minutes) from TLE epoch
+    /// calculates the JD of an offset (in minutes) from TLE epoch
     /// - Parameter minsAfterEpoch: minutes since `Satellite` epoch
     /// - Returns: the Julian date
     func julianDay(_ minsAfterEpoch: Double) -> Double {

@@ -50,6 +50,11 @@ public extension Elements {
         case tleClass = "CLASSIFICATION_TYPE"
         case tleNumber = "ELEMENT_SET_NO"
         case revNumber = "REV_AT_EPOCH"
+
+//                      "MEAN_MOTION_DOT"
+//                      "MEAN_MOTION_DDOT"
+//                      "RMS"
+//                      "DATA_SOURCE"
     }
 
     init(from decoder: Decoder) throws {

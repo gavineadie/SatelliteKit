@@ -12,9 +12,10 @@ class XmlTests: XCTestCase {
     func testXmlTLEArray() {
 
         var xmlText = """
-        <ndm xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
-               xsi:noNamespaceSchemaLocation="https://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd">
-            <omm>
+        <ndm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="https://sanaregistry.org/r/ndmxml_unqualified/ndmxml-2.0.0-master-2.0.xsd">
+
+            <omm id="CCSDS_OMM_VERS" version="2.0">
                 <header>
                     <CREATION_DATE/>
                     <ORIGINATOR/>

@@ -20,7 +20,6 @@ enum SatKitError: Error {
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃ The TLE struct .. Decodable for JSON usage ..                                                    ┃
-  ┃                                                               MemoryLayout<TLE>.size = 200 bytes ┃
   ┃                                                                                                  ┃
   ┃ Information derived directly from the Two Line Elements ..                                       ┃
   ┃                                          .. then un'Kozai'd for mean motion and semi major axis. ┃
@@ -233,7 +232,7 @@ extension Elements {
         do {
             let θ = cos(self.i₀)                                    //         cos(i₀)  ..  θ
             let x3thm1 = 3.0 * θ * θ - 1.0                          //      3×cos²(i₀) - 1
-            let β₀ = (1.0 - self.e₀ * self.e₀).squareRoot()         //         √(1-e₀²) ..  β₀
+            let β₀ = √(1.0 - self.e₀ * self.e₀)                     //         √(1-e₀²) ..  β₀
             let temp = 1.5 * EarthConstants.K₂ * x3thm1 / (β₀ * β₀ * β₀)
 
             let a₀ʹ = pow(EarthConstants.kₑ / n₀ʹ, ⅔)

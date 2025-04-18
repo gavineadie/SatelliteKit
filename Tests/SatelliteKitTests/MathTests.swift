@@ -11,10 +11,6 @@ import XCTest
 
 class MathTests: XCTestCase {
 
-    override func setUp() {    }
-
-    override func tearDown() {    }
-
     class MathsTest: XCTestCase {
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐

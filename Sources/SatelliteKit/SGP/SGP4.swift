@@ -45,7 +45,7 @@ class SGP4: Propagator {
             d₄ = 0.5 * temp * tle.a₀ * super.ξ * (221.0 * tle.a₀ + 31.0 * super.s) * super.c₁
             t₃cof = d₂ + 2.0 * c₁²
             t₄cof = 0.25 * (3.0 * d₃ + super.c₁ * (12.0 * d₂ + 10.0 * c₁²))
-            t₅cof =  0.2 * (3.0 * d₄ + 12.0 * super.c₁ * d₃ + 6.0 * d₂ * d₂ + 15.0 * c₁² * (2.0 * d₂ + c₁²))
+            t₅cof = 0.2  * (3.0 * d₄ + 12.0 * super.c₁ * d₃ + 6.0 * d₂ * d₂ + 15.0 * c₁² * (2.0 * d₂ + c₁²))
 
             if tle.e₀ > 1e-4 {
 //              omgcof = 0.0; xmcof = 0.0

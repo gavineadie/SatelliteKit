@@ -11,10 +11,6 @@ import XCTest
 
 class TimeTests: XCTestCase {
 
-    override func setUp() {    }
-
-    override func tearDown() {    }
-
     func testDate() {
         XCTAssertTrue(String(describing: TimeConstants.tleEpochReferenceDate) == "1949-12-31 00:00:00 +0000")
 

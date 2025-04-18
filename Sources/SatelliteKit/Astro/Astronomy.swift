@@ -67,7 +67,7 @@ public func siteMeanSiderealTime(date: Date, _ siteLongitude: Double) -> Double 
   ║                                                                                                  ║
   ║ GEO: (bad name) Right Ascension and Declination angles                                           ║
   ║                                                                                                  ║
-  ║ TOP: Earth surface latitude and longitude                                                        ║
+  ║ TOP: Earth surface latitude and longitude (topological)                                          ║
   ║                                                                                                  ║
   ║ xxx: azimuth, elevation and range from Observer's latitude and longitude                         ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/

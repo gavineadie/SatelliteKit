@@ -136,7 +136,7 @@ public class Propagator {
 
         self.e₀² = self.tle.e₀ * self.tle.e₀                //             e₀²
         self.β₀² = 1.0 - self.e₀²                           //          (1-e₀²)
-        self.β₀ = (self.β₀²).squareRoot()                   //         √(1-e₀²) ..  β₀
+        self.β₀ = √(self.β₀²)                               //         √(1-e₀²) ..  β₀
 
 /*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
@@ -290,9 +290,7 @@ public class Propagator {
                 else if Δepw < -maxNewtonRaphson { Δepw = -maxNewtonRaphson }
                 else { doSecondOrderNewtonRaphson = true }
             }
-            if doSecondOrderNewtonRaphson {
-                Δepw = f / (fdot + 0.5 * esinE * Δepw)
-            }
+            if doSecondOrderNewtonRaphson { Δepw = f / (fdot + 0.5 * esinE * Δepw) }
             epw += Δepw
         }
 
@@ -376,7 +374,7 @@ public class Propagator {
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
 public func selectPropagator(tle: Elements) -> Propagator {
 
-    if tle.ephemType == 2 { return SGP4(tle) }
+         if tle.ephemType == 2 { return SGP4(tle) }
     else if tle.ephemType == 3 { return DeepSDP4(tle) }
     else { return (π*2) / (tle.n₀ * TimeConstants.day2min) < (1.0 / 6.4) ? SGP4(tle) : DeepSDP4(tle) }
 
@@ -387,7 +385,7 @@ public func selectPropagator(tle: Elements) -> Propagator {
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
 public func selectPropagator(_ elements: Elements) -> Propagator {
 
-    if elements.ephemType == 2 { return SGP4(elements) }
+         if elements.ephemType == 2 { return SGP4(elements) }
     else if elements.ephemType == 3 { return DeepSDP4(elements) }
     else { return (π*2) / (elements.n₀ * TimeConstants.day2min) < (1.0 / 6.4) ?
                                                             SGP4(elements) : DeepSDP4(elements) }

@@ -11,10 +11,6 @@ import XCTest
 
 class AstroTests: XCTestCase {
 
-    override func setUp() {    }
-
-    override func tearDown() {    }
-
     func TestDs1950() {
         let s1 = solarCel(ds1950: 0.0)
         let s2 = solarCel(julianDays: 2433281.5)
