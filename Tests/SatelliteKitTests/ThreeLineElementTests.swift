@@ -10,7 +10,8 @@ import Foundation
 
 struct ThreeLineElementTests {
 
-    @Test func twoLines() {
+    @Test
+    func twoLines() {
         
         do {
             let tle = try Elements("",
@@ -24,7 +25,8 @@ struct ThreeLineElementTests {
         }
     }
     
-    @Test func nullLine0() {
+    @Test
+    func nullLine0() {
         do {
             let tle = try Elements("",
                                    "1 00000  57001    98001.00000000  .00000000  00000-0  00000-0 0  0000",
@@ -50,7 +52,8 @@ struct ThreeLineElementTests {
 
     }
 
-    @Test func indexedLine0() {
+    @Test
+    func indexedLine0() {
         do {
             let tle = try Elements("0 ZERO OBJECT",
                                    "1 00000  57001    98001.00000000  .00000000  00000-0  00000-0 0  0000",
@@ -74,7 +77,8 @@ struct ThreeLineElementTests {
 
     }
 
-    @Test func NoIndexTLE() {
+    @Test
+    func NoIndexTLE() {
 
         do {
             let tle = try Elements("ZERO OBJECT",
@@ -99,7 +103,8 @@ struct ThreeLineElementTests {
 
     }
 
-    @Test func CurrentTLE() {
+    @Test
+    func CurrentTLE() {
 
         do {
             let tle1 = try Elements("ISS (ZARYA)",
@@ -120,7 +125,8 @@ struct ThreeLineElementTests {
 
     }
 
-    @Test func SuccessFormatTLE() {
+    @Test
+    func SuccessFormatTLE() {
 
         #expect(formatOK("1 25544U 98067A   17108.89682041  .00002831  00000-0  50020-4 0  9990",
                          "2 25544  51.6438 333.8309 0007185  71.6711  62.5473 15.54124690 52531"))
@@ -130,7 +136,8 @@ struct ThreeLineElementTests {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ line 1 has no leading "1"                                                                        │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    @Test func FailureFormatTLE1() {
+    @Test
+    func FailureFormatTLE1() {
 
         #expect(!formatOK("X 25544U 98067A   17108.89682041  .00002831  00000-0  50020-4 0  9990",
                           "2 25544  51.6438 333.8309 0007185  71.6711  62.5473 15.54124690 52531"))
@@ -140,7 +147,8 @@ struct ThreeLineElementTests {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ line 1 has no leading "1" (blank)                                                                │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    @Test func FailureFormatTLE2() {
+    @Test
+    func FailureFormatTLE2() {
 
         #expect(!formatOK("  25544U 98067A   17108.89682041  .00002831  00000-0  50020-4 0  9990",
                           "2 25544  51.6438 333.8309 0007185  71.6711  62.5473 15.54124690 52531"))
@@ -150,7 +158,8 @@ struct ThreeLineElementTests {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ line 1 has bad checksum                                                                          │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    @Test func FailureFormatTLE3() {
+    @Test
+    func FailureFormatTLE3() {
 
         #expect(!formatOK("1 25544U 98067A   17108.89682041  .00002831  00000-0  50020-4 0  9991",
                           "2 25544  51.6438 333.8309 0007185  71.6711  62.5473 15.54124690 52531"))
@@ -160,7 +169,8 @@ struct ThreeLineElementTests {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ line 1 has bad length                                                                            │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    @Test func FailureFormatTLE4() {
+    @Test
+    func FailureFormatTLE4() {
 
         #expect(!formatOK("1 25544U 98067A   17108.89682041  .00002831  00000-0  50020-4 0 9991",
                           "2 25544  51.6438 333.8309 0007185  71.6711  62.5473 15.54124690 52531"))
@@ -170,7 +180,8 @@ struct ThreeLineElementTests {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ line 1 has non-zero ephemeris type                                                               │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    @Test func FailureNonZeroEphemType() {
+    @Test
+    func FailureNonZeroEphemType() {
 
         #expect(formatOK("1 44433U 19040B   19196.49919926  .00000000  00000-0  00000-0 2  5669",
                          "2 44433 052.6278 127.6338 9908875 004.4926 008.9324 00.01340565    01"))
@@ -186,7 +197,8 @@ struct ThreeLineElementTests {
         }
     }
     
-    @Test func TleAccess() {
+    @Test
+    func TleAccess() {
 
         let sat = Satellite("ISS (ZARYA)",
                             "1 25544U 98067A   17108.89682041  .00002831  00000-0  50020-4 0  9990",
@@ -196,7 +208,8 @@ struct ThreeLineElementTests {
 
     }
 
-    @Test func LongFile() {
+    @Test
+    func LongFile() {
 
         do {
             let contents = try String(contentsOfFile: "/Users/gavin/Library/Application Support/com.ramsaycons.tle/active.txt")
@@ -207,7 +220,8 @@ struct ThreeLineElementTests {
 
     }
 
-    @Test func Base34() {
+    @Test
+    func Base34() {
         #expect(base10ID(     "") == 0)
 
         #expect(alpha5ID(     "") == 0)
@@ -243,7 +257,8 @@ struct ThreeLineElementTests {
         #expect(alpha5ID("AAAAA") == 0, "got \(alpha5ID("AAAAA"))")
     }
 
-    @Test func Base10() {
+    @Test 
+    func Base10() {
         #expect(base10ID("") == 0)
 
         #expect(base10ID("5") == 5)

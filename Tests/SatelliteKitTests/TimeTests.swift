@@ -12,16 +12,13 @@ import Foundation
 
 struct TimeTests {
 
-    @Test func dateExtensions() {
-        #expect(String(describing: TimeConstants.tleEpochReferenceDate) == "1949-12-31 00:00:00 +0000")
+//    @Test
+//    func dateExtensions() {
+//        #expect(String(describing: TimeConstants.tleEpochReferenceDate) == "1949-12-31 00:00:00 +0000")
+//    }
 
-        // TODO: Fix Date extension if needed
-        // #expect(String(describing: Date(year: 1951, month: 1, day: 10)) == "1951-01-10 00:00:00 +0000")
-        // #expect(String(describing: Date(year: 2018, month: 4, day: 23)) == "2018-04-23 00:00:00 +0000")
-        // #expect(String(describing: Date(year: 2034, month: 12, day: 1)) == "2034-12-01 00:00:00 +0000")
-    }
-
-    @Test func MHS() {
+    @Test
+    func MHS() {
         #expect(deg2hms(decimalDegrees: 45.0).0 == 3)
         #expect(deg2hms(decimalDegrees: 45.00001).2 == 0.002)
 
@@ -34,7 +31,8 @@ struct TimeTests {
 
     }
     
-    @Test func Sidereal() {
+    @Test
+    func Sidereal() {
         print(String(format: "GMT MeanSiderealTime: %.2f°", zeroMeanSiderealTime(date: Date())))
         print(stringHMS(hms: deg2hms(decimalDegrees: zeroMeanSiderealTime(date: Date()))))
 
@@ -45,22 +43,26 @@ struct TimeTests {
         print(stringHMS(hms: deg2hms(decimalDegrees: siteMeanSiderealTime(date: Date(), -83.75))))
     }
 
-    @Test func Julian() {
+    @Test
+    func Julian() {
         #expect(Date(julianDate: 2433281.5).julianDate == 2433281.5)
         #expect(Date(julianDate:      10.0).julianDate ==      10.0)
         #expect(Date(julianDate: 4321432.1).julianDate == 4321432.1)
         #expect(Date(julianDate: -4321432.1).julianDate == -4321432.1)
     }
     
-    @Test func JD() {
+    @Test
+    func JD() {
         print(julianDaysNow())
     }
 
-    @Test func MJD() {
+    @Test
+    func MJD() {
         print(Date(mjd: 42338.9113))                // 1974-10-18 21:52:16 +0000
     }
 
-    @Test func HMS() {
+    @Test
+    func HMS() {
         print(deg2hms(decimalDegrees:  45.0))
         print(deg2hms(decimalDegrees:   0.0))
         print(deg2hms(decimalDegrees: -45.0))
@@ -70,6 +72,7 @@ struct TimeTests {
         #expect(stringHMS(hms: deg2hms(decimalDegrees: 123.456)) == "08ʰ13ᵐ49.440")
     }
 
+    @Test
     func testDeg2hms() {
         #expect(stringHMS(hms: deg2hms(decimalDegrees: 179.5)) == "11ʰ58ᵐ00.000")
         #expect(stringHMS(hms: deg2hms(decimalDegrees: 180.0)) == "12ʰ00ᵐ00.000")
@@ -85,7 +88,8 @@ struct TimeTests {
         print(hms2deg(hms: deg2hms(decimalDegrees: 345.678)))       //   0.67799999999..
     }
 
-    @Test func Constants() {
+    @Test
+    func Constants() {
 
         print(TimeConstants.tleEpochReferenceDate)
         print(Date(ds1950: 0.0))

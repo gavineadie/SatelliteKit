@@ -11,7 +11,8 @@ import Foundation
 @testable import SatelliteKit
 
 struct AstroTests {
-
+    
+    @Test
     func TestDs1950() {
         let s1 = solarCel(ds1950: 0.0)
         let s2 = solarCel(julianDays: 2433281.5)
@@ -21,7 +22,8 @@ struct AstroTests {
         #expect(s1.z == s2.z)
     }
 
-    @Test func Solar() {
+    @Test 
+    func Solar() {
         var baseJD: Double
         if #available(macOS 12, *) {
             baseJD = Date.now.julianDate

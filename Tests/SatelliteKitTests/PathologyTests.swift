@@ -11,6 +11,7 @@ import Testing
 import Foundation
 @testable import SatelliteKit
 
+// Expect(throws..) to implement?
 struct PathologyTests {
 
     struct Pathology {
