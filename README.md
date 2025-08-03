@@ -30,7 +30,11 @@ test output and the test output in the above published paper [1].
 ### Change Notes
 
 At the end of the README.
-Lastest change: Version/Tag 2.0.0 -- (2025 Feb 16)
+Lastest change: Version/Tag 2.1.0 -- (2025 Aug 03)
+
+### Important Changes • 2025 Aug 03
+
+Significant contributed changes. Source compatibility maintained.
 
 ### Important Changes • 2025 Feb 16
 
@@ -451,5 +455,17 @@ is mostly decorative, with no semantic value, this is not treated as an API chan
     is now:
   
     `topPosition(minsAfterEpoch: Double, observer: LatLonAlt)`
+
+`version/Tag 2.1.0 -- (2025 Aug 03) --  contributed by Mathis Gaignet`
+
+Swift 6 Sendable compatibility and Swift Testing migration
+- Migrated from class-based inheritance to protocol-based architecture
+- Added Sendable conformance to all public types
+- Replaced PropagatorProtocol with Propagable protocol
+- Implemented SGP4Propagator, SDP4Propagator, DeepSDP4Propagator structs
+- Updated Satellite to use any Propagable instead of Propagator class
+- Migrated test suite from XCTest to Swift Testing framework
+- Preserved 100% calculation accuracy through delegation pattern
+- Added backward compatibility functions for legacy API
 
 ---
