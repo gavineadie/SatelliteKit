@@ -7,12 +7,13 @@
 // swiftlint:disable line_length
 // swiftlint:disable identifier_name
 
-import XCTest
+import Testing
+import Foundation
 @testable import SatelliteKit
 
-class PathologyTests: XCTestCase {
+struct PathologyTests {
 
-    class Pathology: XCTestCase {
+    struct Pathology {
 
         // # check error code 4 (0.0 ... 150.0 ... 5.00)
         func test33333() {

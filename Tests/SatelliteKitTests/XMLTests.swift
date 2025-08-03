@@ -4,12 +4,13 @@
   ║ Created by Gavin Eadie on Nov09/22 ... Copyright 2017-25 Ramsay Consulting. All rights reserved. ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
-import XCTest
+import Testing
+import Foundation
 @testable import SatelliteKit
 
-class XmlTests: XCTestCase {
+struct XmlTests {
 
-    func testXmlTLEArray() {
+    @Test func XmlTLEArray() {
 
         var xmlText = """
         <ndm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -155,7 +156,7 @@ class XmlTests: XCTestCase {
 
     }
 
-    func testNewXmlTLEArray() {
+    @Test func NewXmlTLEArray() {
 
         var xmlText = """
         <?xml version="1.0" encoding="utf-8"?>
@@ -494,7 +495,7 @@ class XmlTests: XCTestCase {
 
     }
     
-//    func testXMLMassiveArray() async {
+//    @Test func XMLMassiveArray() async {
 //
 //        do {
 //            var xmlText = try String(contentsOf: URL(fileURLWithPath:

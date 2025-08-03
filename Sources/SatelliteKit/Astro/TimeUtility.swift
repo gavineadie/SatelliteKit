@@ -21,7 +21,7 @@ import Foundation
   ┃                                          NORAD: 0 -- JD: 2433281.5    |                          ┃
   ┃                                              |||                 Apple: 0 -- JD: 2451910.5       ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-public struct JD {
+public struct JD: Sendable {
 
            static let modJDZero: TimeInterval = 2400000.5   // Modified JD (MJD) zero
            static let epoch1900: TimeInterval = 2415020.0   // 1900 Jan 0.5
@@ -32,7 +32,7 @@ public struct JD {
 
 }
 
-public struct TimeConstants {
+public struct TimeConstants: Sendable {
 
            static let       daysPerYear = 365.25        // days in a Julian year
     public static let    daysPerCentury = 36525.0       // days in a Julian century

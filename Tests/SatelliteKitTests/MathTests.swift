@@ -6,12 +6,13 @@
 
 // swiftlint:disable comma
 
-import XCTest
+import Testing
+import Foundation
 @testable import SatelliteKit
 
-class MathTests: XCTestCase {
+struct MathTests {
 
-    class MathsTest: XCTestCase {
+    struct MathsTest {
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │                                                                                                  │
@@ -26,102 +27,102 @@ class MathTests: XCTestCase {
   │               |                                                                                  │
   │                                                                                                  │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-        func testTrig() {
+        @Test func Trig() {
 
-            XCTAssertEqual((atan2pi(+1.0, +1.0) * rad2deg),  45.0)
-            XCTAssertEqual((atan2pi(+1.0, -1.0) * rad2deg), 135.0)
-            XCTAssertEqual((atan2pi(-1.0, -1.0) * rad2deg), 225.0)
-            XCTAssertEqual((atan2pi(-1.0, +1.0) * rad2deg), 315.0)
+            #expect((atan2pi(+1.0, +1.0) * rad2deg) == 45.0)
+            #expect((atan2pi(+1.0, -1.0) * rad2deg) == 135.0)
+            #expect((atan2pi(-1.0, -1.0) * rad2deg) == 225.0)
+            #expect((atan2pi(-1.0, +1.0) * rad2deg) == 315.0)
 
         }
 
-        func testAlmost() {
+        @Test func Almost() {
 
-            XCTAssertTrue (almostEqual(10.0, 10.000000000000001), "10.0 ≈ 10.000000000000001")
-            XCTAssertTrue (almostEqual(10.0,  9.999999999999999), "10.0 ≈  9.999999999999999")
+            #expect(almostEqual(10.0, 10.000000000000001))
+            #expect(almostEqual(10.0,  9.999999999999999))
 
-            XCTAssertTrue (almostEqual(10.0, 10.000000000000002), "10.0 ≈ 10.000000000000002")
-            XCTAssertTrue (almostEqual(10.0,  9.999999999999998), "10.0 ≈  9.999999999999998")
+            #expect(almostEqual(10.0, 10.000000000000002))
+            #expect(almostEqual(10.0,  9.999999999999998))
 
-            XCTAssertFalse (almostEqual(10.0, 10.000000000000005), "10.0 ≈ 10.000000000000003")
-            XCTAssertFalse (almostEqual(10.0,  9.999999999999995), "10.0 ≈  9.999999999999997")
+            #expect(!almostEqual(10.0, 10.000000000000005))
+            #expect(!almostEqual(10.0,  9.999999999999995))
 
-            XCTAssertFalse (almostEqual(10.0, 10.00000000000001),  "10.0 ≉ 10.00000000000001")
-            XCTAssertFalse (almostEqual(10.0,  9.99999999999999),  "10.0 ≉  9.99999999999999")
+            #expect(!almostEqual(10.0, 10.00000000000001))
+            #expect(!almostEqual(10.0,  9.99999999999999))
 
-            XCTAssertFalse (almostEqual(1e-200, 1e-201), "1e-200 ≉ 1e-201")
+            #expect(!almostEqual(1e-200, 1e-201))
 
-            XCTAssertTrue (10.0 ≈ 10.000000000000001, "10.0 ≈ 10.000000000000001")
-            XCTAssertTrue (10.0 ≈  9.999999999999999, "10.0 ≈  9.999999999999999")
+            #expect(10.0 ≈ 10.000000000000001)
+            #expect(10.0 ≈  9.999999999999999)
 
-            XCTAssertFalse (10.0 ≈ 10.00000000000001,  "10.0 ≉ 10.00000000000001")
-            XCTAssertFalse (10.0 ≈  9.99999999999999,  "10.0 ≉  9.99999999999999")
+            #expect(!(10.0 ≈ 10.00000000000001))
+            #expect(!(10.0 ≈  9.99999999999999))
 
-            XCTAssertFalse (1e-200 ≈ 1e-201, "1e-200 ≉ 1e-201")
+            #expect(!(1e-200 ≈ 1e-201))
        }
 
-        func testDotProduct() {
+        @Test func DotProduct() {
 
             var v1 = Vector()
             var v2 = Vector()
 
-            XCTAssertEqual (v1 • v2, 0.0, "(0.0, 0.0, 0.0) • (0.0, 0.0, 0.0))")
+            #expect((v1 • v2) == 0.0)
 
             v1 = Vector(1.0, 0.0, 0.0)
             v2 = Vector(1.0, 0.0, 0.0)
-            XCTAssertEqual (v1 • v2, 1.0, "(1.0, 0.0, 0.0) • (1.0, 0.0, 0.0))")
+            #expect((v1 • v2) == 1.0)
 
             v1 = Vector(1.0, 3.0, -5.0)
             v2 = Vector(4.0, -2.0, -1.0)
-            XCTAssertEqual (v1 • v2, 3.0, "(1.0, 0.0, 0.0) • (0.0, 1.0, 0.0))")
+            #expect((v1 • v2) == 3.0)
 
         }
 
-        func testCrossProduct() {
+        @Test func CrossProduct() {
 
             var v1 = Vector(1.0, 0.0, 0.0)
             var v2 = Vector(0.0, 1.0, 0.0)
 
-            XCTAssertEqual (v1 ⨯ v2, Vector(0.0, 0.0, +1.0), "(1.0, 0.0, 0.0) ⨯ (0.0, 1.0, 0.0) == (0.0, 0.0, +1.0)")
-            XCTAssertEqual (v2 ⨯ v1, Vector(0.0, 0.0, -1.0), "(0.0, 1.0, 0.0) ⨯ (1.0, 0.0, 0.0) == (0.0, 0.0, -1.0)")
+            #expect((v1 ⨯ v2) == Vector(0.0, 0.0, +1.0))
+            #expect((v2 ⨯ v1) == Vector(0.0, 0.0, -1.0))
 
             v1 = Vector(0.0, 0.0, 1.0)
             v2 = Vector(0.0, 1.0, 0.0)
 
-            XCTAssertEqual (v2 ⨯ v1, Vector(1.0, 0.0, 0.0), "(0.0, 1.0, 0.0) ⨯ (0.0, 0.0, 1.0) == (0.0, 0.0, +1.0)")
+            #expect((v2 ⨯ v1) == Vector(1.0, 0.0, 0.0))
 
         }
 
-        func testLimits() {
-            XCTAssertEqual(limit180(180.0), 180.0)
-            XCTAssertEqual(limit180(120.0), 120.0)
-            XCTAssertEqual(limit180(60.0), 60.0)
-            XCTAssertEqual(limit180(0.0), 0.0)
-            XCTAssertEqual(limit180(-60.0), -60.0)
-            XCTAssertEqual(limit180(-120.0), -120.0)
-            XCTAssertEqual(limit180(-180.0), -180.0)
-            XCTAssertEqual(limit180(-240.0), 120.0)
+        @Test func Limits() {
+            #expect(limit180(180.0) == 180.0)
+            #expect(limit180(120.0) == 120.0)
+            #expect(limit180(60.0) == 60.0)
+            #expect(limit180(0.0) == 0.0)
+            #expect(limit180(-60.0) == -60.0)
+            #expect(limit180(-120.0) == -120.0)
+            #expect(limit180(-180.0) == -180.0)
+            #expect(limit180(-240.0) == 120.0)
 
-            XCTAssertEqual(limit360(420.0), 60.0)
-            XCTAssertEqual(limit360(360.0), 360.0)
-            XCTAssertEqual(limit360(300.0), 300.0)
-            XCTAssertEqual(limit360(240.0), 240.0)
-            XCTAssertEqual(limit360(180.0), 180.0)
-            XCTAssertEqual(limit360(120.0), 120.0)
-            XCTAssertEqual(limit360(60.0), 60.0)
-            XCTAssertEqual(limit360(0.0), 0.0)
-            XCTAssertEqual(limit360(-60.0), 300.0)
-            XCTAssertEqual(limit360(-120.0), 240.0)
-            XCTAssertEqual(limit360(-180.0), 180.0)
-            XCTAssertEqual(limit360(-240.0), 120.0)
+            #expect(limit360(420.0) == 60.0)
+            #expect(limit360(360.0) == 360.0)
+            #expect(limit360(300.0) == 300.0)
+            #expect(limit360(240.0) == 240.0)
+            #expect(limit360(180.0) == 180.0)
+            #expect(limit360(120.0) == 120.0)
+            #expect(limit360(60.0) == 60.0)
+            #expect(limit360(0.0) == 0.0)
+            #expect(limit360(-60.0) == 300.0)
+            #expect(limit360(-120.0) == 240.0)
+            #expect(limit360(-180.0) == 180.0)
+            #expect(limit360(-240.0) == 120.0)
 
-            XCTAssertEqual(limit360(360.00001),   0.00001, accuracy: 0.0000000001)
-            XCTAssertEqual(limit360(360.00000), 360.0)
-            XCTAssertEqual(limit360(359.99999), 359.99999, accuracy: 0.0000000001)
+            #expect(abs(limit360(360.00001) -   0.00001) < 0.0000000001)
+            #expect(limit360(360.00000) == 360.0)
+            #expect(abs(limit360(359.99999) - 359.99999) < 0.0000000001)
 
         }
 
-        func testnormalizeAngle() {
+        @Test func normalizeAngle() {
 
             for angle in stride(from: -400.0, to: +400.0, by: 20.0) {
                 print("   \(angle) : \((fmod2pi_0(angle*deg2rad)*rad2deg).roundTo6Places())")
@@ -130,7 +131,7 @@ class MathTests: XCTestCase {
         }
 
 //        @available(OSX 10.12, *)
-//        func testUnits() {
+//        @Test func Units() {
 //            let degrees = Measurement<UnitAngle>(value: 1.0, unit: .degrees)
 //            print(degrees.description)
 //

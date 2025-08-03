@@ -35,7 +35,7 @@ import Foundation
   ┃  @author Fabien Maussion (java translation)                                                      ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
 
-public struct EarthConstants {
+public struct EarthConstants: Sendable {
 
     public static let Rₑ = 6378.135                    // Earth radius (Km) - WGS72
 
@@ -55,6 +55,58 @@ public struct EarthConstants {
 
     private static let J₄ = -1.65597e-6
     static let K₄ = -0.375 * J₄
+}
+
+public protocol Propagable: Sendable {
+    var tle: Elements { get }
+    var e: Double { get }
+    var i: Double { get }
+    var ω: Double { get }
+    var Ω: Double { get }
+    
+    func getPVCoordinates(minsAfterEpoch: Double) throws -> PVCoordinates
+    func getPVCoordinates(_ date: Date) throws -> PVCoordinates
+}
+
+public struct PropagatorData: Sendable {
+    let tle: Elements
+    let perigee: Double                     // perigee (in Kms)
+    let θ²: Double                          //
+
+    let M_dot: Double                       // common parameter for mean anomaly (M) computation.
+    let ω_dot: Double                       // common parameter for perigee argument (ω) computation.
+    let Ω_dot: Double                       // common parameter for raan (Ω) computation.
+    let xnodcf: Double                      // common parameter for raan ( ) computation.
+
+    let e₀²: Double                         // original eccentricity squared .. e₀²
+    let β₀²: Double                         //                                1-e₀²
+    let β₀: Double                          //                              √(1-e₀²)
+
+    let ξ: Double                           // tsi from SPTRCK #3.
+    let η: Double                           // eta from SPTRCK #3.
+    let η²: Double                          // eta squared.
+    let eeta: Double                        // original e₀ * eta.
+
+    let coef: Double                        // coef for SGP C3 computation.
+    let coef1: Double                       // coef for SGP C5 computation.
+
+    let c₁: Double                          //  C1 from SPTRCK #3.
+    let c₂: Double                          //  C2 from SPTRCK #3.
+    let c₄: Double                          //  C4 from SPTRCK #3.
+    let t2cof: Double                       // 3/2 * C1.
+
+    let sini₀: Double                       // sin original inclination.
+    let cosi₀: Double                       // cos original inclination.
+    let s: Double                           // s* new value for the contant s.
+}
+
+struct PropagatorState: Sendable {
+    var e: Double                           // final eccentricity.
+    var i: Double                           // final inclination.
+    var ω: Double                           // final argument of perigee.
+    var Ω: Double                           // final RA of ascending node.
+    var a: Double                           // final semi major axis.
+    var xl: Double                          //   L from SPTRCK #3.
 }
 
 public class Propagator {
@@ -369,25 +421,252 @@ public class Propagator {
 
 }
 
-/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ Period >= 225 minutes is deep space                                                              │
-  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-public func selectPropagator(tle: Elements) -> Propagator {
+func createPropagatorData(_ initialTLE: Elements) -> PropagatorData {
+    let perigee = (initialTLE.a₀ * (1.0 - initialTLE.e₀) - 1.0) * EarthConstants.Rₑ
+    
+    let s: Double
+    switch perigee {
+        case ..<98.0:       s = 20.0
+        case 98.0...156.0:  s = perigee - 78.0
+        default:            s = 78.0
+    }
+    let q₀_s = (120.0 - s) / EarthConstants.Rₑ
+    let sFinal = s / EarthConstants.Rₑ + 1.0
+    
+    let sini₀ = sin(initialTLE.i₀)
+    let cosi₀ = cos(initialTLE.i₀)
+    let θ² = cosi₀ * cosi₀
+    
+    let e₀² = initialTLE.e₀ * initialTLE.e₀
+    let β₀² = 1.0 - e₀²
+    let β₀ = √(β₀²)
+    
+    let ξ = 1.0 / (initialTLE.a₀ - sFinal)
+    let η = initialTLE.a₀ * initialTLE.e₀ * ξ
+    let η² = η * η
+    let eeta = initialTLE.e₀ * η
+    
+    let coef = q₀_s * q₀_s * q₀_s * q₀_s * ξ * ξ * ξ * ξ
+    let ψ² = abs(1.0 - η²)
+    let coef1 = coef / pow(ψ², 3.5)
+    
+    let x3thm1 = 3.0 * θ² - 1.0
+    let c₂ = coef1 * initialTLE.n₀ * (initialTLE.a₀ * (1.0 + 1.5 * η² + eeta * (4.0 + η²)) +
+                     0.75 * EarthConstants.K₂ * ξ / ψ² * x3thm1 *
+                             (8.0 + 3.0 * η² * (8.0 + η²)))
+    let c₁ = initialTLE.dragCoeff * c₂
+    
+    let x1mth2 = 1.0 - θ²
+    
+    let c₄ = 2.0 * initialTLE.n₀ * coef1 * initialTLE.a₀ * β₀² * (η * (2.0 + 0.5 * η²) +
+        initialTLE.e₀ * (0.5 + 2.0 * η²) - 2.0 * EarthConstants.K₂ * ξ / (initialTLE.a₀ * ψ²) *
+        (-3.0 * x3thm1 * (1.0 - 2.0 * eeta + η² * (1.5 - 0.5 * eeta)) +
+            0.75 * x1mth2 * (2.0 * η² - eeta * (1.0 + η²)) * cos(2.0 * initialTLE.ω₀)))
+    
+    let pinv = 1.0 / (initialTLE.a₀ * β₀²)
+    let pinv² = pinv * pinv
+    
+    let temp1 = 3.0 * EarthConstants.K₂ * pinv² * initialTLE.n₀
+    let temp2 = temp1 * EarthConstants.K₂ * pinv²
+    let temp3 = 1.25 * EarthConstants.K₄ * pinv² * pinv² * initialTLE.n₀
+    
+    let θ⁴ = θ² * θ²
+    let M_dot = initialTLE.n₀ + 0.5 * temp1 * β₀ * x3thm1 +
+                       0.0625 * temp2 * β₀ * (13.0 - 78.0 * θ² + 137.0 * θ⁴)
+    
+    let x1m5θ² = 1.0 - 5.0 * θ²
+    
+    let ω_dot = -0.5 * temp1 * x1m5θ² + 0.0625 * temp2 * (7.0 - 114.0 * θ² + 395.0 * θ⁴) +
+                                                   temp3 * (3.0 - 36.0 * θ² + 49.0 * θ⁴)
+    
+    let xhdot1 = -temp1 * cosi₀
+    
+    let Ω_dot = xhdot1 + (0.5 * temp2 * (4.0 - 19.0 * θ²) +
+                         2.0 * temp3 * (3.0 - 7.0 * θ²)) * cosi₀
+    let xnodcf = 3.5 * β₀² * xhdot1 * c₁
+    let t2cof = 1.5 * c₁
+    
+    return PropagatorData(
+        tle: initialTLE,
+        perigee: perigee,
+        θ²: θ²,
+        M_dot: M_dot,
+        ω_dot: ω_dot,
+        Ω_dot: Ω_dot,
+        xnodcf: xnodcf,
+        e₀²: e₀²,
+        β₀²: β₀²,
+        β₀: β₀,
+        ξ: ξ,
+        η: η,
+        η²: η²,
+        eeta: eeta,
+        coef: coef,
+        coef1: coef1,
+        c₁: c₁,
+        c₂: c₂,
+        c₄: c₄,
+        t2cof: t2cof,
+        sini₀: sini₀,
+        cosi₀: cosi₀,
+        s: sFinal
+    )
+}
 
-         if tle.ephemType == 2 { return SGP4(tle) }
-    else if tle.ephemType == 3 { return DeepSDP4(tle) }
-    else { return (π*2) / (tle.n₀ * TimeConstants.day2min) < (1.0 / 6.4) ? SGP4(tle) : DeepSDP4(tle) }
+func computePVCoordinates(data: PropagatorData, state: PropagatorState) throws -> PVCoordinates {
+/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+  ┆ long period periodics                                                                            ┆
+  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+    let axn = state.e * cos(state.ω)
+    var temp = 1.0 / (state.a * (1.0 - state.e * state.e))
+    let xlcof = 0.125 * EarthConstants.J₃OVK₂ * data.sini₀ *
+                                            (3.0 + 5.0 * data.cosi₀) / (1.0 + data.cosi₀)
+    let aycof = 0.250 * EarthConstants.J₃OVK₂ * data.sini₀
+    let aynl = temp * aycof
+    let xlt = state.xl + temp * xlcof * axn
+    let ayn = state.e * sin(state.ω) + aynl
+    let elsq = axn * axn + ayn * ayn
 
+    if elsq > 1.0 { throw SatKitError.SGP(sgpError: "4: semi-latus rectum < 0.0") }
+
+    let capu = fmod2pi_π(xlt - state.Ω)           // normalize an angle between 0 and 2π
+
+/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+  ┆ Dundee changes:  items dependent on cosio get recomputed:                                        ┆
+  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+    let cosθ² = data.cosi₀ * data.cosi₀
+    let x3thm1 = 3.0 * cosθ² - 1.0
+    let x1mth2 = 1.0 - cosθ²
+    let x7thm1 = 7.0 * cosθ² - 1.0
+
+    if state.e > (1 - 1e-6) { throw SatKitError.SGP(sgpError: "1: eccentricity too close to 1.0") }
+
+/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+  ┆ Solve Kepler's Equation ..                                                                       ┆
+  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+    var epw = capu
+    var sinEPW = 0.0
+    var cosEPW = 0.0
+    var ecosE = 0.0
+    var esinE = 0.0
+
+    let newtonRaphsonEpsilon = 1e-12
+    for j in 0...10 {
+        var doSecondOrderNewtonRaphson = true
+
+        sinEPW = sin(epw)
+        cosEPW = cos(epw)
+        ecosE = axn * cosEPW + ayn * sinEPW
+        esinE = axn * sinEPW - ayn * cosEPW
+        let f = capu - epw + esinE
+        if abs(f) < newtonRaphsonEpsilon { break }
+
+        let fdot = 1.0 - ecosE
+        var Δepw = f / fdot
+        if j == 0 {
+            let maxNewtonRaphson = 1.25 * abs(state.e)
+            doSecondOrderNewtonRaphson = false
+            if Δepw > maxNewtonRaphson { Δepw = maxNewtonRaphson }
+            else if Δepw < -maxNewtonRaphson { Δepw = -maxNewtonRaphson }
+            else { doSecondOrderNewtonRaphson = true }
+        }
+        if doSecondOrderNewtonRaphson { Δepw = f / (fdot + 0.5 * esinE * Δepw) }
+        epw += Δepw
+    }
+
+/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+  ┆ Short period preliminary quantities                                                              ┆
+  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+    temp = 1.0 - elsq
+    let pl = state.a * temp
+    let r = state.a * (1.0 - ecosE)
+    var temp2 = state.a / r
+    let betal = temp.squareRoot()
+    temp = esinE / (1.0 + betal)
+    let cosu = temp2 * (cosEPW - axn + ayn * temp)
+    let sinu = temp2 * (sinEPW - ayn - axn * temp)
+    let u = atan2(sinu, cosu)
+    let sin2u = 2.0 * sinu * cosu
+    let cos2u = 2.0 * cosu * cosu - 1.0
+    let temp1 = EarthConstants.K₂ / pl
+    temp2 = temp1 / pl
+
+/*╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+  ┆ Update for short periodics                                                                       ┆
+  ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯*/
+    let rk = r * (1.0 - 1.5 * temp2 * betal * x3thm1) + 0.5 * temp1 * x1mth2 * cos2u
+
+    if rk < 1 { throw SatKitError.SGP(sgpError: "6: decay condition .. radius < Rₑ") }
+
+    let uk = u - 0.25 * temp2 * x7thm1 * sin2u
+    let xnodek = state.Ω + 1.5 * temp2 * data.cosi₀ * sin2u
+    let xinck = state.i + 1.5 * temp2 * data.cosi₀ * data.sini₀ * cos2u
+
+    // Orientation vectors
+    let sinuk = sin(uk)
+    let cosuk = cos(uk)
+    let sinik = sin(xinck)
+    let cosik = cos(xinck)
+    let sinnok = sin(xnodek)
+    let cosnok = cos(xnodek)
+    let xmx = -sinnok * cosik
+    let xmy =  cosnok * cosik
+    let ux = xmx * sinuk + cosnok * cosuk
+    let uy = xmy * sinuk + sinnok * cosuk
+    let uz = sinik * sinuk
+
+    // Position and velocity
+    let cr = 1000.0 * rk * EarthConstants.Rₑ
+    let pos = Vector(cr * ux, cr * uy, cr * uz)
+
+    let rdot   = EarthConstants.kₑ * √(state.a) * esinE / r
+    let rfdot  = EarthConstants.kₑ * √(pl) / r
+    let xn     = EarthConstants.kₑ / (state.a * √(state.a))
+    let rdotk  = rdot - xn * temp1 * x1mth2 * sin2u
+    let rfdotk = rfdot + xn * temp1 * (x1mth2 * cos2u + 1.5 * x3thm1)
+    let vx     = xmx * cosuk - cosnok * sinuk
+    let vy     = xmy * cosuk - sinnok * sinuk
+    let vz     = sinik * cosuk
+
+    let cv = 1000.0 * EarthConstants.Rₑ / 60.0
+    let vel = Vector(cv * (rdotk * ux + rfdotk * vx),
+                     cv * (rdotk * uy + rfdotk * vy),
+                     cv * (rdotk * uz + rfdotk * vz))
+
+    if (cv * (rdotk * ux + rfdotk * vx)).isNaN { throw SatKitError.SGP(sgpError: "nan") }
+
+    return PVCoordinates(position: pos, velocity: vel)
 }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ Period >= 225 minutes is deep space                                                              │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-public func selectPropagator(_ elements: Elements) -> Propagator {
+public func selectPropagator(tle: Elements) -> any Propagable {
+         if tle.ephemType == 2 { return SGP4Propagator(tle) }
+    else if tle.ephemType == 3 { return DeepSDP4Propagator(tle) }
+    else { return (π*2) / (tle.n₀ * TimeConstants.day2min) < (1.0 / 6.4) ? SGP4Propagator(tle) : DeepSDP4Propagator(tle) }
+}
 
+/*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Period >= 225 minutes is deep space                                                              │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
+public func selectPropagator(_ elements: Elements) -> any Propagable {
+         if elements.ephemType == 2 { return SGP4Propagator(elements) }
+    else if elements.ephemType == 3 { return DeepSDP4Propagator(elements) }
+    else { return (π*2) / (elements.n₀ * TimeConstants.day2min) < (1.0 / 6.4) ?
+                                                            SGP4Propagator(elements) : DeepSDP4Propagator(elements) }
+}
+
+// Backward cptblty
+public func selectPropagatorLegacy(tle: Elements) -> Propagator {
+         if tle.ephemType == 2 { return SGP4(tle) }
+    else if tle.ephemType == 3 { return DeepSDP4(tle) }
+    else { return (π*2) / (tle.n₀ * TimeConstants.day2min) < (1.0 / 6.4) ? SGP4(tle) : DeepSDP4(tle) }
+}
+
+public func selectPropagatorLegacy(_ elements: Elements) -> Propagator {
          if elements.ephemType == 2 { return SGP4(elements) }
     else if elements.ephemType == 3 { return DeepSDP4(elements) }
     else { return (π*2) / (elements.n₀ * TimeConstants.day2min) < (1.0 / 6.4) ?
                                                             SGP4(elements) : DeepSDP4(elements) }
-
 }

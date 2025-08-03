@@ -6,21 +6,22 @@
 
 // swiftlint:disable comma
 
-import XCTest
+import Testing
+import Foundation
 @testable import SatelliteKit
 
-class AstroTests: XCTestCase {
+struct AstroTests {
 
     func TestDs1950() {
         let s1 = solarCel(ds1950: 0.0)
         let s2 = solarCel(julianDays: 2433281.5)
 
-        XCTAssertEqual(s1.x, s2.x)
-        XCTAssertEqual(s1.y, s2.y)
-        XCTAssertEqual(s1.z, s2.z)
+        #expect(s1.x == s2.x)
+        #expect(s1.y == s2.y)
+        #expect(s1.z == s2.z)
     }
 
-    func testSolar() {
+    @Test func Solar() {
         var baseJD: Double
         if #available(macOS 12, *) {
             baseJD = Date.now.julianDate

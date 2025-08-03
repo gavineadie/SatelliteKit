@@ -4,12 +4,13 @@
   ║ Created by Gavin Eadie on Sep25/22     Copyright 2020-25 Ramsay Consulting. All rights reserved. ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
-import XCTest
+import Testing
+import Foundation
 @testable import SatelliteKit
 
-class JSONElementTests: XCTestCase {
+struct JSONElementTests {
     
-    func testJsonOneSmall() {
+    @Test func JsonOneSmall() {
         let jsonData = """
             {"OBJECT_NAME":"XINGYUN-2 01",
             "OBJECT_ID":"2020-028A",
@@ -41,7 +42,7 @@ class JSONElementTests: XCTestCase {
         }
     }
     
-    func testJsonOneLarge() {
+    @Test func JsonOneLarge() {
         let jsonData = """
         {
             "CCSDS_OMM_VERS":"2.0",
@@ -95,7 +96,7 @@ class JSONElementTests: XCTestCase {
         }
     }
 
-    func testJsonArray() {
+    @Test func JsonArray() {
         let jsonText = """
             [{
             "OBJECT_NAME": "ATLAS CENTAUR 2",
@@ -169,7 +170,7 @@ class JSONElementTests: XCTestCase {
         }
     }
     
-//    func testJsonMassiveArray() async {
+//    @Test func JsonMassiveArray() async {
 //        
 //        do {
 //            let jsonData = try Data(contentsOf: URL(fileURLWithPath:
