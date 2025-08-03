@@ -6,12 +6,13 @@
 
 // swiftlint statement_position
 
-import XCTest
+import Testing
+import Foundation
 @testable import SatelliteKit
 
-class PosVelThrowingTests: XCTestCase {
+struct PosVelThrowingTests {
 
-    func testSatPosition() {
+    @Test func SatPosition() {
 
         let sat = Satellite(
             "ISS (ZARYA)",

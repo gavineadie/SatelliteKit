@@ -8,9 +8,9 @@
 
 import Foundation
 
-public struct Satellite {
+public struct Satellite: Sendable {
 
-    private let propagator: Propagator
+    private let propagator: any Propagable
 
     public let tle: Elements                            // make TLE accessible
     public let commonName: String                       // "COSMOS .."
@@ -22,7 +22,7 @@ public struct Satellite {
     public var ω: Double { return propagator.ω }        //###
     public var Ω: Double { return propagator.Ω }        //###
 
-    public var extraInfo = [String: AnyObject]()
+    public let extraInfo: [String: any Sendable]
 
 }
 
@@ -30,35 +30,33 @@ public extension Satellite {
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │  Initialize Satellite with TLE struct ..                                                         │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    init(withTLE elements: Elements) {
+    init(withTLE elements: Elements, extraInfo: [String: any Sendable] = [:]) {
         self.propagator = selectPropagator(tle: elements)
-
         self.tle = elements
-
         self.commonName = propagator.tle.commonName.isEmpty ? propagator.tle.launchName : 
                                                                propagator.tle.commonName
         self.noradIdent = String(propagator.tle.noradIndex)      // convert UInt to String
         self.t₀Days1950 = propagator.tle.t₀
+        self.extraInfo = extraInfo
     }
 
-    init(elements: Elements) {
+    init(elements: Elements, extraInfo: [String: any Sendable] = [:]) {
         self.propagator = selectPropagator(tle: elements)
-
         self.tle = elements
-
         self.commonName = propagator.tle.commonName.isEmpty ? propagator.tle.launchName : 
                                                                propagator.tle.commonName
         self.noradIdent = String(propagator.tle.noradIndex)      // convert UInt to String
         self.t₀Days1950 = propagator.tle.t₀
+        self.extraInfo = extraInfo
     }
 
 /*┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
   │  Initialize Satellite with the three lines of a three line element set                           │
   └──────────────────────────────────────────────────────────────────────────────────────────────────┘*/
-    init(_ line0: String, _ line1: String, _ line2: String) {
+    init(_ line0: String, _ line1: String, _ line2: String, extraInfo: [String: any Sendable] = [:]) {
         do {
             let elements = try Elements(line0, line1, line2)
-            self.init(withTLE: elements)
+            self.init(withTLE: elements, extraInfo: extraInfo)
         } catch {
             fatalError("Satellite(L0, L1, L2)) failure ..")
         }

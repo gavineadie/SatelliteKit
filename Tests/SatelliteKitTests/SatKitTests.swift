@@ -6,18 +6,17 @@
 
 // swiftlint statement_position
 
-import XCTest
+import Testing
+import Foundation
 @testable import SatelliteKit
 
-class SwiftTests: XCTestCase {
+struct SwiftTests {
 
-    func testVersion() {
-
+    @Test func version() {
         print(SatelliteKit.version)
-
     }
 
-    func testProp1() {
+    @Test func prop1() {
 
         do {
             let elements = try Elements("ISS (ZARYA)",
@@ -52,7 +51,7 @@ class SwiftTests: XCTestCase {
 
     }
 
-    func testProp2() {
+    @Test func prop2() {
 
         do {
             let tle = try Elements("INTELSAT 39 (IS-39)",
@@ -87,7 +86,7 @@ class SwiftTests: XCTestCase {
 
     }
 
-    func testAzEl() {
+    @Test func azEl() {
 
         let jdate = Date().julianDate
         print("  Julian Ddate: \(jdate)")
@@ -100,21 +99,14 @@ class SwiftTests: XCTestCase {
 
     }
 
-    func testConversion() {
-
+    @Test func conversion() {
         let sat = Satellite(
             "ISS (ZARYA)",
             "1 25544U 98067A   18039.95265046  .00001678  00000-0  32659-4 0  9999",
             "2 25544  51.6426 297.9871 0003401  86.7895 100.1959 15.54072469 98577")
 
-        XCTAssertEqual(JD.epoch2000,
-                       sat.minsAfterEpoch(sat.julianDay(JD.epoch2000)),
-                       accuracy: 1e-7)
-
-        XCTAssertEqual(999.9,
-                       sat.julianDay(sat.minsAfterEpoch(999.9)),
-                       accuracy: 1e-10)
-
+        #expect(abs(JD.epoch2000 - sat.minsAfterEpoch(sat.julianDay(JD.epoch2000))) < 1e-7)
+        #expect(abs(999.9 - sat.julianDay(sat.minsAfterEpoch(999.9))) < 1e-10)
     }
 
 }

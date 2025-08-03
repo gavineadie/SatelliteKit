@@ -61,7 +61,7 @@ extension Double {
   ║ V E C T O R S                                                                                    ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
-public struct Vector: Equatable {
+public struct Vector: Equatable, Sendable {
 
     public var x: Double
     public var y: Double

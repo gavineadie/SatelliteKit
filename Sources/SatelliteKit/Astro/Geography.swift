@@ -10,7 +10,7 @@ import Foundation
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-public struct LatLonAlt {
+public struct LatLonAlt: Sendable {
     public var lat: Double                                  // latitude (degrees)
     public var lon: Double                                  // longitude (degrees)
     public var alt: Double                                  // altitude (Kms above geoid)

@@ -6,7 +6,7 @@
 
 import Foundation
 
-public struct PVCoordinates {
+public struct PVCoordinates: Sendable {
 
     public let position: Vector                 // position in meters
     public let velocity: Vector                 // velocity in m/sec
