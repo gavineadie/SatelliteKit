@@ -22,7 +22,7 @@ public struct Satellite: Sendable {
     public var ω: Double { return propagator.ω }        //###
     public var Ω: Double { return propagator.Ω }        //###
 
-    public let extraInfo: [String: any Sendable]
+    public var extraInfo: [String: any Sendable]
 
 }
 
