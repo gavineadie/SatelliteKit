@@ -51,7 +51,7 @@ struct GeoTests {
     }
 
     @Test func AzEl() {
-        let azEl = azel(time: Date(), site: (45.0, -90.0), cele: (0.0, 0.0))
+    let azEl = azel(time: Date(), site: LatLon(45.0, -90.0), cele: RADec(0.0, 0.0))
         print(azEl)
     }
 

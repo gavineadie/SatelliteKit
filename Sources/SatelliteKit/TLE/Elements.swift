@@ -13,7 +13,7 @@ import Foundation
 @available(*, deprecated, renamed: "Elements")
 public typealias TLE = Elements
 
-enum SatKitError: Error, Sendable {
+public enum SatKitError: Error, Equatable, Sendable {
     case TLE(tleError: String)
     case SGP(sgpError: String)
 }
@@ -24,7 +24,7 @@ enum SatKitError: Error, Sendable {
   ┃ Information derived directly from the Two Line Elements ..                                       ┃
   ┃                                          .. then un'Kozai'd for mean motion and semi major axis. ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-public struct Elements: Codable, Sendable {
+public struct Elements: Codable, Equatable, Sendable {
 
     public let commonName: String                       // line zero name (if any) [eg: ISS (ZARYA)]
     public let noradIndex: UInt                         // The satellite number [eg: 25544]

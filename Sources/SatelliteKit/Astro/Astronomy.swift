@@ -8,6 +8,30 @@
 
 import Foundation
 
+/// RADec: right ascension and declination
+public struct RADec: Equatable, Hashable, Codable, Sendable {
+    public var ra: Double      // right ascension (degrees or radians)
+    public var dec: Double     // declination (degrees or radians)
+
+    public init(_ ra: Double, _ dec: Double) {
+        self.ra = ra
+        self.dec = dec
+    }
+
+    public init(_ vector: Vector) {
+        self.init(
+            atan2pi(vector.y, vector.x) * rad2deg,
+            asin(
+                vector.z / (
+                    vector.x * vector.x +
+                    vector.y * vector.y +
+                    vector.z * vector.z
+                ).squareRoot()
+            ) * rad2deg
+        )
+    }
+}
+
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃ sidereal time                                                                                    ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
@@ -97,15 +121,16 @@ public func solarCel(ds1950: Double) -> Vector { solarCel(julianDays: ds1950 + J
 /// Declination (delta) and Right Ascension (alpha) are returned as decimal degrees.
 /// - Parameter julianDays: Julian days
 /// - Returns: Solar Declination and Right Ascension.
-public func solarGeo(julianDays: Double) -> (delta: Double, alpha: Double) {
+public func solarGeo(julianDays: Double) -> RADec {
     let     solarVector: Vector = solarCel(julianDays: julianDays)
 
-    return (asin(solarVector.z) * rad2deg,
-            atan2pi(solarVector.y, solarVector.x) * rad2deg)
+    // Note: RADec(ra, dec), but tuple is (delta, alpha)
+    return RADec(atan2pi(solarVector.y, solarVector.x) * rad2deg,
+                 asin(solarVector.z) * rad2deg)
 }
 
-public func solarGeo(ds1950: Double) -> (delta: Double, alpha: Double) {
-    solarGeo(julianDays: ds1950 + JD.epoch1950)
+public func solarGeo(ds1950: Double) -> RADec {
+    return solarGeo(julianDays: ds1950 + JD.epoch1950)
 }
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -152,37 +177,41 @@ public func lunarCel(ds1950: Double) -> Vector {
 /// lunarGeo
 /// - Parameter julianDays: Julian Days
 /// - Returns: (Declination, Right Ascension) are returned as decimal degrees.
-public func lunarGeo (julianDays: Double) -> (delta: Double, alpha: Double) {
-    let     lunarVector: Vector = lunarCel(julianDays: julianDays)
+public func lunarGeo (julianDays: Double) -> RADec {
+    let lunarVector: Vector = lunarCel(julianDays: julianDays)
 
-    return (asin(lunarVector.z / (lunarVector.x * lunarVector.x +
-                                  lunarVector.y * lunarVector.y +
-                                  lunarVector.z * lunarVector.z).squareRoot()) * rad2deg,
-            atan2pi(lunarVector.y, lunarVector.x) * rad2deg)
+    // Note: RADec(ra, dec), but tuple is (delta, alpha)
+    return RADec(atan2pi(lunarVector.y, lunarVector.x) * rad2deg,
+                 asin(lunarVector.z / (lunarVector.x * lunarVector.x +
+                                      lunarVector.y * lunarVector.y +
+                                      lunarVector.z * lunarVector.z).squareRoot()) * rad2deg)
 }
 
-public func lunarGeo(ds1950: Double) -> (delta: Double, alpha: Double) {
-    lunarGeo(julianDays: ds1950 + JD.epoch1950)
+public func lunarGeo(ds1950: Double) -> RADec {
+    return lunarGeo(julianDays: ds1950 + JD.epoch1950)
 }
 
-/// calculates `el-az`  from date, observer location (lat/log), and object coordinates (RA/Dec)
+/// calculates `el-az`  from date, observer location (LatLon), and object coordinates (RADec)
 /// - Parameters:
 ///   - time: date
-///   - site: (lat°, lon°)
-///   - cele: (ra°, dec°)
-/// - Returns: (alt°, azi°)
-public func azel(time: Date,
-                 site: (Double, Double),
-                 cele: (Double, Double)) -> (alt: Double, azi: Double) {
+///   - site: LatLon
+///   - cele: RADec
+/// - Returns: AziEle
+public func azel(
+    time: Date,
+    site: LatLon,
+    cele: RADec
+) -> AziEle {
+    let hourAngle = (siteMeanSiderealTime(date: time, site.lon) - cele.ra) * deg2rad
 
-    let hourAngle = (siteMeanSiderealTime(date: time, site.1) - cele.0) * deg2rad
-
-    let lat = site.0 * deg2rad
-    let dec = cele.1 * deg2rad
+    let lat = site.lat * deg2rad
+    let dec = cele.dec * deg2rad
 
     let elev = asin(sin(lat) * sin(dec) + cos(lat) * cos(dec) * cos(hourAngle))
     let azim = atan2pi(sin(hourAngle), sin(lat) * cos(hourAngle) - cos(lat) * tan(dec))
 
-    return (fmod(elev * rad2deg,         360.0),
-            fmod(azim * rad2deg + 540.0, 360.0))
+    return AziEle(
+        fmod(azim * rad2deg + 540.0, 360.0),
+        fmod(elev * rad2deg, 360.0),
+    )
 }

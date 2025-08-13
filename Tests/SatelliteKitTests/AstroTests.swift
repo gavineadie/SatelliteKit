@@ -25,7 +25,7 @@ struct AstroTests {
     @Test 
     func Solar() {
         var baseJD: Double
-        if #available(macOS 12, *) {
+        if #available(macOS 12, iOS 15, *) {
             baseJD = Date.now.julianDate
         } else {
             baseJD = Date().julianDate
