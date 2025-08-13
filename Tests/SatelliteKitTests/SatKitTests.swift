@@ -88,14 +88,14 @@ struct SwiftTests {
 
     @Test func azEl() {
 
-        let jdate = Date().julianDate
-        print("  Julian Ddate: \(jdate)")
+    let jdate = Date().julianDate
+    print("  Julian Ddate: \(jdate)")
 
-        let moonCele = lunarGeo(julianDays: jdate)
-        print(" Moon (Dec/RA): \(moonCele)°")
+    let moonCele = lunarGeo(julianDays: jdate)
+    print(" Moon (RA/Dec): \(moonCele)°")
 
-        let azelx = azel(time: Date(), site: (+42.0, -84.0), cele: (moonCele.1, moonCele.0))
-        print("       (Az/El): \(azelx)°")
+    let azelx = azel(time: Date(), site: LatLon(+42.0, -84.0), cele: moonCele)
+    print("       (Az/El): \(azelx)°")
 
     }
 

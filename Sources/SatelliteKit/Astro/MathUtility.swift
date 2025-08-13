@@ -61,7 +61,7 @@ extension Double {
   ║ V E C T O R S                                                                                    ║
   ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝*/
 
-public struct Vector: Equatable, Sendable {
+public struct Vector: Equatable, Hashable, Sendable {
 
     public var x: Double
     public var y: Double
@@ -89,6 +89,14 @@ public struct Vector: Equatable, Sendable {
 
     public static func - (lhs: Vector, rhs: Vector) -> Vector {
         Vector(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z)
+    }
+
+    public static func * (lhs: Vector, scalar: Double) -> Vector {
+        Vector(lhs.x * scalar, lhs.y * scalar, lhs.z * scalar)
+    }
+
+    public static func / (lhs: Vector, scalar: Double) -> Vector {
+        Vector(lhs.x / scalar, lhs.y / scalar, lhs.z / scalar)
     }
 
     public static func == (lhs: Vector, rhs: Vector) -> Bool {

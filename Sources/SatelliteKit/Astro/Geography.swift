@@ -10,7 +10,7 @@ import Foundation
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-public struct LatLonAlt: Sendable {
+public struct LatLonAlt: Equatable, Hashable, Codable, Sendable {
     public var lat: Double                                  // latitude (degrees)
     public var lon: Double                                  // longitude (degrees)
     public var alt: Double                                  // altitude (Kms above geoid)
@@ -21,6 +21,22 @@ public struct LatLonAlt: Sendable {
         self.alt = alt
     }
 
+}
+
+/// LatLon: latitude and longitude only
+public struct LatLon: Equatable, Hashable, Codable, Sendable {
+    public var lat: Double
+    public var lon: Double
+
+    public init(_ lat: Double, _ lon: Double) {
+        self.lat = lat
+        self.lon = lon
+    }
+
+    public init(_ lla: LatLonAlt) {
+        self.lat = lla.lat
+        self.lon = lla.lon
+    }
 }
 
 /// eci to geo [OBLATE]
@@ -165,7 +181,7 @@ public func cel2top(julianDays: Double, satCel: Vector, obsCel: Vector) -> Vecto
 
 /*┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛*/
-public struct AziEleDst {
+public struct AziEleDst: Equatable, Hashable, Codable, Sendable {
     public var azim: Double                                 // azimuth (degrees)
     public var elev: Double                                 // elevation (degrees)
     public var dist: Double                                 // distance/range
@@ -176,6 +192,22 @@ public struct AziEleDst {
         self.dist = dist
     }
 
+}
+
+/// AziEle: azimuth and elevation only
+public struct AziEle: Equatable, Hashable, Codable, Sendable {
+    public var azim: Double
+    public var elev: Double
+
+    public init(_ azim: Double, _ elev: Double) {
+        self.azim = azim
+        self.elev = elev
+    }
+
+    public init(_ aed: AziEleDst) {
+        self.azim = aed.azim
+        self.elev = aed.elev
+    }
 }
 
 /// eci2aed
