@@ -15,7 +15,12 @@ let package = Package(
     targets: [
         .target(
             name: "SatelliteKit",
-            dependencies: [ ]
+            dependencies: [ ],
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+                .enableUpcomingFeature("InferIsolatedConformances")
+            ]
         ),
         .testTarget(name: "SatelliteKitTests", dependencies: ["SatelliteKit"])
     ]
