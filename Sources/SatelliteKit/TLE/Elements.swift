@@ -450,7 +450,7 @@ func alpha5ID(_ noradID: String) -> UInt {              //      "B1234"      "5"
 
 import RegexBuilder
 
-@available(macOS 13.0, iOS 16, *)
+@available(macOS 13.0, iOS 16, tvOS 16, watchOS 9, *)
 nonisolated(unsafe) let lineOneRegEx = Regex {
     "1 "
     Repeat(count: 5) {
@@ -555,7 +555,7 @@ nonisolated(unsafe) let lineOneRegEx = Regex {
     )
 }
 
-@available(macOS 13.0, iOS 16, *)
+@available(macOS 13.0, iOS 16, tvOS 16, watchOS 9, *)
 nonisolated(unsafe) let lineTwoRegEx = Regex {
     "2 "
     Repeat(count: 5) {
