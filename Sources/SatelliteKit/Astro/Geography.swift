@@ -74,7 +74,7 @@ public func geo2eci(julianDays: Double, geodetic: LatLonAlt) -> Vector {
     let     cosSidereal = cos(siderealRads)
 
     let     correction = EarthConstants.Rₑ /
-                            (1.0 + EarthConstants.e2 * sinLatitude*sinLatitude).squareRoot()
+                            (1.0 - EarthConstants.e2 * sinLatitude*sinLatitude).squareRoot()
     let     s = (1 - EarthConstants.e2) * correction
     let     achcp = (correction + geodetic.alt) * cosLatitude
 
@@ -96,7 +96,7 @@ public func geo2eci(geodetic: LatLonAlt) -> Vector {
     let     cosSidereal = cos(siderealRads)
 
     let     correction = EarthConstants.Rₑ /
-                            (1.0 + EarthConstants.e2 * sinLatitude*sinLatitude).squareRoot()
+                            (1.0 - EarthConstants.e2 * sinLatitude*sinLatitude).squareRoot()
     let     s = (1 - EarthConstants.e2) * correction
     let     achcp = (correction + geodetic.alt) * cosLatitude
 
