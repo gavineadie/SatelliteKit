@@ -11,6 +11,19 @@ import Foundation
 struct ThreeLineElementTests {
 
     @Test
+    func dragCoefficientExponent() throws {                 // #16: the exponent digit was read as its byte value
+        let iss = try Elements("ISS (ZARYA)",
+                               "1 25544U 98067A   18039.95265046  .00001678  00000-0  32659-4 0  9999",
+                               "2 25544  51.6426 297.9871 0003401  86.7895 100.1959 15.54072469 98577")
+        #expect(abs(iss.dragCoeff - 3.2659e-5) < 1e-15)
+
+        let vanguard = try Elements("",
+                                    "1 00005U 58002B   00179.78495062  .00000023  00000-0 -11606-4 0  4753",
+                                    "2 00005  34.2682 348.7242 1859667 331.7664  19.3264 10.82419157413667")
+        #expect(abs(vanguard.dragCoeff - -1.1606e-5) < 1e-15)
+    }
+
+    @Test
     func twoLines() {
         
         do {
